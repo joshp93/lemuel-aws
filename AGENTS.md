@@ -10,19 +10,26 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
 - User Pool Domain for hosted UI
 
 ### ProverbForTheDayStack (`lib/proverb-for-the-day-stack.ts`)
-- DynamoDB table for storing proverbs
+- DynamoDB table for storing proverbs with global secondary index on version
+- Secrets Manager secret for API.Bible credentials
 - Lambda functions:
+  - `fetch-proverbs-for-version` - fetches Proverbs from API.Bible for a specific Bible version
+    - Event: `{ "version": "kjv", "citation": "King James Version" }`
+    - Output: `{ "version": "kjv", "proverbs": [{ "ref": "Proverbs 1:1", "proverb": "The proverbs of Solomon..." }], "citation": "..." }`
+    - Uses API_BIBLE_SECRET_NAME env var (Secrets Manager)
+  - `get-available-versions` - retrieves list of available Bible versions from DynamoDB
   - `load-proverbs` - loads proverbs into DynamoDB from JSON
   - `choose-proverb` - selects random daily proverb
   - `get-proverb` - retrieves the daily proverb
   - `check-user-exists` - checks if a user exists in Cognito
 - REST API Gateway endpoints:
-  - `GET /{version}` - returns daily proverb
+  - `GET /{version}` - returns daily proverb (no auth required)
   - `POST /auth/check-user-exists` - checks user existence (rate limited)
-- EventBridge rule for daily proverb selection
+- EventBridge cron rule (minute: 0, hour: 0) triggers choose-proverb daily
 
 ## API Endpoints
 
+- `GET /available-versions` - Returns list of available Bible versions (no auth required)
 - `GET /{version}` - Returns daily proverb (no auth required)
 - `POST /auth/check-user-exists` - Checks if user exists in Cognito
   - Request: `{"email": "user@example.com"}`

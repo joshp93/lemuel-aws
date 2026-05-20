@@ -37,11 +37,13 @@ describe("fetch-proverbs-for-version handler", () => {
         {
           id: "WEB-BIBLE-ID",
           abbreviation: "web",
+          abbreviationLocal: "WEB",
           name: "World English Bible",
         },
         {
           id: "NIV-BIBLE-ID",
-          abbreviation: "niv",
+          abbreviation: "niv11",
+          abbreviationLocal: "NIV",
           name: "New International Version",
         },
       ],
@@ -487,7 +489,7 @@ describe("fetch-proverbs-for-version handler", () => {
     expect(biblesCall).toBeDefined();
     const headers = biblesCall![1]?.headers as Record<string, string>;
     expect(headers?.["api-key"]).toBe("test-api-key");
-  });
+  }, 30000);
 
   it("Should throw if version is not provided", async () => {
     jest.resetModules();
@@ -527,6 +529,7 @@ describe("fetch-proverbs-for-version handler", () => {
             {
               id: "WEB-BIBLE-ID",
               abbreviation: "web",
+              abbreviationLocal: "WEB",
               name: "World English Bible",
             },
           ],

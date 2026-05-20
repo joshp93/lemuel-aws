@@ -59,9 +59,6 @@ export const handler = async (
   console.debug("Proverb for the day:", response);
   return {
     statusCode: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    },
     body: response,
   };
 };

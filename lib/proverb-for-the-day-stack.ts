@@ -98,7 +98,38 @@ export class ProverbForTheDayStack extends cdk.Stack {
       deployOptions: {
         dataTraceEnabled: false,
       },
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+      },
     });
+
+    const getAvailableVersions = new lambda.Function(
+      this,
+      "get-available-versions",
+      {
+        functionName: "get-available-versions",
+        runtime: lambda.Runtime.NODEJS_22_X,
+        handler: "index.handler",
+        code: lambda.Code.fromAsset("dist/get-available-versions"),
+        environment: {
+          TABLE_NAME: table.tableName,
+        },
+      },
+    );
+
+    table.grantReadData(getAvailableVersions);
+
+    api.root
+      .addResource("available-versions")
+      .addMethod(
+        "GET",
+        new apigateway.LambdaIntegration(getAvailableVersions),
+        {
+          authorizationType: apigateway.AuthorizationType.NONE,
+        },
+      );
 
     api.root
       .addResource("{version}")

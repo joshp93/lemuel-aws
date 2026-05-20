@@ -24,9 +24,6 @@ export const handler = async (
     if (!email) {
       return {
         statusCode: 400,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
         body: JSON.stringify({ error: "Email is required" }),
       };
     }
@@ -45,20 +42,13 @@ export const handler = async (
       const response: CheckUserExistsResponse = { exists: true };
       return {
         statusCode: 200,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
         body: JSON.stringify(response),
       };
     } catch (error) {
       if (error instanceof UserNotFoundException) {
-        // User does not exist
         const response: CheckUserExistsResponse = { exists: false };
         return {
           statusCode: 200,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
           body: JSON.stringify(response),
         };
       }
@@ -68,9 +58,6 @@ export const handler = async (
     console.error("Error checking user existence:", error);
     return {
       statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
       body: JSON.stringify({ error: "Internal server error" }),
     };
   }

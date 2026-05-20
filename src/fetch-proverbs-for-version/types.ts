@@ -1,4 +1,10 @@
 import z from "zod";
+import {
+  BiblesResponse,
+  ChaptersResponse,
+  ContentElement,
+  ContentTextItem,
+} from "./models/apiBible";
 
 export const FetchProverbsForVersionEventSchema = z.object({
   version: z.string().min(1, "Version is required").lowercase(),
@@ -25,7 +31,4 @@ export interface Proverb {
   proverb: string;
 }
 
-export interface Output {
-  version: string;
-  proverbs: Proverb[];
-}
+export type { BiblesResponse, ChaptersResponse, ContentElement, ContentTextItem };

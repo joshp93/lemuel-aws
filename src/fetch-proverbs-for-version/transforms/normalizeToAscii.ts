@@ -6,6 +6,8 @@ export const normalizeToAscii = (str: string): string => {
     [/[\u2014]/g, "-"],
     [/\u2026/g, "..."],
     [/\u00A0/g, " "],
+    [/\u00A9/g, "(C)"],
+    [/\u00AE/g, "(R)"],
     [/[\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5]/g, "A"],
     [/[\u00E0\u00E1\u00E2\u00E3\u00E4\u00E5]/g, "a"],
     [/[\u00C8\u00C9\u00CA\u00CB]/g, "E"],
@@ -31,5 +33,9 @@ export const normalizeToAscii = (str: string): string => {
   for (const [pattern, replacement] of replacements) {
     result = result.replace(pattern, replacement);
   }
+  result = result
+    .replace("A(C)", "(C)")
+    .replace("A(R)", "(R)")
+    .replace(/[ ]+/g, " ");
   return result;
 };
