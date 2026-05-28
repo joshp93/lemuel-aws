@@ -13,7 +13,7 @@ describe("choose-proverb handler", () => {
     process.env.TABLE_NAME = "TestTable";
   });
 
-  it("chooses a random unused proverb and updates refs and proverb-for-the-day", async () => {
+  it("chooses a random unused proverb and updates refs and the daily proverb", async () => {
     ddbMock.on(GetCommand).resolves({
       Item: {
         pk: "refs",

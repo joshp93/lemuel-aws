@@ -4,12 +4,15 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
 
 ## Stacks
 
+### LemuelSecretStack (`lib/lemuel-secret-stack.ts`)
+- Secrets Manager secret for API.Bible credentials (`api-bible-creds`)
+
 ### LemuelUserManagementStack (`lib/lemuel-user-management-stack.ts`)
 - Cognito User Pool for user authentication
 - User Pool Client with SRP authentication
 - User Pool Domain for hosted UI
 
-### ProverbForTheDayStack (`lib/proverb-for-the-day-stack.ts`)
+### LemuelStack (`lib/lemuel-stack.ts`)
 - DynamoDB table for storing proverbs with global secondary index on version
 - Secrets Manager secret for API.Bible credentials
 - Lambda functions:
@@ -24,7 +27,7 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
   - `check-user-exists` - checks if a user exists in Cognito
 - REST API Gateway endpoints:
   - `GET /{version}` - returns daily proverb (no auth required)
-  - `POST /auth/check-user-exists` - checks user existence (rate limited)
+- `POST /auth/check-user-exists` - checks user existence (rate limited)
 - EventBridge cron rule (minute: 0, hour: 0) triggers choose-proverb daily
 
 ## API Endpoints

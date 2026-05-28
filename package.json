@@ -1,10 +1,7 @@
 {
-  "name": "proverb-for-the-day",
-  "version": "0.1.0",
+  "name": "lemuel",
+  "version": "1.0.0",
   "packageManager": "pnpm@10.15.0",
-  "bin": {
-    "proverb-for-the-day": "bin/proverb-for-the-day.js"
-  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "pretest": "pnpm typecheck",

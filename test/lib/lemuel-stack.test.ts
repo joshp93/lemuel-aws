@@ -1,14 +1,15 @@
 import * as cdk from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
-import { ProverbForTheDayStack } from "../../lib/proverb-for-the-day-stack";
+import { LemuelStack } from "../../lib/lemuel-stack";
 import { LemuelUserManagementStack } from "../../lib/lemuel-user-management-stack";
 
-describe("ProverbForTheDayStack", () => {
+describe("LemuelStack", () => {
   it("should match snapshot", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
-    const stack = new ProverbForTheDayStack(app, "TestStack", {
+    const stack = new LemuelStack(app, "TestStack", {
       userPoolId: userManagementStack.userPool.userPoolId,
+      apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
     expect(template.toJSON()).toMatchSnapshot();
@@ -17,8 +18,9 @@ describe("ProverbForTheDayStack", () => {
   it("should create a DynamoDB table for proverbs", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
-    const stack = new ProverbForTheDayStack(app, "TestStack", {
+    const stack = new LemuelStack(app, "TestStack", {
       userPoolId: userManagementStack.userPool.userPoolId,
+      apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
 
@@ -35,8 +37,9 @@ describe("ProverbForTheDayStack", () => {
   it("should create Lambda functions for choose-proverb, get-proverb, load-proverbs, and check-user-exists", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
-    const stack = new ProverbForTheDayStack(app, "TestStack", {
+    const stack = new LemuelStack(app, "TestStack", {
       userPoolId: userManagementStack.userPool.userPoolId,
+      apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
 
@@ -64,26 +67,28 @@ describe("ProverbForTheDayStack", () => {
   it("should create a REST API with auth endpoints", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
-    const stack = new ProverbForTheDayStack(app, "TestStack", {
+    const stack = new LemuelStack(app, "TestStack", {
       userPoolId: userManagementStack.userPool.userPoolId,
+      apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
 
     template.hasResourceProperties("AWS::ApiGateway::RestApi", {
-      Name: "proverb-for-the-day-api",
+      Name: "lemuel-api",
     });
   });
 
   it("should create an EventBridge rule for daily schedule", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
-    const stack = new ProverbForTheDayStack(app, "TestStack", {
+    const stack = new LemuelStack(app, "TestStack", {
       userPoolId: userManagementStack.userPool.userPoolId,
+      apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
 
     template.hasResourceProperties("AWS::Events::Rule", {
-      Name: "proverb-for-the-day-schedule",
+      Name: "lemuel-schedule",
       ScheduleExpression: "cron(0 0 * * ? *)",
       State: "ENABLED",
     });
@@ -92,8 +97,9 @@ describe("ProverbForTheDayStack", () => {
   it("should grant check-user-exists Lambda permission to call AdminGetUser", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
-    const stack = new ProverbForTheDayStack(app, "TestStack", {
+    const stack = new LemuelStack(app, "TestStack", {
       userPoolId: userManagementStack.userPool.userPoolId,
+      apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
 

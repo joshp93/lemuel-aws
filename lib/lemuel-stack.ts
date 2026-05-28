@@ -8,12 +8,13 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import { Construct } from "constructs";
 
-interface ProverbForTheDayStackProps extends cdk.StackProps {
+interface LemuelStackProps extends cdk.StackProps {
   userPoolId: string;
+  apiBibleSecretName: string;
 }
 
-export class ProverbForTheDayStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: ProverbForTheDayStackProps) {
+export class LemuelStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: LemuelStackProps) {
     super(scope, id, props);
 
     const table = new dynamodb.Table(this, "proverbs-store", {
@@ -30,11 +31,6 @@ export class ProverbForTheDayStack extends cdk.Stack {
       sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
     });
 
-    const apiBibleSecret = new secretsmanager.Secret(this, "api-bible-secret", {
-      secretName: "api-bible-credentials",
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
-
     const fetchProverbsForVersion = new lambda.Function(
       this,
       "fetch-proverbs-for-version",
@@ -44,13 +40,17 @@ export class ProverbForTheDayStack extends cdk.Stack {
         handler: "index.handler",
         code: lambda.Code.fromAsset("dist/fetch-proverbs-for-version"),
         environment: {
-          API_BIBLE_SECRET_NAME: apiBibleSecret.secretName,
+          API_BIBLE_SECRET_NAME: props.apiBibleSecretName,
         },
         timeout: cdk.Duration.minutes(1),
       },
     );
 
-    apiBibleSecret.grantRead(fetchProverbsForVersion);
+    secretsmanager.Secret.fromSecretNameV2(
+      this,
+      "imported-api-bible-secret",
+      props.apiBibleSecretName,
+    ).grantRead(fetchProverbsForVersion);
 
     const chooseProverb = new lambda.Function(this, "choose-proverb", {
       functionName: "choose-proverb",
@@ -93,8 +93,8 @@ export class ProverbForTheDayStack extends cdk.Stack {
       }),
     );
 
-    const api = new apigateway.RestApi(this, "proverb-for-the-day-api", {
-      restApiName: "proverb-for-the-day-api",
+    const api = new apigateway.RestApi(this, "lemuel-api", {
+      restApiName: "lemuel-api",
       deployOptions: {
         dataTraceEnabled: false,
       },
@@ -201,8 +201,8 @@ export class ProverbForTheDayStack extends cdk.Stack {
     table.grantReadWriteData(loadProverbsLambda);
     table.grantReadData(getProverb);
 
-    new events.Rule(this, "proverb-for-the-day-schedule", {
-      ruleName: "proverb-for-the-day-schedule",
+    new events.Rule(this, "lemuel-schedule", {
+      ruleName: "lemuel-schedule",
       schedule: events.Schedule.cron({ minute: "0", hour: "0" }),
       targets: [new targets.LambdaFunction(chooseProverb)],
     });

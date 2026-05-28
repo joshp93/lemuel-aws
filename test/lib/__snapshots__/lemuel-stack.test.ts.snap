@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ProverbForTheDayStack should match snapshot 1`] = `
+exports[`LemuelStack should match snapshot 1`] = `
 {
   "Outputs": {
-    "proverbforthedayapiEndpoint77971F2D": {
+    "lemuelapiEndpoint8357EA29": {
       "Value": {
         "Fn::Join": [
           "",
           [
             "https://",
             {
-              "Ref": "proverbforthedayapi6FFFAEB6",
+              "Ref": "lemuelapi762B60E0",
             },
             ".execute-api.",
             {
@@ -22,7 +22,7 @@ exports[`ProverbForTheDayStack should match snapshot 1`] = `
             },
             "/",
             {
-              "Ref": "proverbforthedayapiDeploymentStageprodBEAAC809",
+              "Ref": "lemuelapiDeploymentStageprodB8C98E53",
             },
             "/",
           ],
@@ -38,15 +38,6 @@ exports[`ProverbForTheDayStack should match snapshot 1`] = `
     },
   },
   "Resources": {
-    "apibiblesecret0F5BE30F": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "GenerateSecretString": {},
-        "Name": "api-bible-credentials",
-      },
-      "Type": "AWS::SecretsManager::Secret",
-      "UpdateReplacePolicy": "Delete",
-    },
     "checkuserexists488D9724": {
       "DependsOn": [
         "checkuserexistsServiceRoleDefaultPolicyD416E2A9",
@@ -306,82 +297,7 @@ exports[`ProverbForTheDayStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
-            "API_BIBLE_SECRET_NAME": {
-              "Fn::Join": [
-                "-",
-                [
-                  {
-                    "Fn::Select": [
-                      0,
-                      {
-                        "Fn::Split": [
-                          "-",
-                          {
-                            "Fn::Select": [
-                              6,
-                              {
-                                "Fn::Split": [
-                                  ":",
-                                  {
-                                    "Ref": "apibiblesecret0F5BE30F",
-                                  },
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  {
-                    "Fn::Select": [
-                      1,
-                      {
-                        "Fn::Split": [
-                          "-",
-                          {
-                            "Fn::Select": [
-                              6,
-                              {
-                                "Fn::Split": [
-                                  ":",
-                                  {
-                                    "Ref": "apibiblesecret0F5BE30F",
-                                  },
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  {
-                    "Fn::Select": [
-                      2,
-                      {
-                        "Fn::Split": [
-                          "-",
-                          {
-                            "Fn::Select": [
-                              6,
-                              {
-                                "Fn::Split": [
-                                  ":",
-                                  {
-                                    "Ref": "apibiblesecret0F5BE30F",
-                                  },
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              ],
-            },
+            "API_BIBLE_SECRET_NAME": "test-api-bible-creds",
           },
         },
         "FunctionName": "fetch-proverbs-for-version",
@@ -439,7 +355,24 @@ exports[`ProverbForTheDayStack should match snapshot 1`] = `
               ],
               "Effect": "Allow",
               "Resource": {
-                "Ref": "apibiblesecret0F5BE30F",
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:test-api-bible-creds-??????",
+                  ],
+                ],
               },
             },
           ],
@@ -464,7 +397,7 @@ exports[`ProverbForTheDayStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "6c15aa0e028c71c50437a21b4cb42b2c3d063a6bfbd7649536706278907d008b.zip",
+          "S3Key": "eb01433056e87c0f0289ea73f5e0a020a93f175bcf630c75b1fcbf1427bd2c2c.zip",
         },
         "Environment": {
           "Variables": {
@@ -734,6 +667,830 @@ exports[`ProverbForTheDayStack should match snapshot 1`] = `
       },
       "Type": "AWS::IAM::Policy",
     },
+    "lemuelapi762B60E0": {
+      "Properties": {
+        "Name": "lemuel-api",
+      },
+      "Type": "AWS::ApiGateway::RestApi",
+    },
+    "lemuelapiAccount5BA0E708": {
+      "DeletionPolicy": "Retain",
+      "DependsOn": [
+        "lemuelapi762B60E0",
+      ],
+      "Properties": {
+        "CloudWatchRoleArn": {
+          "Fn::GetAtt": [
+            "lemuelapiCloudWatchRole776E5B7B",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ApiGateway::Account",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "lemuelapiCheckUserExistsKeyEE99907A": {
+      "Properties": {
+        "Enabled": true,
+        "Name": "check-user-exists-key",
+        "StageKeys": [
+          {
+            "RestApiId": {
+              "Ref": "lemuelapi762B60E0",
+            },
+            "StageName": {
+              "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+            },
+          },
+        ],
+      },
+      "Type": "AWS::ApiGateway::ApiKey",
+    },
+    "lemuelapiCheckUserExistsUsagePlan94C2E4A2": {
+      "Properties": {
+        "ApiStages": [
+          {
+            "ApiId": {
+              "Ref": "lemuelapi762B60E0",
+            },
+            "Stage": {
+              "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+            },
+            "Throttle": {},
+          },
+        ],
+        "Description": "Rate limiting for check-user-exists endpoint",
+        "Quota": {
+          "Limit": 10000,
+          "Period": "DAY",
+        },
+        "Throttle": {
+          "BurstLimit": 20,
+          "RateLimit": 10,
+        },
+        "UsagePlanName": "check-user-exists-rate-limit",
+      },
+      "Type": "AWS::ApiGateway::UsagePlan",
+    },
+    "lemuelapiCheckUserExistsUsagePlanUsagePlanKeyResourceTestStacklemuelapiCheckUserExistsKey57F183EA6FF1FA30": {
+      "Properties": {
+        "KeyId": {
+          "Ref": "lemuelapiCheckUserExistsKeyEE99907A",
+        },
+        "KeyType": "API_KEY",
+        "UsagePlanId": {
+          "Ref": "lemuelapiCheckUserExistsUsagePlan94C2E4A2",
+        },
+      },
+      "Type": "AWS::ApiGateway::UsagePlanKey",
+    },
+    "lemuelapiCloudWatchRole776E5B7B": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "lemuelapiDeployment2137DA7Adb714968b39141423b18acd5f1da5b72": {
+      "DependsOn": [
+        "lemuelapiversionGET9CB1814C",
+        "lemuelapiversionOPTIONSB1F64BAF",
+        "lemuelapiversion53308960",
+        "lemuelapiauthcheckuserexistsOPTIONSAAB4D667",
+        "lemuelapiauthcheckuserexistsPOST27BF45A3",
+        "lemuelapiauthcheckuserexists746BE83B",
+        "lemuelapiauthOPTIONSB2FFC4CE",
+        "lemuelapiauthFC1EA1F6",
+        "lemuelapiavailableversionsGETC40BC4B7",
+        "lemuelapiavailableversionsOPTIONS7A36E4D0",
+        "lemuelapiavailableversions7E69CC63",
+        "lemuelapiOPTIONS67B4627A",
+      ],
+      "Metadata": {
+        "aws:cdk:do-not-refactor": true,
+      },
+      "Properties": {
+        "Description": "Automatically created by the RestApi construct",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Deployment",
+    },
+    "lemuelapiDeploymentStageprodB8C98E53": {
+      "DependsOn": [
+        "lemuelapiAccount5BA0E708",
+      ],
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "lemuelapiDeployment2137DA7Adb714968b39141423b18acd5f1da5b72",
+        },
+        "MethodSettings": [
+          {
+            "DataTraceEnabled": false,
+            "HttpMethod": "*",
+            "ResourcePath": "/*",
+          },
+        ],
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+        "StageName": "prod",
+      },
+      "Type": "AWS::ApiGateway::Stage",
+    },
+    "lemuelapiOPTIONS67B4627A": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Fn::GetAtt": [
+            "lemuelapi762B60E0",
+            "RootResourceId",
+          ],
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiauthFC1EA1F6": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "lemuelapi762B60E0",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "auth",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapiauthOPTIONSB2FFC4CE": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapiauthFC1EA1F6",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiauthcheckuserexists746BE83B": {
+      "Properties": {
+        "ParentId": {
+          "Ref": "lemuelapiauthFC1EA1F6",
+        },
+        "PathPart": "check-user-exists",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapiauthcheckuserexistsOPTIONSAAB4D667": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapiauthcheckuserexists746BE83B",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiauthcheckuserexistsPOST27BF45A3": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "POST",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "checkuserexists488D9724",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+          },
+          {
+            "StatusCode": "400",
+          },
+          {
+            "StatusCode": "429",
+          },
+          {
+            "StatusCode": "500",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapiauthcheckuserexists746BE83B",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiauthcheckuserexistsPOSTApiPermissionTestStacklemuelapiBB28E280POSTauthcheckuserexists7B7CA51C": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "checkuserexists488D9724",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/POST/auth/check-user-exists",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiauthcheckuserexistsPOSTApiPermissionTestTestStacklemuelapiBB28E280POSTauthcheckuserexistsE1035DAF": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "checkuserexists488D9724",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/POST/auth/check-user-exists",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiavailableversions7E69CC63": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "lemuelapi762B60E0",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "available-versions",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapiavailableversionsGETApiPermissionTestStacklemuelapiBB28E280GETavailableversionsDD9B5B63": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "getavailableversions8AF877EA",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/GET/available-versions",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiavailableversionsGETApiPermissionTestTestStacklemuelapiBB28E280GETavailableversions036CAF30": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "getavailableversions8AF877EA",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/GET/available-versions",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiavailableversionsGETC40BC4B7": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "GET",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "getavailableversions8AF877EA",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "ResourceId": {
+          "Ref": "lemuelapiavailableversions7E69CC63",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiavailableversionsOPTIONS7A36E4D0": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapiavailableversions7E69CC63",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiversion53308960": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "lemuelapi762B60E0",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "{version}",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapiversionGET9CB1814C": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "GET",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "getproverb58091E74",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "ResourceId": {
+          "Ref": "lemuelapiversion53308960",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiversionGETApiPermissionTestStacklemuelapiBB28E280GETversion5F0CDE4D": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "getproverb58091E74",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/GET/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiversionGETApiPermissionTestTestStacklemuelapiBB28E280GETversion00F29613": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "getproverb58091E74",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/GET/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiversionOPTIONSB1F64BAF": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapiversion53308960",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelschedule1C0FCCC8": {
+      "Properties": {
+        "Name": "lemuel-schedule",
+        "ScheduleExpression": "cron(0 0 * * ? *)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "chooseproverb54249DA0",
+                "Arn",
+              ],
+            },
+            "Id": "Target0",
+          },
+        ],
+      },
+      "Type": "AWS::Events::Rule",
+    },
+    "lemuelscheduleAllowEventRuleTestStackchooseproverb44AD85C6C42A634A": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "chooseproverb54249DA0",
+            "Arn",
+          ],
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "lemuelschedule1C0FCCC8",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
     "loadproverbs4682488D": {
       "DependsOn": [
         "loadproverbsServiceRoleDefaultPolicy20ACD3FD",
@@ -877,830 +1634,6 @@ exports[`ProverbForTheDayStack should match snapshot 1`] = `
         ],
       },
       "Type": "AWS::IAM::Policy",
-    },
-    "proverbforthedayapi6FFFAEB6": {
-      "Properties": {
-        "Name": "proverb-for-the-day-api",
-      },
-      "Type": "AWS::ApiGateway::RestApi",
-    },
-    "proverbforthedayapiAccountA65386A3": {
-      "DeletionPolicy": "Retain",
-      "DependsOn": [
-        "proverbforthedayapi6FFFAEB6",
-      ],
-      "Properties": {
-        "CloudWatchRoleArn": {
-          "Fn::GetAtt": [
-            "proverbforthedayapiCloudWatchRole735AA893",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::ApiGateway::Account",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "proverbforthedayapiCheckUserExistsKey2AE42370": {
-      "Properties": {
-        "Enabled": true,
-        "Name": "check-user-exists-key",
-        "StageKeys": [
-          {
-            "RestApiId": {
-              "Ref": "proverbforthedayapi6FFFAEB6",
-            },
-            "StageName": {
-              "Ref": "proverbforthedayapiDeploymentStageprodBEAAC809",
-            },
-          },
-        ],
-      },
-      "Type": "AWS::ApiGateway::ApiKey",
-    },
-    "proverbforthedayapiCheckUserExistsUsagePlan4E20988A": {
-      "Properties": {
-        "ApiStages": [
-          {
-            "ApiId": {
-              "Ref": "proverbforthedayapi6FFFAEB6",
-            },
-            "Stage": {
-              "Ref": "proverbforthedayapiDeploymentStageprodBEAAC809",
-            },
-            "Throttle": {},
-          },
-        ],
-        "Description": "Rate limiting for check-user-exists endpoint",
-        "Quota": {
-          "Limit": 10000,
-          "Period": "DAY",
-        },
-        "Throttle": {
-          "BurstLimit": 20,
-          "RateLimit": 10,
-        },
-        "UsagePlanName": "check-user-exists-rate-limit",
-      },
-      "Type": "AWS::ApiGateway::UsagePlan",
-    },
-    "proverbforthedayapiCheckUserExistsUsagePlanUsagePlanKeyResourceTestStackproverbforthedayapiCheckUserExistsKey6C22F790C815F450": {
-      "Properties": {
-        "KeyId": {
-          "Ref": "proverbforthedayapiCheckUserExistsKey2AE42370",
-        },
-        "KeyType": "API_KEY",
-        "UsagePlanId": {
-          "Ref": "proverbforthedayapiCheckUserExistsUsagePlan4E20988A",
-        },
-      },
-      "Type": "AWS::ApiGateway::UsagePlanKey",
-    },
-    "proverbforthedayapiCloudWatchRole735AA893": {
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "apigateway.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "proverbforthedayapiDeploymentE2EBB5B4dd5790c39f1b43cdbf02f77d43c258f9": {
-      "DependsOn": [
-        "proverbforthedayapiversionGET216FF9BC",
-        "proverbforthedayapiversionOPTIONSCFE5F6CB",
-        "proverbforthedayapiversion64D0829D",
-        "proverbforthedayapiauthcheckuserexistsOPTIONS68007718",
-        "proverbforthedayapiauthcheckuserexistsPOST34090010",
-        "proverbforthedayapiauthcheckuserexists32C8E9CA",
-        "proverbforthedayapiauthOPTIONSA4BA2678",
-        "proverbforthedayapiauthBF92B274",
-        "proverbforthedayapiavailableversionsGETD9115452",
-        "proverbforthedayapiavailableversionsOPTIONS3793E013",
-        "proverbforthedayapiavailableversions21943914",
-        "proverbforthedayapiOPTIONS671B7CDB",
-      ],
-      "Metadata": {
-        "aws:cdk:do-not-refactor": true,
-      },
-      "Properties": {
-        "Description": "Automatically created by the RestApi construct",
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Deployment",
-    },
-    "proverbforthedayapiDeploymentStageprodBEAAC809": {
-      "DependsOn": [
-        "proverbforthedayapiAccountA65386A3",
-      ],
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "proverbforthedayapiDeploymentE2EBB5B4dd5790c39f1b43cdbf02f77d43c258f9",
-        },
-        "MethodSettings": [
-          {
-            "DataTraceEnabled": false,
-            "HttpMethod": "*",
-            "ResourcePath": "/*",
-          },
-        ],
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-        "StageName": "prod",
-      },
-      "Type": "AWS::ApiGateway::Stage",
-    },
-    "proverbforthedayapiOPTIONS671B7CDB": {
-      "Properties": {
-        "ApiKeyRequired": false,
-        "AuthorizationType": "NONE",
-        "HttpMethod": "OPTIONS",
-        "Integration": {
-          "IntegrationResponses": [
-            {
-              "ResponseParameters": {
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
-                "method.response.header.Access-Control-Allow-Origin": "'*'",
-              },
-              "StatusCode": "204",
-            },
-          ],
-          "RequestTemplates": {
-            "application/json": "{ statusCode: 200 }",
-          },
-          "Type": "MOCK",
-        },
-        "MethodResponses": [
-          {
-            "ResponseParameters": {
-              "method.response.header.Access-Control-Allow-Headers": true,
-              "method.response.header.Access-Control-Allow-Methods": true,
-              "method.response.header.Access-Control-Allow-Origin": true,
-            },
-            "StatusCode": "204",
-          },
-        ],
-        "ResourceId": {
-          "Fn::GetAtt": [
-            "proverbforthedayapi6FFFAEB6",
-            "RootResourceId",
-          ],
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayapiauthBF92B274": {
-      "Properties": {
-        "ParentId": {
-          "Fn::GetAtt": [
-            "proverbforthedayapi6FFFAEB6",
-            "RootResourceId",
-          ],
-        },
-        "PathPart": "auth",
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "proverbforthedayapiauthOPTIONSA4BA2678": {
-      "Properties": {
-        "ApiKeyRequired": false,
-        "AuthorizationType": "NONE",
-        "HttpMethod": "OPTIONS",
-        "Integration": {
-          "IntegrationResponses": [
-            {
-              "ResponseParameters": {
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
-                "method.response.header.Access-Control-Allow-Origin": "'*'",
-              },
-              "StatusCode": "204",
-            },
-          ],
-          "RequestTemplates": {
-            "application/json": "{ statusCode: 200 }",
-          },
-          "Type": "MOCK",
-        },
-        "MethodResponses": [
-          {
-            "ResponseParameters": {
-              "method.response.header.Access-Control-Allow-Headers": true,
-              "method.response.header.Access-Control-Allow-Methods": true,
-              "method.response.header.Access-Control-Allow-Origin": true,
-            },
-            "StatusCode": "204",
-          },
-        ],
-        "ResourceId": {
-          "Ref": "proverbforthedayapiauthBF92B274",
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayapiauthcheckuserexists32C8E9CA": {
-      "Properties": {
-        "ParentId": {
-          "Ref": "proverbforthedayapiauthBF92B274",
-        },
-        "PathPart": "check-user-exists",
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "proverbforthedayapiauthcheckuserexistsOPTIONS68007718": {
-      "Properties": {
-        "ApiKeyRequired": false,
-        "AuthorizationType": "NONE",
-        "HttpMethod": "OPTIONS",
-        "Integration": {
-          "IntegrationResponses": [
-            {
-              "ResponseParameters": {
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
-                "method.response.header.Access-Control-Allow-Origin": "'*'",
-              },
-              "StatusCode": "204",
-            },
-          ],
-          "RequestTemplates": {
-            "application/json": "{ statusCode: 200 }",
-          },
-          "Type": "MOCK",
-        },
-        "MethodResponses": [
-          {
-            "ResponseParameters": {
-              "method.response.header.Access-Control-Allow-Headers": true,
-              "method.response.header.Access-Control-Allow-Methods": true,
-              "method.response.header.Access-Control-Allow-Origin": true,
-            },
-            "StatusCode": "204",
-          },
-        ],
-        "ResourceId": {
-          "Ref": "proverbforthedayapiauthcheckuserexists32C8E9CA",
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayapiauthcheckuserexistsPOST34090010": {
-      "Properties": {
-        "AuthorizationType": "NONE",
-        "HttpMethod": "POST",
-        "Integration": {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                {
-                  "Fn::GetAtt": [
-                    "checkuserexists488D9724",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "MethodResponses": [
-          {
-            "StatusCode": "200",
-          },
-          {
-            "StatusCode": "400",
-          },
-          {
-            "StatusCode": "429",
-          },
-          {
-            "StatusCode": "500",
-          },
-        ],
-        "ResourceId": {
-          "Ref": "proverbforthedayapiauthcheckuserexists32C8E9CA",
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayapiauthcheckuserexistsPOSTApiPermissionTestStackproverbforthedayapi70C10693POSTauthcheckuserexistsE7BB3B0B": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "checkuserexists488D9724",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "proverbforthedayapi6FFFAEB6",
-              },
-              "/",
-              {
-                "Ref": "proverbforthedayapiDeploymentStageprodBEAAC809",
-              },
-              "/POST/auth/check-user-exists",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "proverbforthedayapiauthcheckuserexistsPOSTApiPermissionTestTestStackproverbforthedayapi70C10693POSTauthcheckuserexists37AD233C": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "checkuserexists488D9724",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "proverbforthedayapi6FFFAEB6",
-              },
-              "/test-invoke-stage/POST/auth/check-user-exists",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "proverbforthedayapiavailableversions21943914": {
-      "Properties": {
-        "ParentId": {
-          "Fn::GetAtt": [
-            "proverbforthedayapi6FFFAEB6",
-            "RootResourceId",
-          ],
-        },
-        "PathPart": "available-versions",
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "proverbforthedayapiavailableversionsGETApiPermissionTestStackproverbforthedayapi70C10693GETavailableversionsEC1A6CC1": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "getavailableversions8AF877EA",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "proverbforthedayapi6FFFAEB6",
-              },
-              "/",
-              {
-                "Ref": "proverbforthedayapiDeploymentStageprodBEAAC809",
-              },
-              "/GET/available-versions",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "proverbforthedayapiavailableversionsGETApiPermissionTestTestStackproverbforthedayapi70C10693GETavailableversionsC59F535B": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "getavailableversions8AF877EA",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "proverbforthedayapi6FFFAEB6",
-              },
-              "/test-invoke-stage/GET/available-versions",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "proverbforthedayapiavailableversionsGETD9115452": {
-      "Properties": {
-        "AuthorizationType": "NONE",
-        "HttpMethod": "GET",
-        "Integration": {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                {
-                  "Fn::GetAtt": [
-                    "getavailableversions8AF877EA",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "ResourceId": {
-          "Ref": "proverbforthedayapiavailableversions21943914",
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayapiavailableversionsOPTIONS3793E013": {
-      "Properties": {
-        "ApiKeyRequired": false,
-        "AuthorizationType": "NONE",
-        "HttpMethod": "OPTIONS",
-        "Integration": {
-          "IntegrationResponses": [
-            {
-              "ResponseParameters": {
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
-                "method.response.header.Access-Control-Allow-Origin": "'*'",
-              },
-              "StatusCode": "204",
-            },
-          ],
-          "RequestTemplates": {
-            "application/json": "{ statusCode: 200 }",
-          },
-          "Type": "MOCK",
-        },
-        "MethodResponses": [
-          {
-            "ResponseParameters": {
-              "method.response.header.Access-Control-Allow-Headers": true,
-              "method.response.header.Access-Control-Allow-Methods": true,
-              "method.response.header.Access-Control-Allow-Origin": true,
-            },
-            "StatusCode": "204",
-          },
-        ],
-        "ResourceId": {
-          "Ref": "proverbforthedayapiavailableversions21943914",
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayapiversion64D0829D": {
-      "Properties": {
-        "ParentId": {
-          "Fn::GetAtt": [
-            "proverbforthedayapi6FFFAEB6",
-            "RootResourceId",
-          ],
-        },
-        "PathPart": "{version}",
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "proverbforthedayapiversionGET216FF9BC": {
-      "Properties": {
-        "AuthorizationType": "NONE",
-        "HttpMethod": "GET",
-        "Integration": {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                {
-                  "Fn::GetAtt": [
-                    "getproverb58091E74",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "ResourceId": {
-          "Ref": "proverbforthedayapiversion64D0829D",
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayapiversionGETApiPermissionTestStackproverbforthedayapi70C10693GETversion668760C7": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "getproverb58091E74",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "proverbforthedayapi6FFFAEB6",
-              },
-              "/",
-              {
-                "Ref": "proverbforthedayapiDeploymentStageprodBEAAC809",
-              },
-              "/GET/*",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "proverbforthedayapiversionGETApiPermissionTestTestStackproverbforthedayapi70C10693GETversion5670B2F7": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "getproverb58091E74",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "proverbforthedayapi6FFFAEB6",
-              },
-              "/test-invoke-stage/GET/*",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "proverbforthedayapiversionOPTIONSCFE5F6CB": {
-      "Properties": {
-        "ApiKeyRequired": false,
-        "AuthorizationType": "NONE",
-        "HttpMethod": "OPTIONS",
-        "Integration": {
-          "IntegrationResponses": [
-            {
-              "ResponseParameters": {
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
-                "method.response.header.Access-Control-Allow-Origin": "'*'",
-              },
-              "StatusCode": "204",
-            },
-          ],
-          "RequestTemplates": {
-            "application/json": "{ statusCode: 200 }",
-          },
-          "Type": "MOCK",
-        },
-        "MethodResponses": [
-          {
-            "ResponseParameters": {
-              "method.response.header.Access-Control-Allow-Headers": true,
-              "method.response.header.Access-Control-Allow-Methods": true,
-              "method.response.header.Access-Control-Allow-Origin": true,
-            },
-            "StatusCode": "204",
-          },
-        ],
-        "ResourceId": {
-          "Ref": "proverbforthedayapiversion64D0829D",
-        },
-        "RestApiId": {
-          "Ref": "proverbforthedayapi6FFFAEB6",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "proverbforthedayscheduleA383731F": {
-      "Properties": {
-        "Name": "proverb-for-the-day-schedule",
-        "ScheduleExpression": "cron(0 0 * * ? *)",
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "chooseproverb54249DA0",
-                "Arn",
-              ],
-            },
-            "Id": "Target0",
-          },
-        ],
-      },
-      "Type": "AWS::Events::Rule",
-    },
-    "proverbforthedayscheduleAllowEventRuleTestStackchooseproverb44AD85C60A35CFA9": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "chooseproverb54249DA0",
-            "Arn",
-          ],
-        },
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [
-            "proverbforthedayscheduleA383731F",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
     },
     "proverbsstore7682A597": {
       "DeletionPolicy": "Delete",
