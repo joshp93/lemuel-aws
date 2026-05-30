@@ -25,8 +25,12 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
   - `choose-proverb` - selects random daily proverb
   - `get-proverb` - retrieves the daily proverb
   - `check-user-exists` - checks if a user exists in Cognito
+  - `handle-account-creation` - creates a user account record in DynamoDB
+  - `get-account-details` - retrieves user account details from DynamoDB
 - REST API Gateway endpoints:
   - `GET /{version}` - returns daily proverb (no auth required)
+  - `POST /handle-account-creation/{uuid}` - creates user account record (Cognito auth)
+  - `GET /get-account-details/{uuid}` - returns user account details (Cognito auth)
 - `POST /auth/check-user-exists` - checks user existence (rate limited)
 - EventBridge cron rule (minute: 0, hour: 0) triggers choose-proverb daily
 
@@ -38,6 +42,36 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
   - Request: `{"email": "user@example.com"}`
   - Response: `{"exists": true}` or `{"exists": false}`
   - Rate limited: 10 req/s, 20 burst, 10,000/day
+- `POST /handle-account-creation/{uuid}` - Creates user account record in DynamoDB (Cognito auth required)
+  - Response: `{"success": true}`
+- `GET /get-account-details/{uuid}` - Returns user account details from DynamoDB (Cognito auth required)
+  - Response: Account record JSON with `accountCreatedDate`, `totalMeditations`, `totalNotes`
+
+## Lambda Function Structure
+
+Each Lambda lives in its own directory under `src/<function-name>/`:
+
+```
+src/<function-name>/
+  index.ts              # Handler orchestrator
+  schemas.ts            # Zod schemas + types for env, events, responses
+  factories/            # Domain logic that builds/transforms objects
+    buildRecord.ts
+  transforms/           # Pure data transformations
+  utils/                # I/O helpers (AWS SDK, HTTP calls)
+  constants/            # Static data
+```
+
+### Conventions (Functional Programming Style)
+
+- **One function per code file** with `export const` named exports (no `export default`)
+- **Handlers orchestrate only**: validate input with Zod, call factories/utils, return response
+- **Factories** build/transform domain objects (e.g., `buildAccountRecord(uuid)`)
+- **Shared entity schemas** (DynamoDB row shapes) live in `src/models/proverbStoreSchemas.ts`
+- **Per-Lambda schemas** (env, events, responses) go in a local `schemas.ts`
+- **Zod at boundaries** — validate env vars, events, and DynamoDB reads; don't validate internal operations
+- **Simple Lambdas** (single DynamoDB op) use only `schemas.ts` + `index.ts`
+- **Complex Lambdas** (multi-step, I/O, transformations) extract into `factories/`, `transforms/`, `utils/`, `constants/`
 
 ## Environment Variables
 

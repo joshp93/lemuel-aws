@@ -8,7 +8,7 @@ describe("LemuelStack", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
     const stack = new LemuelStack(app, "TestStack", {
-      userPoolId: userManagementStack.userPool.userPoolId,
+      userPool: userManagementStack.userPool,
       apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
@@ -19,7 +19,7 @@ describe("LemuelStack", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
     const stack = new LemuelStack(app, "TestStack", {
-      userPoolId: userManagementStack.userPool.userPoolId,
+      userPool: userManagementStack.userPool,
       apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
@@ -38,7 +38,7 @@ describe("LemuelStack", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
     const stack = new LemuelStack(app, "TestStack", {
-      userPoolId: userManagementStack.userPool.userPoolId,
+      userPool: userManagementStack.userPool,
       apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
@@ -68,7 +68,7 @@ describe("LemuelStack", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
     const stack = new LemuelStack(app, "TestStack", {
-      userPoolId: userManagementStack.userPool.userPoolId,
+      userPool: userManagementStack.userPool,
       apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
@@ -82,7 +82,7 @@ describe("LemuelStack", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
     const stack = new LemuelStack(app, "TestStack", {
-      userPoolId: userManagementStack.userPool.userPoolId,
+      userPool: userManagementStack.userPool,
       apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);
@@ -98,7 +98,7 @@ describe("LemuelStack", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
     const stack = new LemuelStack(app, "TestStack", {
-      userPoolId: userManagementStack.userPool.userPoolId,
+      userPool: userManagementStack.userPool,
       apiBibleSecretName: "test-api-bible-creds",
     });
     const template = Template.fromStack(stack);

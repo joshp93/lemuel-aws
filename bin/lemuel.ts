@@ -16,6 +16,6 @@ const userManagementStack = new LemuelUserManagementStack(
 );
 new LemuelStack(app, "LemuelStack", {
   env,
-  userPoolId: userManagementStack.userPool.userPoolId,
+  userPool: userManagementStack.userPool,
   apiBibleSecretName: secretStack.apiBibleSecretName,
 });

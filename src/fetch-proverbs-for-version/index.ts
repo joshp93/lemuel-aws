@@ -1,15 +1,17 @@
 import { REFS } from "./constants/refs";
-import { normalizeToAscii } from "./transforms/normalizeToAscii";
-import { buildProverbsFromChapter, getChaptersFromRefs } from "./factories/buildProverbs";
-import { fetchBible } from "./utils/fetchBible";
-import { fetchChapter } from "./utils/fetchChapter";
-import { getSecret } from "./utils/getSecret";
+import {
+  buildProverbsFromChapter,
+  getChaptersFromRefs,
+} from "./factories/buildProverbs";
 import {
   FetchProverbsForVersionEvent,
   FetchProverbsForVersionEventSchema,
   Output,
   Proverb,
 } from "./types";
+import { fetchBible } from "./utils/fetchBible";
+import { fetchChapter } from "./utils/fetchChapter";
+import { getSecret } from "./utils/getSecret";
 
 /**
  * Lambda handler that fetches Proverbs from API.Bible for a specific version.
@@ -63,7 +65,7 @@ export const handler = async (
 
   const output: Output = {
     version: versionName,
-    ...(parsed.citation && { citation: normalizeToAscii(parsed.citation) }),
+    ...(parsed.citation && { citation: parsed.citation }),
     proverbs,
   };
 

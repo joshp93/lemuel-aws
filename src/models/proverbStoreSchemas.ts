@@ -50,3 +50,13 @@ export const VersionCitationSchema = z.object({
 });
 
 export type VersionCitation = z.infer<typeof VersionCitationSchema>;
+
+export const AccountEntitySchema = z.object({
+  pk: z.string(),
+  sk: z.string(),
+  accountCreatedDate: z.string(),
+  totalMeditations: z.number(),
+  totalNotes: z.number(),
+});
+
+export type AccountEntity = z.infer<typeof AccountEntitySchema>;

@@ -1,5 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
@@ -9,7 +10,7 @@ import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import { Construct } from "constructs";
 
 interface LemuelStackProps extends cdk.StackProps {
-  userPoolId: string;
+  userPool: cognito.IUserPool;
   apiBibleSecretName: string;
 }
 
@@ -78,7 +79,7 @@ export class LemuelStack extends cdk.Stack {
       handler: "index.handler",
       code: lambda.Code.fromAsset("dist/check-user-exists"),
       environment: {
-        USER_POOL_ID: props.userPoolId,
+        USER_POOL_ID: props.userPool.userPoolId,
       },
     });
 
@@ -88,7 +89,7 @@ export class LemuelStack extends cdk.Stack {
         effect: iam.Effect.ALLOW,
         actions: ["cognito-idp:AdminGetUser"],
         resources: [
-          `arn:aws:cognito-idp:${this.region}:${this.account}:userpool/${props.userPoolId}`,
+          `arn:aws:cognito-idp:${this.region}:${this.account}:userpool/${props.userPool.userPoolId}`,
         ],
       }),
     );
@@ -136,6 +137,70 @@ export class LemuelStack extends cdk.Stack {
       .addMethod("GET", new apigateway.LambdaIntegration(getProverb), {
         authorizationType: apigateway.AuthorizationType.NONE,
       });
+
+    const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
+      this,
+      "CognitoAuthorizer",
+      {
+        cognitoUserPools: [props.userPool],
+        authorizerName: "lemuel-cognito-authorizer",
+      },
+    );
+
+    const handleAccountCreation = new lambda.Function(
+      this,
+      "handle-account-creation",
+      {
+        functionName: "handle-account-creation",
+        runtime: lambda.Runtime.NODEJS_22_X,
+        handler: "index.handler",
+        code: lambda.Code.fromAsset("dist/handle-account-creation"),
+        environment: {
+          TABLE_NAME: table.tableName,
+        },
+      },
+    );
+
+    const getAccountDetails = new lambda.Function(
+      this,
+      "get-account-details",
+      {
+        functionName: "get-account-details",
+        runtime: lambda.Runtime.NODEJS_22_X,
+        handler: "index.handler",
+        code: lambda.Code.fromAsset("dist/get-account-details"),
+        environment: {
+          TABLE_NAME: table.tableName,
+        },
+      },
+    );
+
+    table.grantReadWriteData(handleAccountCreation);
+    table.grantReadData(getAccountDetails);
+
+    api.root
+      .addResource("handle-account-creation")
+      .addResource("{uuid}")
+      .addMethod(
+        "POST",
+        new apigateway.LambdaIntegration(handleAccountCreation),
+        {
+          authorizationType: apigateway.AuthorizationType.COGNITO,
+          authorizer: cognitoAuthorizer,
+        },
+      );
+
+    api.root
+      .addResource("get-account-details")
+      .addResource("{uuid}")
+      .addMethod(
+        "GET",
+        new apigateway.LambdaIntegration(getAccountDetails),
+        {
+          authorizationType: apigateway.AuthorizationType.COGNITO,
+          authorizer: cognitoAuthorizer,
+        },
+      );
 
     // Add auth endpoints with rate limiting
     const authResource = api.root.addResource("auth");

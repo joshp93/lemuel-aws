@@ -1,8 +1,7 @@
 import { REFS } from "../constants/refs";
-import { Proverb } from "../types";
-import { normalizeToAscii } from "../transforms/normalizeToAscii";
-import { parseChapterContent } from "../transforms/parseChapterContent";
 import { ContentElement } from "../models/apiBible";
+import { parseChapterContent } from "../transforms/parseChapterContent";
+import { Proverb } from "../types";
 
 /**
  * Extracts the chapter number from a reference string like "Proverbs 10:1".
@@ -69,7 +68,7 @@ export const buildProverbsFromChapter = (
     for (let v = parsed.verseStart; v <= parsed.verseEnd; v++) {
       const verseText = versesMap.get(v);
       if (verseText) {
-        proverbParts.push(normalizeToAscii(verseText));
+        proverbParts.push(verseText);
       }
     }
 
