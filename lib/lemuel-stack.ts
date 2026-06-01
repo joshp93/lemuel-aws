@@ -73,6 +73,16 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
+    const getProverbs = new lambda.Function(this, "get-proverbs", {
+      functionName: "get-proverbs",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("dist/get-proverbs"),
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+
     const checkUserExists = new lambda.Function(this, "check-user-exists", {
       functionName: "check-user-exists",
       runtime: lambda.Runtime.NODEJS_22_X,
@@ -106,6 +116,11 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
+    const requestValidator = api.addRequestValidator("RequestValidator", {
+      requestValidatorName: "lemuel-request-validator",
+      validateRequestParameters: true,
+    });
+
     const getAvailableVersions = new lambda.Function(
       this,
       "get-available-versions",
@@ -136,6 +151,10 @@ export class LemuelStack extends cdk.Stack {
       .addResource("{version}")
       .addMethod("GET", new apigateway.LambdaIntegration(getProverb), {
         authorizationType: apigateway.AuthorizationType.NONE,
+        requestParameters: {
+          "method.request.querystring.date": false,
+        },
+        requestValidator,
       });
 
     const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
@@ -175,8 +194,19 @@ export class LemuelStack extends cdk.Stack {
       },
     );
 
+    const noteHandler = new lambda.Function(this, "note-handler", {
+      functionName: "note-handler",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("dist/note-handler"),
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+
     table.grantReadWriteData(handleAccountCreation);
     table.grantReadData(getAccountDetails);
+    table.grantReadWriteData(noteHandler);
 
     api.root
       .addResource("handle-account-creation")
@@ -199,6 +229,74 @@ export class LemuelStack extends cdk.Stack {
         {
           authorizationType: apigateway.AuthorizationType.COGNITO,
           authorizer: cognitoAuthorizer,
+        },
+      );
+
+    const noteModel = api.addModel("NoteModel", {
+      contentType: "application/json",
+      modelName: "NoteModel",
+      schema: {
+        schema: apigateway.JsonSchemaVersion.DRAFT4,
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          note: { type: apigateway.JsonSchemaType.STRING },
+        },
+        required: ["note"],
+      },
+    });
+
+    const bodyValidator = api.addRequestValidator("BodyValidator", {
+      requestValidatorName: "lemuel-body-validator",
+      validateRequestBody: true,
+    });
+
+    const notes = api.root.addResource("notes");
+    const notesUser = notes.addResource("{uuid}");
+    const notesRef = notesUser.addResource("{ref}");
+
+    notesUser.addMethod("GET", new apigateway.LambdaIntegration(noteHandler), {
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+      authorizer: cognitoAuthorizer,
+      requestParameters: {
+        "method.request.querystring.limit": false,
+        "method.request.querystring.lastKey": false,
+        "method.request.querystring.scanForward": false,
+      },
+      requestValidator,
+    });
+
+    notesRef.addMethod("GET", new apigateway.LambdaIntegration(noteHandler), {
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+      authorizer: cognitoAuthorizer,
+    });
+
+    notesRef.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestModels: {
+          "application/json": noteModel,
+        },
+        requestValidator: bodyValidator,
+      },
+    );
+
+    api.root
+      .addResource("get-proverbs")
+      .addMethod(
+        "GET",
+        new apigateway.LambdaIntegration(getProverbs),
+        {
+          authorizationType: apigateway.AuthorizationType.COGNITO,
+          authorizer: cognitoAuthorizer,
+          requestParameters: {
+            "method.request.querystring.limit": false,
+            "method.request.querystring.lastKey": false,
+            "method.request.querystring.scanForward": false,
+          },
+          requestValidator,
         },
       );
 
@@ -265,6 +363,7 @@ export class LemuelStack extends cdk.Stack {
     table.grantReadWriteData(chooseProverb);
     table.grantReadWriteData(loadProverbsLambda);
     table.grantReadData(getProverb);
+    table.grantReadData(getProverbs);
 
     new events.Rule(this, "lemuel-schedule", {
       ruleName: "lemuel-schedule",

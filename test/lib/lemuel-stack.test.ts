@@ -54,6 +54,11 @@ describe("LemuelStack", () => {
     });
 
     template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "get-proverbs",
+      Runtime: "nodejs22.x",
+    });
+
+    template.hasResourceProperties("AWS::Lambda::Function", {
       FunctionName: "load-proverbs",
       Runtime: "nodejs22.x",
     });

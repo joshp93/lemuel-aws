@@ -13,7 +13,7 @@ describe("choose-proverb handler", () => {
     process.env.TABLE_NAME = "TestTable";
   });
 
-  it("chooses a random unused proverb and updates refs and the daily proverb", async () => {
+  it("chooses a random unused proverb and writes the daily proverb entity", async () => {
     ddbMock.on(GetCommand).resolves({
       Item: {
         pk: "refs",
@@ -27,5 +27,10 @@ describe("choose-proverb handler", () => {
     expect(ddbMock.commandCalls(PutCommand).length).toBe(2);
     const refsPut = ddbMock.commandCalls(PutCommand)[1].args[0].input.Item;
     expect(refsPut!.usedRefs.length).toBe(2);
+
+    const dailyProverbPut = ddbMock.commandCalls(PutCommand)[0].args[0].input.Item;
+    expect(dailyProverbPut!.pk).toBe("daily-proverb");
+    expect(dailyProverbPut!.sk).toBe(new Date().toISOString().split("T")[0]);
+    expect(dailyProverbPut!.ref).toBe("Proverbs10:2");
   });
 });

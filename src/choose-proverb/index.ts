@@ -5,7 +5,7 @@ import {
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import {
-  ProverbForTheDayEntitySchema,
+  DailyProverbEntitySchema,
   RefsEntitySchema,
 } from "../models/proverbStoreSchemas";
 
@@ -31,12 +31,14 @@ export const handler = async (): Promise<void> => {
 
   refs.usedRefs.push(randomRef);
 
-  const putProverbForTheDayPromise = client.send(
+  const today = new Date().toISOString().split("T")[0];
+
+  const putDailyProverbPromise = client.send(
     new PutCommand({
       TableName: tableName,
-      Item: ProverbForTheDayEntitySchema.parse({
-        pk: "proverb-for-the-day",
-        sk: "proverb-for-the-day",
+      Item: DailyProverbEntitySchema.parse({
+        pk: "daily-proverb",
+        sk: today,
         ref: randomRef,
       }),
     }),
@@ -47,5 +49,5 @@ export const handler = async (): Promise<void> => {
       Item: refs,
     }),
   );
-  await Promise.all([putProverbForTheDayPromise, putRefsPromise]);
+  await Promise.all([putDailyProverbPromise, putRefsPromise]);
 };

@@ -25,15 +25,13 @@ export const ProverbEntitySchema = z.object({
 
 export type ProverbEntity = z.infer<typeof ProverbEntitySchema>;
 
-export const ProverbForTheDayEntitySchema = z.object({
-  pk: z.string(),
+export const DailyProverbEntitySchema = z.object({
+  pk: z.literal("daily-proverb"),
   sk: z.string(),
   ref: z.string(),
 });
 
-export type ProverbForTheDayEntity = z.infer<
-  typeof ProverbForTheDayEntitySchema
->;
+export type DailyProverbEntity = z.infer<typeof DailyProverbEntitySchema>;
 
 export const VersionEntitySchema = z.object({
   pk: z.string().default("versions"),
@@ -60,3 +58,11 @@ export const AccountEntitySchema = z.object({
 });
 
 export type AccountEntity = z.infer<typeof AccountEntitySchema>;
+
+export const NoteEntitySchema = z.object({
+  pk: z.string(),
+  sk: z.string(),
+  note: z.string(),
+});
+
+export type NoteEntity = z.infer<typeof NoteEntitySchema>;
