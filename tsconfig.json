@@ -2,10 +2,9 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
+    "isolatedModules": true,
     "moduleResolution": "NodeNext",
-    "lib": [
-      "es2022"
-    ],
+    "lib": ["es2022"],
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -21,15 +20,8 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
-    "types": [
-      "node",
-      "jest"
-    ],
+    "types": ["node", "jest"],
     "outDir": "dist"
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "cdk.out",
-  ]
+  "exclude": ["node_modules", "dist", "cdk.out"]
 }

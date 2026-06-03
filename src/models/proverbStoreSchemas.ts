@@ -60,9 +60,19 @@ export const AccountEntitySchema = z.object({
 export type AccountEntity = z.infer<typeof AccountEntitySchema>;
 
 export const NoteEntitySchema = z.object({
-  pk: z.string(),
-  sk: z.string(),
-  note: z.string(),
+  pk: z.string().describe("The cognito uuid of the user who created the note"),
+  sk: z.string().min(1).describe("The proverb reference, e.g. Proverbs3:5"),
+  note: z.string().min(1).describe("The content of the note"),
+  dateCreated: z.iso
+    .datetime()
+    .describe("ISO date string of when the note was created"),
+  uuid: z
+    .string()
+    .describe("The cognito uuid of the user — mirrors pk for GSI access"),
+  ref: z
+    .string()
+    .min(1)
+    .describe("The proverb reference — mirrors sk for GSI access"),
 });
 
 export type NoteEntity = z.infer<typeof NoteEntitySchema>;

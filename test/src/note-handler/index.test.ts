@@ -1,369 +1,115 @@
-import {
-  DynamoDBDocumentClient,
-  GetCommand,
-  PutCommand,
-  QueryCommand,
-} from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { mockClient } from "aws-sdk-client-mock";
 import { handler } from "../../../src/note-handler/index";
 
-describe("note-handler", () => {
-  const ddbMock = mockClient(DynamoDBDocumentClient);
+jest.mock("../../../src/note-handler/getProverbNotes/index", () => ({
+  getProverbNotesHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ items: [], lastKey: undefined }),
+  }),
+}));
 
+jest.mock("../../../src/note-handler/getUserNote/index", () => ({
+  getUserNoteHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ pk: "uuid", sk: "ref", note: "test" }),
+  }),
+}));
+
+jest.mock("../../../src/note-handler/getUserNotes/index", () => ({
+  getUserNotesHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ items: [], lastKey: undefined }),
+  }),
+}));
+
+jest.mock("../../../src/note-handler/postUserNote/index", () => ({
+  postUserNoteHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ pk: "uuid", sk: "ref", note: "test" }),
+  }),
+}));
+
+import { getProverbNotesHandler } from "../../../src/note-handler/getProverbNotes/index";
+import { getUserNoteHandler } from "../../../src/note-handler/getUserNote/index";
+import { getUserNotesHandler } from "../../../src/note-handler/getUserNotes/index";
+import { postUserNoteHandler } from "../../../src/note-handler/postUserNote/index";
+
+describe("note-handler router", () => {
   beforeEach(() => {
-    ddbMock.resetHistory();
     process.env.TABLE_NAME = "TestTable";
+    jest.clearAllMocks();
   });
 
-  describe("GET /notes/{uuid} — list notes", () => {
-    it("returns paginated notes for a user", async () => {
-      ddbMock.on(QueryCommand).resolves({
-        Items: [
-          { pk: "user-123", sk: "Proverbs1:1", note: "my note 1" },
-          { pk: "user-123", sk: "Proverbs1:2", note: "my note 2" },
-        ],
-      });
+  it("routes GET /notes/proverbs/{ref} to getProverbNotesHandler", async () => {
+    const event = {
+      httpMethod: "GET",
+      resource: "/notes/proverbs/{ref}",
+      pathParameters: { ref: "Proverbs3:5" },
+    } as unknown as APIGatewayProxyEvent;
 
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-      } as unknown as APIGatewayProxyEvent;
+    await handler(event);
 
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body);
-      expect(body.items).toHaveLength(2);
-      expect(body.items[0]).toEqual({
-        pk: "user-123",
-        sk: "Proverbs1:1",
-        note: "my note 1",
-      });
-      expect(body.lastKey).toBeUndefined();
-
-      const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
-      expect(queryCall.KeyConditionExpression).toBe("pk = :pk");
-      expect(queryCall.ExpressionAttributeValues![":pk"]).toBe("user-123");
-    });
-
-    it("defaults to scanForward=false (newest first)", async () => {
-      ddbMock.on(QueryCommand).resolves({ Items: [] });
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-      } as unknown as APIGatewayProxyEvent;
-      await handler(event);
-
-      const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
-      expect(queryCall.ScanIndexForward).toBe(false);
-    });
-
-    it("accepts scanForward=true query param", async () => {
-      ddbMock.on(QueryCommand).resolves({ Items: [] });
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-        queryStringParameters: { scanForward: "true" },
-      } as unknown as APIGatewayProxyEvent;
-      await handler(event);
-
-      const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
-      expect(queryCall.ScanIndexForward).toBe(true);
-    });
-
-    it("passes limit from query param", async () => {
-      ddbMock.on(QueryCommand).resolves({ Items: [] });
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-        queryStringParameters: { limit: "5" },
-      } as unknown as APIGatewayProxyEvent;
-      await handler(event);
-
-      const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
-      expect(queryCall.Limit).toBe(5);
-    });
-
-    it("passes lastKey from query param as ExclusiveStartKey", async () => {
-      ddbMock.on(QueryCommand).resolves({ Items: [] });
-
-      const exclusiveStartKey = { pk: "user-123", sk: "Proverbs10:1" };
-      const lastKey = Buffer.from(JSON.stringify(exclusiveStartKey)).toString(
-        "base64",
-      );
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-        queryStringParameters: { lastKey },
-      } as unknown as APIGatewayProxyEvent;
-      await handler(event);
-
-      const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
-      expect(queryCall.ExclusiveStartKey).toEqual(exclusiveStartKey);
-    });
-
-    it("returns lastKey when LastEvaluatedKey is present", async () => {
-      const lastEvaluatedKey = { pk: "user-123", sk: "Proverbs10:1" };
-      ddbMock.on(QueryCommand).resolves({
-        Items: [{ pk: "user-123", sk: "Proverbs1:1", note: "my note" }],
-        LastEvaluatedKey: lastEvaluatedKey,
-      });
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-      } as unknown as APIGatewayProxyEvent;
-      const result = await handler(event);
-
-      const body = JSON.parse(result.body);
-      expect(body.lastKey).toBe(
-        Buffer.from(JSON.stringify(lastEvaluatedKey)).toString("base64"),
-      );
-    });
-
-    it("returns empty items array when no notes exist", async () => {
-      ddbMock.on(QueryCommand).resolves({ Items: [] });
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-      } as unknown as APIGatewayProxyEvent;
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(200);
-      const body = JSON.parse(result.body);
-      expect(body.items).toEqual([]);
-    });
+    expect(getProverbNotesHandler).toHaveBeenCalled();
   });
 
-  describe("GET /notes/{uuid}/{ref} — get single note", () => {
-    it("returns the note when found", async () => {
-      const mockItem = {
-        pk: "user-123",
-        sk: "Proverbs1:1",
-        note: "my note",
-      };
-      ddbMock
-        .on(GetCommand, {
-          TableName: "TestTable",
-          Key: { pk: "user-123", sk: "Proverbs1:1" },
-        })
-        .resolves({ Item: mockItem });
+  it("routes GET /notes/users/{uuid} to getUserNotesHandler", async () => {
+    const event = {
+      httpMethod: "GET",
+      resource: "/notes/users/{uuid}",
+      pathParameters: { uuid: "user-123" },
+    } as unknown as APIGatewayProxyEvent;
 
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123", ref: "Proverbs1:1" },
-      } as unknown as APIGatewayProxyEvent;
+    await handler(event);
 
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(200);
-      expect(JSON.parse(result.body)).toEqual(mockItem);
-    });
-
-    it("returns 404 when note is not found", async () => {
-      ddbMock
-        .on(GetCommand, {
-          TableName: "TestTable",
-          Key: { pk: "user-123", sk: "Proverbs1:1" },
-        })
-        .resolves({ Item: undefined });
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123", ref: "Proverbs1:1" },
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(404);
-      expect(JSON.parse(result.body)).toEqual({ error: "Note not found" });
-    });
+    expect(getUserNotesHandler).toHaveBeenCalled();
   });
 
-  describe("POST /notes/{uuid}/{ref} — create/update note", () => {
-    it("creates a note and returns it", async () => {
-      ddbMock.on(PutCommand).resolves({});
+  it("routes GET /notes/users/{uuid}/{ref} to getUserNoteHandler", async () => {
+    const event = {
+      httpMethod: "GET",
+      resource: "/notes/users/{uuid}/{ref}",
+      pathParameters: { uuid: "user-123", ref: "Proverbs3:5" },
+    } as unknown as APIGatewayProxyEvent;
 
-      const event = {
-        httpMethod: "POST",
-        pathParameters: { uuid: "user-123", ref: "Proverbs3:5" },
-        body: JSON.stringify({ note: "Trust in the Lord" }),
-      } as unknown as APIGatewayProxyEvent;
+    await handler(event);
 
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(200);
-      expect(JSON.parse(result.body)).toEqual({
-        pk: "user-123",
-        sk: "Proverbs3:5",
-        note: "Trust in the Lord",
-      });
-
-      const putCalls = ddbMock.commandCalls(PutCommand);
-      expect(putCalls).toHaveLength(1);
-      expect(putCalls[0].args[0].input.Item).toEqual({
-        pk: "user-123",
-        sk: "Proverbs3:5",
-        note: "Trust in the Lord",
-      });
-    });
-
-    it("updates an existing note", async () => {
-      ddbMock.on(PutCommand).resolves({});
-
-      const event = {
-        httpMethod: "POST",
-        pathParameters: { uuid: "user-123", ref: "Proverbs3:5" },
-        body: JSON.stringify({ note: "Updated note" }),
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(200);
-      expect(JSON.parse(result.body)).toEqual({
-        pk: "user-123",
-        sk: "Proverbs3:5",
-        note: "Updated note",
-      });
-    });
-
-    it("returns 400 when body is empty", async () => {
-      const event = {
-        httpMethod: "POST",
-        pathParameters: { uuid: "user-123", ref: "Proverbs3:5" },
-        body: "{}",
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "note body parameter is required",
-      });
-    });
-
-    it("returns 400 when ref is missing", async () => {
-      const event = {
-        httpMethod: "POST",
-        pathParameters: { uuid: "user-123" },
-        body: JSON.stringify({ note: "my note" }),
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "ref path parameter is required",
-      });
-    });
+    expect(getUserNoteHandler).toHaveBeenCalled();
   });
 
-  describe("error handling", () => {
-    it("returns 400 when uuid is missing", async () => {
-      const event = {
-        httpMethod: "GET",
-        pathParameters: {},
-      } as unknown as APIGatewayProxyEvent;
+  it("routes POST /notes/users/{uuid}/{ref} to postUserNoteHandler", async () => {
+    const event = {
+      httpMethod: "POST",
+      resource: "/notes/users/{uuid}/{ref}",
+      pathParameters: { uuid: "user-123", ref: "Proverbs3:5" },
+    } as unknown as APIGatewayProxyEvent;
 
-      const result = await handler(event);
+    await handler(event);
 
-      expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "uuid path parameter is required",
-      });
-    });
+    expect(postUserNoteHandler).toHaveBeenCalled();
+  });
 
-    it("returns 400 when pathParameters is undefined", async () => {
-      const event = { httpMethod: "GET" } as unknown as APIGatewayProxyEvent;
+  it("returns 405 for unsupported routes", async () => {
+    const event = {
+      httpMethod: "DELETE",
+      resource: "/notes/users/{uuid}",
+    } as unknown as APIGatewayProxyEvent;
 
-      const result = await handler(event);
+    const result = await handler(event);
 
-      expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "uuid path parameter is required",
-      });
-    });
+    expect(result.statusCode).toBe(405);
+    expect(JSON.parse(result.body)).toEqual({ error: "Method not allowed" });
+  });
 
-    it("returns 405 for unsupported HTTP methods", async () => {
-      const event = {
-        httpMethod: "DELETE",
-        pathParameters: { uuid: "user-123" },
-      } as unknown as APIGatewayProxyEvent;
+  it("returns 500 when env var is missing", async () => {
+    delete process.env.TABLE_NAME;
 
-      const result = await handler(event);
+    const event = {
+      httpMethod: "GET",
+      resource: "/notes/proverbs/{ref}",
+    } as unknown as APIGatewayProxyEvent;
 
-      expect(result.statusCode).toBe(405);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "Method not allowed",
-      });
-    });
+    const result = await handler(event);
 
-    it("returns 500 when DynamoDB throws an error", async () => {
-      ddbMock.on(GetCommand).rejects(new Error("DynamoDB failure"));
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123", ref: "Proverbs1:1" },
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(500);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "Internal server error",
-      });
-    });
-
-    it("returns 500 when DynamoDB query throws an error", async () => {
-      ddbMock.on(QueryCommand).rejects(new Error("DynamoDB failure"));
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(500);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "Internal server error",
-      });
-    });
-
-    it("returns 500 when DynamoDB put throws an error", async () => {
-      ddbMock.on(PutCommand).rejects(new Error("DynamoDB failure"));
-
-      const event = {
-        httpMethod: "POST",
-        pathParameters: { uuid: "user-123", ref: "Proverbs3:5" },
-        body: JSON.stringify({ note: "my note" }),
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(500);
-      expect(JSON.parse(result.body)).toEqual({
-        error: "Internal server error",
-      });
-    });
-
-    it("returns 500 when TABLE_NAME env var is missing", async () => {
-      delete process.env.TABLE_NAME;
-
-      const event = {
-        httpMethod: "GET",
-        pathParameters: { uuid: "user-123" },
-      } as unknown as APIGatewayProxyEvent;
-
-      const result = await handler(event);
-
-      expect(result.statusCode).toBe(500);
-    });
+    expect(result.statusCode).toBe(500);
   });
 });

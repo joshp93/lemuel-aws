@@ -32,6 +32,18 @@ export class LemuelStack extends cdk.Stack {
       sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
     });
 
+    table.addGlobalSecondaryIndex({
+      indexName: "proverb-notes-index",
+      partitionKey: { name: "ref", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "dateCreated", type: dynamodb.AttributeType.STRING },
+    });
+
+    table.addGlobalSecondaryIndex({
+      indexName: "user-notes-index",
+      partitionKey: { name: "uuid", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "dateCreated", type: dynamodb.AttributeType.STRING },
+    });
+
     const fetchProverbsForVersion = new lambda.Function(
       this,
       "fetch-proverbs-for-version",
@@ -180,19 +192,15 @@ export class LemuelStack extends cdk.Stack {
       },
     );
 
-    const getAccountDetails = new lambda.Function(
-      this,
-      "get-account-details",
-      {
-        functionName: "get-account-details",
-        runtime: lambda.Runtime.NODEJS_22_X,
-        handler: "index.handler",
-        code: lambda.Code.fromAsset("dist/get-account-details"),
-        environment: {
-          TABLE_NAME: table.tableName,
-        },
+    const getAccountDetails = new lambda.Function(this, "get-account-details", {
+      functionName: "get-account-details",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("dist/get-account-details"),
+      environment: {
+        TABLE_NAME: table.tableName,
       },
-    );
+    });
 
     const noteHandler = new lambda.Function(this, "note-handler", {
       functionName: "note-handler",
@@ -223,14 +231,10 @@ export class LemuelStack extends cdk.Stack {
     api.root
       .addResource("get-account-details")
       .addResource("{uuid}")
-      .addMethod(
-        "GET",
-        new apigateway.LambdaIntegration(getAccountDetails),
-        {
-          authorizationType: apigateway.AuthorizationType.COGNITO,
-          authorizer: cognitoAuthorizer,
-        },
-      );
+      .addMethod("GET", new apigateway.LambdaIntegration(getAccountDetails), {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+      });
 
     const noteModel = api.addModel("NoteModel", {
       contentType: "application/json",
@@ -251,13 +255,32 @@ export class LemuelStack extends cdk.Stack {
     });
 
     const notes = api.root.addResource("notes");
-    const notesUser = notes.addResource("{uuid}");
-    const notesRef = notesUser.addResource("{ref}");
 
-    notesUser.addMethod("GET", new apigateway.LambdaIntegration(noteHandler), {
+    const proverbs = notes.addResource("proverbs");
+    const proverbsRef = proverbs.addResource("{ref}");
+    proverbsRef.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.path.ref": true,
+          "method.request.querystring.limit": false,
+          "method.request.querystring.lastKey": false,
+          "method.request.querystring.scanForward": false,
+        },
+        requestValidator,
+      },
+    );
+
+    const users = notes.addResource("users");
+    const usersUuid = users.addResource("{uuid}");
+    usersUuid.addMethod("GET", new apigateway.LambdaIntegration(noteHandler), {
       authorizationType: apigateway.AuthorizationType.COGNITO,
       authorizer: cognitoAuthorizer,
       requestParameters: {
+        "method.request.path.uuid": true,
         "method.request.querystring.limit": false,
         "method.request.querystring.lastKey": false,
         "method.request.querystring.scanForward": false,
@@ -265,17 +288,31 @@ export class LemuelStack extends cdk.Stack {
       requestValidator,
     });
 
-    notesRef.addMethod("GET", new apigateway.LambdaIntegration(noteHandler), {
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-      authorizer: cognitoAuthorizer,
-    });
+    const usersUuidRef = usersUuid.addResource("{ref}");
+    usersUuidRef.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+        },
+        requestValidator,
+      },
+    );
 
-    notesRef.addMethod(
+    usersUuidRef.addMethod(
       "POST",
       new apigateway.LambdaIntegration(noteHandler),
       {
         authorizationType: apigateway.AuthorizationType.COGNITO,
         authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+        },
         requestModels: {
           "application/json": noteModel,
         },
@@ -285,20 +322,16 @@ export class LemuelStack extends cdk.Stack {
 
     api.root
       .addResource("get-proverbs")
-      .addMethod(
-        "GET",
-        new apigateway.LambdaIntegration(getProverbs),
-        {
-          authorizationType: apigateway.AuthorizationType.COGNITO,
-          authorizer: cognitoAuthorizer,
-          requestParameters: {
-            "method.request.querystring.limit": false,
-            "method.request.querystring.lastKey": false,
-            "method.request.querystring.scanForward": false,
-          },
-          requestValidator,
+      .addMethod("GET", new apigateway.LambdaIntegration(getProverbs), {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.querystring.limit": false,
+          "method.request.querystring.lastKey": false,
+          "method.request.querystring.scanForward": false,
         },
-      );
+        requestValidator,
+      });
 
     // Add auth endpoints with rate limiting
     const authResource = api.root.addResource("auth");
