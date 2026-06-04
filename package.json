@@ -10,6 +10,7 @@
     "test": "jest",
     "cdk": "cdk",
     "dep": "cdk deploy --all --profile AdministratorAccess-640223110844",
+    "sso": "aws sso login --profile AdministratorAccess-640223110844",
     "invoke:load": "aws lambda invoke --function-name load-proverbs temp/output.json --payload fileb://temp/fetch-proverbs-output.json --cli-binary-format raw-in-base64-out --profile AdministratorAccess-640223110844 --output=json",
     "invoke:choose": "aws lambda invoke --function-name choose-proverb temp/output.json --profile AdministratorAccess-640223110844 --output=json",
     "invoke:fetch-proverbs-for-version": "aws lambda invoke --function-name fetch-proverbs-for-version temp/fetch-proverbs-output.json --payload fileb://temp/fetch-proverbs-payload.json --cli-binary-format raw-in-base64-out --profile AdministratorAccess-640223110844 --output=json"
