@@ -1,8 +1,8 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
-  GetCommand,
-  PutCommand,
+  BatchGetCommand,
+  BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import {
   DailyProverbEntitySchema,
@@ -12,42 +12,69 @@ import {
 export const handler = async (): Promise<void> => {
   const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
   const tableName = process.env.TABLE_NAME!;
-  const refsResult = await client.send(
-    new GetCommand({
-      TableName: tableName,
-      Key: {
-        pk: "refs",
-        sk: "refs",
+
+  const today = new Date().toISOString().split("T")[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+
+  const batchGetResult = await client.send(
+    new BatchGetCommand({
+      RequestItems: {
+        [tableName]: {
+          Keys: [
+            { pk: "daily-proverb", sk: today },
+            { pk: "refs", sk: "refs" },
+          ],
+        },
       },
     }),
   );
-  const refs = RefsEntitySchema.parse(refsResult.Item);
 
+  const items = batchGetResult.Responses![tableName]!;
+  const todayEntity = items.find((i) => i.pk === "daily-proverb");
+  const refsItem = items.find((i) => i.pk === "refs");
+  const refs = RefsEntitySchema.parse(refsItem);
   if (refs.usedRefs.length === refs.allRefs.length) {
     refs.usedRefs = [];
   }
-  const unusedRefs = refs.allRefs.filter((ref) => !refs.usedRefs.includes(ref));
-  const randomRef = unusedRefs[Math.floor(Math.random() * unusedRefs.length)];
 
-  refs.usedRefs.push(randomRef);
+  const pickUnused = (): string => {
+    const unused = refs.allRefs.filter((r) => !refs.usedRefs.includes(r));
+    const pick = unused[Math.floor(Math.random() * unused.length)];
+    refs.usedRefs.push(pick);
+    return pick;
+  };
 
-  const today = new Date().toISOString().split("T")[0];
+  const putRequests: { PutRequest: { Item: Record<string, unknown> } }[] = [];
 
-  const putDailyProverbPromise = client.send(
-    new PutCommand({
-      TableName: tableName,
+  if (!todayEntity) {
+    const todayRef = pickUnused();
+    putRequests.push({
+      PutRequest: {
+        Item: DailyProverbEntitySchema.parse({
+          pk: "daily-proverb",
+          sk: today,
+          ref: todayRef,
+        }) as Record<string, unknown>,
+      },
+    });
+  }
+
+  const tomorrowRef = pickUnused();
+  putRequests.push({
+    PutRequest: {
       Item: DailyProverbEntitySchema.parse({
         pk: "daily-proverb",
-        sk: today,
-        ref: randomRef,
-      }),
+        sk: tomorrow,
+        ref: tomorrowRef,
+      }) as Record<string, unknown>,
+    },
+  });
+
+  putRequests.push({ PutRequest: { Item: refs as Record<string, unknown> } });
+
+  await client.send(
+    new BatchWriteCommand({
+      RequestItems: { [tableName]: putRequests },
     }),
   );
-  const putRefsPromise = client.send(
-    new PutCommand({
-      TableName: tableName,
-      Item: refs,
-    }),
-  );
-  await Promise.all([putDailyProverbPromise, putRefsPromise]);
 };
