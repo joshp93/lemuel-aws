@@ -178,25 +178,11 @@ export class LemuelStack extends cdk.Stack {
       },
     );
 
-    const handleAccountCreation = new lambda.Function(
-      this,
-      "handle-account-creation",
-      {
-        functionName: "handle-account-creation",
-        runtime: lambda.Runtime.NODEJS_22_X,
-        handler: "index.handler",
-        code: lambda.Code.fromAsset("dist/handle-account-creation"),
-        environment: {
-          TABLE_NAME: table.tableName,
-        },
-      },
-    );
-
-    const getAccountDetails = new lambda.Function(this, "get-account-details", {
-      functionName: "get-account-details",
+    const accountHandler = new lambda.Function(this, "account-handler", {
+      functionName: "account-handler",
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
-      code: lambda.Code.fromAsset("dist/get-account-details"),
+      code: lambda.Code.fromAsset("dist/account-handler"),
       environment: {
         TABLE_NAME: table.tableName,
       },
@@ -212,29 +198,35 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
-    table.grantReadWriteData(handleAccountCreation);
-    table.grantReadData(getAccountDetails);
+    table.grantReadWriteData(accountHandler);
     table.grantReadWriteData(noteHandler);
 
-    api.root
-      .addResource("handle-account-creation")
-      .addResource("{uuid}")
-      .addMethod(
-        "POST",
-        new apigateway.LambdaIntegration(handleAccountCreation),
-        {
-          authorizationType: apigateway.AuthorizationType.COGNITO,
-          authorizer: cognitoAuthorizer,
-        },
-      );
-
-    api.root
-      .addResource("get-account-details")
-      .addResource("{uuid}")
-      .addMethod("GET", new apigateway.LambdaIntegration(getAccountDetails), {
+    const accounts = api.root.addResource("accounts");
+    const accountUuid = accounts.addResource("{uuid}");
+    accountUuid.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(accountHandler),
+      {
         authorizationType: apigateway.AuthorizationType.COGNITO,
         authorizer: cognitoAuthorizer,
-      });
+        requestParameters: {
+          "method.request.path.uuid": true,
+        },
+        requestValidator,
+      },
+    );
+    accountUuid.addResource("create").addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(accountHandler),
+      {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.path.uuid": true,
+        },
+        requestValidator,
+      },
+    );
 
     const noteModel = api.addModel("NoteModel", {
       contentType: "application/json",

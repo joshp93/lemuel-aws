@@ -1,17 +1,19 @@
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
   GetCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
-import { handler } from "../../../src/get-account-details/index";
+import { getAccountDetailsHandler } from "../../../../src/account-handler/getAccountDetails/index";
+import type { AccountHandlerEnv } from "../../../../src/account-handler/models";
 
-describe("get-account-details handler", () => {
+describe("getAccountDetailsHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
+  const env: AccountHandlerEnv = { TABLE_NAME: "TestTable" };
 
   beforeEach(() => {
     ddbMock.resetHistory();
-    process.env.TABLE_NAME = "TestTable";
   });
 
   it("returns the account record when found", async () => {
@@ -34,7 +36,11 @@ describe("get-account-details handler", () => {
       pathParameters: { uuid: "user-123" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await getAccountDetailsHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body)).toEqual(mockItem);
@@ -52,7 +58,11 @@ describe("get-account-details handler", () => {
       pathParameters: { uuid: "user-456" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await getAccountDetailsHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(404);
     expect(JSON.parse(result.body)).toEqual({
@@ -65,7 +75,11 @@ describe("get-account-details handler", () => {
       pathParameters: {},
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await getAccountDetailsHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(400);
     expect(JSON.parse(result.body)).toEqual({
@@ -76,7 +90,11 @@ describe("get-account-details handler", () => {
   it("returns 400 when pathParameters is undefined", async () => {
     const event = {} as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await getAccountDetailsHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(400);
     expect(JSON.parse(result.body)).toEqual({
@@ -91,7 +109,11 @@ describe("get-account-details handler", () => {
       pathParameters: { uuid: "user-123" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await getAccountDetailsHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(500);
     expect(JSON.parse(result.body)).toEqual({

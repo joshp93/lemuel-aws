@@ -1,23 +1,14 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import {
-  DynamoDBDocumentClient,
-  GetCommand,
-  PutCommand,
-} from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { buildAccountRecord } from "./factories/buildAccountRecord";
-import { CreateAccountEnvSchema, CreateAccountResponseSchema } from "./schemas";
+import { buildAccountRecord } from "./buildAccountRecord";
+import type { AccountHandlerEnv, CreateAccountResponse } from "../models";
 
-/**
- * Creates a backend account record for a newly signed-up user.
- * Idempotent — if the record already exists it returns success without
- * overwriting the existing data.
- */
-export const handler = async (
+export const createAccountHandler = async (
+  client: DynamoDBDocumentClient,
+  env: AccountHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const env = CreateAccountEnvSchema.parse(process.env);
     const uuid = event.pathParameters?.uuid;
 
     if (!uuid) {
@@ -27,8 +18,6 @@ export const handler = async (
       };
     }
 
-    const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-
     const existing = await client.send(
       new GetCommand({
         TableName: env.TABLE_NAME,
@@ -37,7 +26,7 @@ export const handler = async (
     );
 
     if (existing.Item) {
-      const response = CreateAccountResponseSchema.parse({ success: true });
+      const response: CreateAccountResponse = { success: true };
       return {
         statusCode: 200,
         body: JSON.stringify(response),
@@ -51,14 +40,14 @@ export const handler = async (
       }),
     );
 
-    const response = CreateAccountResponseSchema.parse({ success: true });
+    const response: CreateAccountResponse = { success: true };
 
     return {
       statusCode: 200,
       body: JSON.stringify(response),
     };
   } catch (error) {
-    console.error("Error creating account:", error);
+    console.error("[createAccount] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

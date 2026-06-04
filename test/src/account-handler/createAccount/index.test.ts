@@ -1,3 +1,4 @@
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
   GetCommand,
@@ -5,14 +6,15 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
-import { handler } from "../../../src/handle-account-creation/index";
+import { createAccountHandler } from "../../../../src/account-handler/createAccount/index";
+import type { AccountHandlerEnv } from "../../../../src/account-handler/models";
 
-describe("handle-account-creation handler", () => {
+describe("createAccountHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
+  const env: AccountHandlerEnv = { TABLE_NAME: "TestTable" };
 
   beforeEach(() => {
     ddbMock.resetHistory();
-    process.env.TABLE_NAME = "TestTable";
   });
 
   it("creates an account record and returns success", async () => {
@@ -23,7 +25,11 @@ describe("handle-account-creation handler", () => {
       pathParameters: { uuid: "user-123" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await createAccountHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body)).toEqual({ success: true });
@@ -49,7 +55,11 @@ describe("handle-account-creation handler", () => {
       pathParameters: { uuid: "user-123" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await createAccountHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body)).toEqual({ success: true });
@@ -63,7 +73,11 @@ describe("handle-account-creation handler", () => {
       pathParameters: {},
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await createAccountHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(400);
     expect(JSON.parse(result.body)).toEqual({
@@ -74,7 +88,11 @@ describe("handle-account-creation handler", () => {
   it("returns 400 when pathParameters is undefined", async () => {
     const event = {} as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await createAccountHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(400);
     expect(JSON.parse(result.body)).toEqual({
@@ -90,7 +108,11 @@ describe("handle-account-creation handler", () => {
       pathParameters: { uuid: "user-123" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await handler(event);
+    const result = await createAccountHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
 
     expect(result.statusCode).toBe(500);
     expect(JSON.parse(result.body)).toEqual({

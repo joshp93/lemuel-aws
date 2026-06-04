@@ -34,7 +34,7 @@ describe("LemuelStack", () => {
     });
   });
 
-  it("should create Lambda functions for choose-proverb, get-proverb, load-proverbs, and check-user-exists", () => {
+  it("should create Lambda functions for all handlers", () => {
     const app = new cdk.App();
     const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
     const stack = new LemuelStack(app, "TestStack", {
@@ -65,6 +65,11 @@ describe("LemuelStack", () => {
 
     template.hasResourceProperties("AWS::Lambda::Function", {
       FunctionName: "check-user-exists",
+      Runtime: "nodejs22.x",
+    });
+
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "account-handler",
       Runtime: "nodejs22.x",
     });
   });
