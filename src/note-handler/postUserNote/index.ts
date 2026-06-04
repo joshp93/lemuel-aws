@@ -1,4 +1,9 @@
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import type { NoteHandlerEnv } from "../schemas";
@@ -38,6 +43,25 @@ export const postUserNoteHandler = async (
       new PutCommand({
         TableName: env.TABLE_NAME,
         Item: entity,
+      }),
+    );
+
+    const queryResult = await client.send(
+      new QueryCommand({
+        TableName: env.TABLE_NAME,
+        IndexName: "user-notes-index",
+        KeyConditionExpression: "uuid = :uuid",
+        ExpressionAttributeValues: { ":uuid": uuid },
+        Select: "COUNT",
+      }),
+    );
+
+    await client.send(
+      new UpdateCommand({
+        TableName: env.TABLE_NAME,
+        Key: { pk: uuid, sk: "account" },
+        UpdateExpression: "SET totalNotes = :count",
+        ExpressionAttributeValues: { ":count": queryResult.Count ?? 0 },
       }),
     );
 

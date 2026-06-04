@@ -21,8 +21,16 @@ jest.mock("../../../src/account-handler/createAccount/index", () => ({
   }),
 }));
 
-import { getAccountDetailsHandler } from "../../../src/account-handler/getAccountDetails/index";
+jest.mock("../../../src/account-handler/updateMeditations/index", () => ({
+  updateMeditationsHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+  }),
+}));
+
 import { createAccountHandler } from "../../../src/account-handler/createAccount/index";
+import { getAccountDetailsHandler } from "../../../src/account-handler/getAccountDetails/index";
+import { updateMeditationsHandler } from "../../../src/account-handler/updateMeditations/index";
 
 describe("account-handler router", () => {
   beforeEach(() => {
@@ -52,6 +60,18 @@ describe("account-handler router", () => {
     await handler(event);
 
     expect(createAccountHandler).toHaveBeenCalled();
+  });
+
+  it("routes POST /accounts/{uuid}/meditations/{date} to updateMeditationsHandler", async () => {
+    const event = {
+      httpMethod: "POST",
+      resource: "/accounts/{uuid}/meditations/{date}",
+      pathParameters: { uuid: "user-123", date: "2026-02-01" },
+    } as unknown as APIGatewayProxyEvent;
+
+    await handler(event);
+
+    expect(updateMeditationsHandler).toHaveBeenCalled();
   });
 
   it("returns 405 for unsupported routes", async () => {

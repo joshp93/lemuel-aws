@@ -76,3 +76,12 @@ export const NoteEntitySchema = z.object({
 });
 
 export type NoteEntity = z.infer<typeof NoteEntitySchema>;
+
+export const MeditationEntitySchema = z.object({
+  pk: z.string(),
+  sk: z.string(),
+  uuid: z.string(),
+  date: z.string(),
+});
+
+export type MeditationEntity = z.infer<typeof MeditationEntitySchema>;

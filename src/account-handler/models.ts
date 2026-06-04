@@ -7,3 +7,5 @@ export const AccountHandlerEnvSchema = z.object({
 export type AccountHandlerEnv = z.infer<typeof AccountHandlerEnvSchema>;
 
 export type CreateAccountResponse = { success: true };
+
+export type UpdateMeditationsResponse = { success: true };

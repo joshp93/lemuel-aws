@@ -228,6 +228,23 @@ export class LemuelStack extends cdk.Stack {
       },
     );
 
+    accountUuid
+      .addResource("meditations")
+      .addResource("{date}")
+      .addMethod(
+        "POST",
+        new apigateway.LambdaIntegration(accountHandler),
+        {
+          authorizationType: apigateway.AuthorizationType.COGNITO,
+          authorizer: cognitoAuthorizer,
+          requestParameters: {
+            "method.request.path.uuid": true,
+            "method.request.path.date": true,
+          },
+          requestValidator,
+        },
+      );
+
     const noteModel = api.addModel("NoteModel", {
       contentType: "application/json",
       modelName: "NoteModel",
