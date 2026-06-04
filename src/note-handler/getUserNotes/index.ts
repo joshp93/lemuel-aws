@@ -31,8 +31,9 @@ export const getUserNotesHandler = async (
       new QueryCommand({
         TableName: env.TABLE_NAME,
         IndexName: "user-notes-index",
-        KeyConditionExpression: "uuid = :uuid",
-        ExpressionAttributeValues: { ":uuid": params.uuid },
+        KeyConditionExpression: "#uid = :uid",
+        ExpressionAttributeNames: { "#uid": "uuid" },
+        ExpressionAttributeValues: { ":uid": params.uuid },
         Limit: params.limit,
         ExclusiveStartKey: params.exclusiveStartKey,
         ScanIndexForward: params.scanForward,

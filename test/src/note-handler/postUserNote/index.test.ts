@@ -66,10 +66,13 @@ describe("postUserNoteHandler", () => {
     expect(queryCalls).toHaveLength(1);
     expect(queryCalls[0].args[0].input.IndexName).toBe("user-notes-index");
     expect(queryCalls[0].args[0].input.KeyConditionExpression).toBe(
-      "uuid = :uuid",
+      "#uid = :uid",
     );
+    expect(queryCalls[0].args[0].input.ExpressionAttributeNames).toEqual({
+      "#uid": "uuid",
+    });
     expect(queryCalls[0].args[0].input.ExpressionAttributeValues).toEqual({
-      ":uuid": "66a20224-c0d1-70f3-58f9-4671e44cac10",
+      ":uid": "66a20224-c0d1-70f3-58f9-4671e44cac10",
     });
     expect(queryCalls[0].args[0].input.Select).toBe("COUNT");
 

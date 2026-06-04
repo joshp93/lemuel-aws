@@ -50,8 +50,9 @@ export const postUserNoteHandler = async (
       new QueryCommand({
         TableName: env.TABLE_NAME,
         IndexName: "user-notes-index",
-        KeyConditionExpression: "uuid = :uuid",
-        ExpressionAttributeValues: { ":uuid": uuid },
+        KeyConditionExpression: "#uid = :uid",
+        ExpressionAttributeNames: { "#uid": "uuid" },
+        ExpressionAttributeValues: { ":uid": uuid },
         Select: "COUNT",
       }),
     );

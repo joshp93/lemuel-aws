@@ -29,8 +29,9 @@ describe("getUserNotesHandler", () => {
 
     const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
     expect(queryCall.IndexName).toBe("user-notes-index");
-    expect(queryCall.KeyConditionExpression).toBe("uuid = :uuid");
-    expect(queryCall.ExpressionAttributeValues![":uuid"]).toBe(
+    expect(queryCall.KeyConditionExpression).toBe("#uid = :uid");
+    expect(queryCall.ExpressionAttributeNames).toEqual({ "#uid": "uuid" });
+    expect(queryCall.ExpressionAttributeValues![":uid"]).toBe(
       "66a20224-c0d1-70f3-58f9-4671e44cac10",
     );
     expect(queryCall.ScanIndexForward).toBe(false);
