@@ -35,6 +35,7 @@
     "zod": "4.1.5"
   },
   "dependencies": {
+    "@aws-lambda-powertools/logger": "2.33.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.1041.0",
     "aws-cdk-lib": "2.250.0",
     "constructs": "^10.0.0"

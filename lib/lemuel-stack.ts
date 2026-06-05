@@ -116,10 +116,26 @@ export class LemuelStack extends cdk.Stack {
       }),
     );
 
+    const logHandler = new lambda.Function(this, "log-handler", {
+      functionName: "log-handler",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("dist/log-handler"),
+      environment: {
+        POWERTOOLS_SERVICE_NAME: "lemuel",
+        POWERTOOLS_LOG_LEVEL: "DEBUG",
+      },
+      loggingFormat: lambda.LoggingFormat.JSON,
+      systemLogLevelV2: lambda.SystemLogLevel.WARN,
+      applicationLogLevelV2: lambda.ApplicationLogLevel.DEBUG,
+    });
+
     const api = new apigateway.RestApi(this, "lemuel-api", {
       restApiName: "lemuel-api",
       deployOptions: {
         dataTraceEnabled: false,
+        throttlingRateLimit: 100,
+        throttlingBurstLimit: 200,
       },
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
@@ -263,6 +279,24 @@ export class LemuelStack extends cdk.Stack {
       validateRequestBody: true,
     });
 
+    const logModel = api.addModel("LogModel", {
+      contentType: "application/json",
+      modelName: "LogModel",
+      schema: {
+        schema: apigateway.JsonSchemaVersion.DRAFT4,
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          level: {
+            type: apigateway.JsonSchemaType.STRING,
+            enum: ["debug", "info", "warn", "error"],
+          },
+          message: { type: apigateway.JsonSchemaType.STRING },
+          context: { type: apigateway.JsonSchemaType.OBJECT },
+        },
+        required: ["level", "message"],
+      },
+    });
+
     const notes = api.root.addResource("notes");
 
     const proverbs = notes.addResource("proverbs");
@@ -324,6 +358,19 @@ export class LemuelStack extends cdk.Stack {
         },
         requestModels: {
           "application/json": noteModel,
+        },
+        requestValidator: bodyValidator,
+      },
+    );
+
+    const logsResource = api.root.addResource("logs");
+    logsResource.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(logHandler),
+      {
+        authorizationType: apigateway.AuthorizationType.NONE,
+        requestModels: {
+          "application/json": logModel,
         },
         requestValidator: bodyValidator,
       },

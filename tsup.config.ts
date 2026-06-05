@@ -11,4 +11,5 @@ export default defineConfig({
   dts: false,
   clean: true,
   external: [],
+  noExternal: ["@aws-lambda-powertools/logger"],
 });

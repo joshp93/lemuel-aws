@@ -1087,7 +1087,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       "Type": "AWS::IAM::Role",
       "UpdateReplacePolicy": "Retain",
     },
-    "lemuelapiDeployment2137DA7Aa1f26fe620ec4ccf7e317e87c8f52caa": {
+    "lemuelapiDeployment2137DA7A33c208d5f6a112e105d9712b87d324fd": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
         "lemuelapiversionGET9CB1814C",
@@ -1117,6 +1117,9 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapigetproverbsGETD7392087",
         "lemuelapigetproverbsOPTIONS33302D82",
         "lemuelapigetproverbs6C14DE1F",
+        "lemuelapilogsOPTIONS250F497D",
+        "lemuelapilogsPOST72F2A316",
+        "lemuelapilogs89E77620",
         "lemuelapinotesOPTIONSCFAD9491",
         "lemuelapinotesproverbsrefGETAA475F29",
         "lemuelapinotesproverbsrefOPTIONS8B408327",
@@ -1134,6 +1137,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapinotesusersOPTIONS1845D0D8",
         "lemuelapinotesusers8A8C2688",
         "lemuelapiOPTIONS67B4627A",
+        "lemuelapiLogModelA896F382",
         "lemuelapiNoteModelE7B26908",
         "lemuelapiRequestValidator9BC748F4",
       ],
@@ -1154,13 +1158,15 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7Aa1f26fe620ec4ccf7e317e87c8f52caa",
+          "Ref": "lemuelapiDeployment2137DA7A33c208d5f6a112e105d9712b87d324fd",
         },
         "MethodSettings": [
           {
             "DataTraceEnabled": false,
             "HttpMethod": "*",
             "ResourcePath": "/*",
+            "ThrottlingBurstLimit": 200,
+            "ThrottlingRateLimit": 100,
           },
         ],
         "RestApiId": {
@@ -1169,6 +1175,41 @@ exports[`LemuelStack should match snapshot 1`] = `
         "StageName": "prod",
       },
       "Type": "AWS::ApiGateway::Stage",
+    },
+    "lemuelapiLogModelA896F382": {
+      "Properties": {
+        "ContentType": "application/json",
+        "Name": "LogModel",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+        "Schema": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "properties": {
+            "context": {
+              "type": "object",
+            },
+            "level": {
+              "enum": [
+                "debug",
+                "info",
+                "warn",
+                "error",
+              ],
+              "type": "string",
+            },
+            "message": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "level",
+            "message",
+          ],
+          "type": "object",
+        },
+      },
+      "Type": "AWS::ApiGateway::Model",
     },
     "lemuelapiNoteModelE7B26908": {
       "Properties": {
@@ -2486,6 +2527,187 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Method",
     },
+    "lemuelapilogs89E77620": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "lemuelapi762B60E0",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "logs",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapilogsOPTIONS250F497D": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapilogs89E77620",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapilogsPOST72F2A316": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "POST",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "loghandlerCCF38AB7",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "RequestModels": {
+          "application/json": {
+            "Ref": "lemuelapiLogModelA896F382",
+          },
+        },
+        "RequestValidatorId": {
+          "Ref": "lemuelapiBodyValidator6CBA4433",
+        },
+        "ResourceId": {
+          "Ref": "lemuelapilogs89E77620",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapilogsPOSTApiPermissionTestStacklemuelapiBB28E280POSTlogs08F3A26E": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "loghandlerCCF38AB7",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/POST/logs",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapilogsPOSTApiPermissionTestTestStacklemuelapiBB28E280POSTlogs6804C349": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "loghandlerCCF38AB7",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/POST/logs",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
     "lemuelapinotes425421B8": {
       "Properties": {
         "ParentId": {
@@ -3682,6 +3904,71 @@ exports[`LemuelStack should match snapshot 1`] = `
         ],
       },
       "Type": "AWS::IAM::Policy",
+    },
+    "loghandlerCCF38AB7": {
+      "DependsOn": [
+        "loghandlerServiceRoleDAC1A4AF",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "5855b2e7c22e2cd4038167f7d8fe20149979b1b38c180c4501c4056054cbc820.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "DEBUG",
+            "POWERTOOLS_SERVICE_NAME": "lemuel",
+          },
+        },
+        "FunctionName": "log-handler",
+        "Handler": "index.handler",
+        "LoggingConfig": {
+          "ApplicationLogLevel": "DEBUG",
+          "LogFormat": "JSON",
+          "SystemLogLevel": "WARN",
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "loghandlerServiceRoleDAC1A4AF",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "loghandlerServiceRoleDAC1A4AF": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
     },
     "notehandler2C39A02E": {
       "DependsOn": [
