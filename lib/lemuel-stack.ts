@@ -6,24 +6,30 @@ import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as eventSources from "aws-cdk-lib/aws-lambda-event-sources";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import { Construct } from "constructs";
 
 interface LemuelStackProps extends cdk.StackProps {
   userPool: cognito.IUserPool;
   apiBibleSecretName: string;
+  fcmSecretName: string;
 }
 
 export class LemuelStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: LemuelStackProps) {
     super(scope, id, props);
 
+    // -----------------------------------------------------------
+    // DynamoDB Table + GSIs
+    // -----------------------------------------------------------
     const table = new dynamodb.Table(this, "proverbs-store", {
       tableName: "proverbs-store",
       partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      stream: dynamodb.StreamViewType.NEW_IMAGE,
     });
 
     table.addGlobalSecondaryIndex({
@@ -44,6 +50,18 @@ export class LemuelStack extends cdk.Stack {
       sortKey: { name: "dateCreated", type: dynamodb.AttributeType.STRING },
     });
 
+    table.addGlobalSecondaryIndex({
+      indexName: "device-notif-index",
+      partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
+      sortKey: {
+        name: "notificationsEnabled",
+        type: dynamodb.AttributeType.STRING,
+      },
+    });
+
+    // -----------------------------------------------------------
+    // Lambda Functions
+    // -----------------------------------------------------------
     const fetchProverbsForVersion = new lambda.Function(
       this,
       "fetch-proverbs-for-version",
@@ -105,7 +123,6 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
-    // Grant Lambda permission to query Cognito User Pool using AdminGetUser
     checkUserExists.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
@@ -130,25 +147,6 @@ export class LemuelStack extends cdk.Stack {
       applicationLogLevelV2: lambda.ApplicationLogLevel.DEBUG,
     });
 
-    const api = new apigateway.RestApi(this, "lemuel-api", {
-      restApiName: "lemuel-api",
-      deployOptions: {
-        dataTraceEnabled: false,
-        throttlingRateLimit: 100,
-        throttlingBurstLimit: 200,
-      },
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
-      },
-    });
-
-    const requestValidator = api.addRequestValidator("RequestValidator", {
-      requestValidatorName: "lemuel-request-validator",
-      validateRequestParameters: true,
-    });
-
     const getAvailableVersions = new lambda.Function(
       this,
       "get-available-versions",
@@ -160,37 +158,6 @@ export class LemuelStack extends cdk.Stack {
         environment: {
           TABLE_NAME: table.tableName,
         },
-      },
-    );
-
-    table.grantReadData(getAvailableVersions);
-
-    api.root
-      .addResource("available-versions")
-      .addMethod(
-        "GET",
-        new apigateway.LambdaIntegration(getAvailableVersions),
-        {
-          authorizationType: apigateway.AuthorizationType.NONE,
-        },
-      );
-
-    api.root
-      .addResource("{version}")
-      .addMethod("GET", new apigateway.LambdaIntegration(getProverb), {
-        authorizationType: apigateway.AuthorizationType.NONE,
-        requestParameters: {
-          "method.request.querystring.date": false,
-        },
-        requestValidator,
-      });
-
-    const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
-      this,
-      "CognitoAuthorizer",
-      {
-        cognitoUserPools: [props.userPool],
-        authorizerName: "lemuel-cognito-authorizer",
       },
     );
 
@@ -214,52 +181,88 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
-    table.grantReadWriteData(accountHandler);
-    table.grantReadWriteData(noteHandler);
-
-    const accounts = api.root.addResource("accounts");
-    const accountUuid = accounts.addResource("{uuid}");
-    accountUuid.addMethod(
-      "GET",
-      new apigateway.LambdaIntegration(accountHandler),
-      {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
-        requestParameters: {
-          "method.request.path.uuid": true,
-        },
-        requestValidator,
+    const loadProverbsLambda = new lambda.Function(this, "load-proverbs", {
+      functionName: "load-proverbs",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("dist/load-proverbs"),
+      environment: {
+        TABLE_NAME: table.tableName,
       },
-    );
-    accountUuid.addResource("create").addMethod(
-      "POST",
-      new apigateway.LambdaIntegration(accountHandler),
+    });
+
+    const createDeviceNotifConfig = new lambda.Function(
+      this,
+      "create-device-notif-config",
       {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
-        requestParameters: {
-          "method.request.path.uuid": true,
+        functionName: "create-device-notif-config",
+        runtime: lambda.Runtime.NODEJS_22_X,
+        handler: "index.handler",
+        code: lambda.Code.fromAsset("dist/create-device-notif-config"),
+        environment: {
+          TABLE_NAME: table.tableName,
         },
-        requestValidator,
       },
     );
 
-    accountUuid
-      .addResource("meditations")
-      .addResource("{date}")
-      .addMethod(
-        "POST",
-        new apigateway.LambdaIntegration(accountHandler),
-        {
-          authorizationType: apigateway.AuthorizationType.COGNITO,
-          authorizer: cognitoAuthorizer,
-          requestParameters: {
-            "method.request.path.uuid": true,
-            "method.request.path.date": true,
-          },
-          requestValidator,
+    const pushDailyProverb = new lambda.Function(this, "push-daily-proverb", {
+      functionName: "push-daily-proverb",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("dist/push-daily-proverb"),
+      environment: {
+        TABLE_NAME: table.tableName,
+        FCM_SECRET_NAME: props.fcmSecretName,
+      },
+      timeout: cdk.Duration.minutes(5),
+    });
+
+    const pushDailyNotification = new lambda.Function(
+      this,
+      "push-daily-notification",
+      {
+        functionName: "push-daily-notification",
+        runtime: lambda.Runtime.NODEJS_22_X,
+        handler: "index.handler",
+        code: lambda.Code.fromAsset("dist/push-daily-notification"),
+        environment: {
+          TABLE_NAME: table.tableName,
+          FCM_SECRET_NAME: props.fcmSecretName,
         },
-      );
+        timeout: cdk.Duration.minutes(5),
+      },
+    );
+
+    // -----------------------------------------------------------
+    // API Gateway
+    // -----------------------------------------------------------
+    const api = new apigateway.RestApi(this, "lemuel-api", {
+      restApiName: "lemuel-api",
+      deployOptions: {
+        dataTraceEnabled: false,
+        throttlingRateLimit: 100,
+        throttlingBurstLimit: 200,
+      },
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+      },
+    });
+
+    const requestValidator = api.addRequestValidator("RequestValidator", {
+      requestValidatorName: "lemuel-request-validator",
+      validateRequestParameters: true,
+    });
+
+    const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
+      this,
+      "CognitoAuthorizer",
+      {
+        cognitoUserPools: [props.userPool],
+        authorizerName: "lemuel-cognito-authorizer",
+      },
+    );
 
     const noteModel = api.addModel("NoteModel", {
       contentType: "application/json",
@@ -297,6 +300,109 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
+    const deviceNotifConfigModel = api.addModel(
+      "CreateDeviceNotificationConfigModel",
+      {
+        contentType: "application/json",
+        modelName: "CreateDeviceNotificationConfigModel",
+        schema: {
+          schema: apigateway.JsonSchemaVersion.DRAFT4,
+          type: apigateway.JsonSchemaType.OBJECT,
+          properties: {
+            token: { type: apigateway.JsonSchemaType.STRING },
+            platform: { type: apigateway.JsonSchemaType.STRING },
+            notificationsEnabled: {
+              type: apigateway.JsonSchemaType.STRING,
+              enum: ["true", "false"],
+            },
+          },
+          required: ["token", "platform", "notificationsEnabled"],
+        },
+      },
+    );
+
+    // -----------------------------------------------------------
+    // API Methods
+    // -----------------------------------------------------------
+
+    // GET /available-versions
+    api.root
+      .addResource("available-versions")
+      .addMethod(
+        "GET",
+        new apigateway.LambdaIntegration(getAvailableVersions),
+        {
+          authorizationType: apigateway.AuthorizationType.NONE,
+        },
+      );
+
+    // GET /{version}
+    api.root
+      .addResource("{version}")
+      .addMethod("GET", new apigateway.LambdaIntegration(getProverb), {
+        authorizationType: apigateway.AuthorizationType.NONE,
+        requestParameters: {
+          "method.request.querystring.date": false,
+        },
+        requestValidator,
+      });
+
+    // GET /get-proverbs
+    api.root
+      .addResource("get-proverbs")
+      .addMethod("GET", new apigateway.LambdaIntegration(getProverbs), {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.querystring.limit": false,
+          "method.request.querystring.lastKey": false,
+          "method.request.querystring.scanForward": false,
+        },
+        requestValidator,
+      });
+
+    // Accounts
+    const accounts = api.root.addResource("accounts");
+    const accountUuid = accounts.addResource("{uuid}");
+    accountUuid.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(accountHandler),
+      {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.path.uuid": true,
+        },
+        requestValidator,
+      },
+    );
+    accountUuid.addResource("create").addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(accountHandler),
+      {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.path.uuid": true,
+        },
+        requestValidator,
+      },
+    );
+
+    accountUuid
+      .addResource("meditations")
+      .addResource("{date}")
+      .addMethod("POST", new apigateway.LambdaIntegration(accountHandler), {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer: cognitoAuthorizer,
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.date": true,
+        },
+        requestValidator,
+      });
+
+    // Notes
     const notes = api.root.addResource("notes");
 
     const proverbs = notes.addResource("proverbs");
@@ -363,6 +469,7 @@ export class LemuelStack extends cdk.Stack {
       },
     );
 
+    // POST /logs
     const logsResource = api.root.addResource("logs");
     logsResource.addMethod(
       "POST",
@@ -376,20 +483,7 @@ export class LemuelStack extends cdk.Stack {
       },
     );
 
-    api.root
-      .addResource("get-proverbs")
-      .addMethod("GET", new apigateway.LambdaIntegration(getProverbs), {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
-        requestParameters: {
-          "method.request.querystring.limit": false,
-          "method.request.querystring.lastKey": false,
-          "method.request.querystring.scanForward": false,
-        },
-        requestValidator,
-      });
-
-    // Add auth endpoints with rate limiting
+    // POST /auth/check-user-exists
     const authResource = api.root.addResource("auth");
     const checkUserExistsResource =
       authResource.addResource("check-user-exists");
@@ -416,7 +510,6 @@ export class LemuelStack extends cdk.Stack {
       },
     );
 
-    // Create usage plan with rate limiting to prevent user enumeration
     const apiKey = api.addApiKey("CheckUserExistsKey", {
       apiKeyName: "check-user-exists-key",
     });
@@ -425,11 +518,11 @@ export class LemuelStack extends cdk.Stack {
       name: "check-user-exists-rate-limit",
       description: "Rate limiting for check-user-exists endpoint",
       throttle: {
-        rateLimit: 10, // 10 requests per second
-        burstLimit: 20, // Allow burst of up to 20
+        rateLimit: 10,
+        burstLimit: 20,
       },
       quota: {
-        limit: 10000, // 10k requests per day
+        limit: 10000,
         period: apigateway.Period.DAY,
       },
     });
@@ -439,25 +532,68 @@ export class LemuelStack extends cdk.Stack {
       stage: api.deploymentStage,
     });
 
-    const loadProverbsLambda = new lambda.Function(this, "load-proverbs", {
-      functionName: "load-proverbs",
-      runtime: lambda.Runtime.NODEJS_22_X,
-      handler: "index.handler",
-      code: lambda.Code.fromAsset("dist/load-proverbs"),
-      environment: {
-        TABLE_NAME: table.tableName,
-      },
-    });
+    // POST /notifications/config
+    api.root
+      .addResource("notifications")
+      .addResource("config")
+      .addMethod(
+        "POST",
+        new apigateway.LambdaIntegration(createDeviceNotifConfig),
+        {
+          authorizationType: apigateway.AuthorizationType.NONE,
+          requestModels: {
+            "application/json": deviceNotifConfigModel,
+          },
+          requestValidator: bodyValidator,
+        },
+      );
 
+    // -----------------------------------------------------------
+    // IAM Grants
+    // -----------------------------------------------------------
     table.grantReadWriteData(chooseProverb);
     table.grantReadWriteData(loadProverbsLambda);
+    table.grantReadWriteData(accountHandler);
+    table.grantReadWriteData(noteHandler);
+    table.grantReadData(getAvailableVersions);
     table.grantReadData(getProverb);
     table.grantReadData(getProverbs);
+    table.grantWriteData(createDeviceNotifConfig);
+    table.grantReadData(pushDailyProverb);
+    table.grantReadData(pushDailyNotification);
 
+    const fcmSecret = secretsmanager.Secret.fromSecretNameV2(
+      this,
+      "imported-fcm-secret",
+      props.fcmSecretName,
+    );
+    fcmSecret.grantRead(pushDailyProverb);
+    fcmSecret.grantRead(pushDailyNotification);
+
+    // -----------------------------------------------------------
+    // EventBridge Rules & Event Source Mappings
+    // -----------------------------------------------------------
     new events.Rule(this, "lemuel-schedule", {
       ruleName: "lemuel-schedule",
       schedule: events.Schedule.cron({ minute: "0", hour: "0" }),
       targets: [new targets.LambdaFunction(chooseProverb)],
     });
+
+    new events.Rule(this, "lemuel-midday-notification", {
+      ruleName: "lemuel-midday-notification",
+      schedule: events.Schedule.cron({ minute: "0", hour: "12" }),
+      targets: [new targets.LambdaFunction(pushDailyNotification)],
+    });
+
+    pushDailyProverb.addEventSource(
+      new eventSources.DynamoEventSource(table, {
+        startingPosition: lambda.StartingPosition.TRIM_HORIZON,
+        filters: [
+          lambda.FilterCriteria.filter({
+            eventName: lambda.FilterRule.isEqual("INSERT"),
+          }),
+        ],
+      }),
+    );
   }
 }

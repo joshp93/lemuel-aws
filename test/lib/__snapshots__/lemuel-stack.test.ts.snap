@@ -64,7 +64,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "20e6d52a79c83dcaf49506ff8dd4526c2eb645fbbce0e9a43a7dbe51c06b91bf.zip",
+          "S3Key": "55384064acf7f5ffaca28a98ff687047f4a31fdc928d05c7b442e5bf7db310d4.zip",
         },
         "Environment": {
           "Variables": {
@@ -309,7 +309,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "43eac61fd1a59e5e9e2a5c5fd8005adffc38cae47504003c1e8bb8afeead0446.zip",
+          "S3Key": "6f38da8fbb49464d013fe8a91d2b8d2bbf421babfc20dd4c29ed3c7ff1628960.zip",
         },
         "Environment": {
           "Variables": {
@@ -443,6 +443,116 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
+    "createdevicenotifconfigDFBE173F": {
+      "DependsOn": [
+        "createdevicenotifconfigServiceRoleDefaultPolicy8F8FDC9A",
+        "createdevicenotifconfigServiceRole020CE57B",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "7a4f12ee96cf1a943b8ead1a720366bf820bc40d5c9b0c7accb4829abd58fd44.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "proverbsstore7682A597",
+            },
+          },
+        },
+        "FunctionName": "create-device-notif-config",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "createdevicenotifconfigServiceRole020CE57B",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "createdevicenotifconfigServiceRole020CE57B": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "createdevicenotifconfigServiceRoleDefaultPolicy8F8FDC9A": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "createdevicenotifconfigServiceRoleDefaultPolicy8F8FDC9A",
+        "Roles": [
+          {
+            "Ref": "createdevicenotifconfigServiceRole020CE57B",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
     "fetchproverbsforversion4C784619": {
       "DependsOn": [
         "fetchproverbsforversionServiceRoleDefaultPolicyDEC1A29A",
@@ -557,7 +667,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "7298660613a4a68a5211322f5be828c1104e5b0aef18b5a86a5ee2b6c09b8d9c.zip",
+          "S3Key": "63f9f4867304e8ad72f4f9b96bf2f4d7fbbfed66b05c768eb7a373997fe2bd4c.zip",
         },
         "Environment": {
           "Variables": {
@@ -697,7 +807,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "ba699476c0e94c3a69a23bd9178e9f44a34c48facc05e2088bb562a815ccaf2e.zip",
+          "S3Key": "479c7a11260f3d3de56d7e3b718e694c89d765c7ae9751af860fc8159d66675d.zip",
         },
         "Environment": {
           "Variables": {
@@ -837,7 +947,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "1150c8e2235dee61bbdac1918002d6fbe1e2445952775dd279ad380d9aff96f7.zip",
+          "S3Key": "e02dc8655ab67d6bd028d679455bcb0d6b8263c627dab904cb325937976c4f32.zip",
         },
         "Environment": {
           "Variables": {
@@ -1087,9 +1197,44 @@ exports[`LemuelStack should match snapshot 1`] = `
       "Type": "AWS::IAM::Role",
       "UpdateReplacePolicy": "Retain",
     },
-    "lemuelapiDeployment2137DA7A33c208d5f6a112e105d9712b87d324fd": {
+    "lemuelapiCreateDeviceNotificationConfigModel528FF86F": {
+      "Properties": {
+        "ContentType": "application/json",
+        "Name": "CreateDeviceNotificationConfigModel",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+        "Schema": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "properties": {
+            "notificationsEnabled": {
+              "enum": [
+                "true",
+                "false",
+              ],
+              "type": "string",
+            },
+            "platform": {
+              "type": "string",
+            },
+            "token": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "token",
+            "platform",
+            "notificationsEnabled",
+          ],
+          "type": "object",
+        },
+      },
+      "Type": "AWS::ApiGateway::Model",
+    },
+    "lemuelapiDeployment2137DA7A186f28e76368e8956329f48173af37e2": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
+        "lemuelapiCreateDeviceNotificationConfigModel528FF86F",
         "lemuelapiversionGET9CB1814C",
         "lemuelapiversionOPTIONSB1F64BAF",
         "lemuelapiversion53308960",
@@ -1136,6 +1281,11 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapinotesusersuuid3A08939C",
         "lemuelapinotesusersOPTIONS1845D0D8",
         "lemuelapinotesusers8A8C2688",
+        "lemuelapinotificationsconfigOPTIONS66AA3721",
+        "lemuelapinotificationsconfigPOST38ACC6F0",
+        "lemuelapinotificationsconfig4BEFA4DD",
+        "lemuelapinotificationsOPTIONS94B1A56A",
+        "lemuelapinotificationsA857DDE0",
         "lemuelapiOPTIONS67B4627A",
         "lemuelapiLogModelA896F382",
         "lemuelapiNoteModelE7B26908",
@@ -1158,7 +1308,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7A33c208d5f6a112e105d9712b87d324fd",
+          "Ref": "lemuelapiDeployment2137DA7A186f28e76368e8956329f48173af37e2",
         },
         "MethodSettings": [
           {
@@ -3544,6 +3694,239 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::Lambda::Permission",
     },
+    "lemuelapinotificationsA857DDE0": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "lemuelapi762B60E0",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "notifications",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapinotificationsOPTIONS94B1A56A": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapinotificationsA857DDE0",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapinotificationsconfig4BEFA4DD": {
+      "Properties": {
+        "ParentId": {
+          "Ref": "lemuelapinotificationsA857DDE0",
+        },
+        "PathPart": "config",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapinotificationsconfigOPTIONS66AA3721": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapinotificationsconfig4BEFA4DD",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapinotificationsconfigPOST38ACC6F0": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "POST",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "createdevicenotifconfigDFBE173F",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "RequestModels": {
+          "application/json": {
+            "Ref": "lemuelapiCreateDeviceNotificationConfigModel528FF86F",
+          },
+        },
+        "RequestValidatorId": {
+          "Ref": "lemuelapiBodyValidator6CBA4433",
+        },
+        "ResourceId": {
+          "Ref": "lemuelapinotificationsconfig4BEFA4DD",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapinotificationsconfigPOSTApiPermissionTestStacklemuelapiBB28E280POSTnotificationsconfigF4122C54": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "createdevicenotifconfigDFBE173F",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/POST/notifications/config",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapinotificationsconfigPOSTApiPermissionTestTestStacklemuelapiBB28E280POSTnotificationsconfig0F658025": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "createdevicenotifconfigDFBE173F",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/POST/notifications/config",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
     "lemuelapiversion53308960": {
       "Properties": {
         "ParentId": {
@@ -3723,6 +4106,44 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Method",
     },
+    "lemuelmiddaynotificationAllowEventRuleTestStackpushdailynotification434976524F692D17": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "pushdailynotification2240C61E",
+            "Arn",
+          ],
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "lemuelmiddaynotificationCC1A6A3D",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelmiddaynotificationCC1A6A3D": {
+      "Properties": {
+        "Name": "lemuel-midday-notification",
+        "ScheduleExpression": "cron(0 12 * * ? *)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "pushdailynotification2240C61E",
+                "Arn",
+              ],
+            },
+            "Id": "Target0",
+          },
+        ],
+      },
+      "Type": "AWS::Events::Rule",
+    },
     "lemuelschedule1C0FCCC8": {
       "Properties": {
         "Name": "lemuel-schedule",
@@ -3771,7 +4192,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "8c0220a515cc1c8a28ca7d548d7e17287aa0f5bf4b0d2a2e6d7e3f1174af6e07.zip",
+          "S3Key": "ba073cbf62fc6bfd633f79580308e4171f340d372eff60146b14bd93a5c50ada.zip",
         },
         "Environment": {
           "Variables": {
@@ -3980,7 +4401,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "218d02dd0845a3b94af4224f1342da13c8f86d24d2d6c9943a2b091c7a9c9357.zip",
+          "S3Key": "84e1ccbe46f7c40066723f14bae9a411e1bf7117ae54482c95285dc5bf1ad93a.zip",
         },
         "Environment": {
           "Variables": {
@@ -4142,6 +4563,10 @@ exports[`LemuelStack should match snapshot 1`] = `
             "AttributeName": "uuid",
             "AttributeType": "S",
           },
+          {
+            "AttributeName": "notificationsEnabled",
+            "AttributeType": "S",
+          },
         ],
         "BillingMode": "PAY_PER_REQUEST",
         "GlobalSecondaryIndexes": [
@@ -4193,6 +4618,22 @@ exports[`LemuelStack should match snapshot 1`] = `
               "ProjectionType": "ALL",
             },
           },
+          {
+            "IndexName": "device-notif-index",
+            "KeySchema": [
+              {
+                "AttributeName": "pk",
+                "KeyType": "HASH",
+              },
+              {
+                "AttributeName": "notificationsEnabled",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": {
+              "ProjectionType": "ALL",
+            },
+          },
         ],
         "KeySchema": [
           {
@@ -4204,10 +4645,393 @@ exports[`LemuelStack should match snapshot 1`] = `
             "KeyType": "RANGE",
           },
         ],
+        "StreamSpecification": {
+          "StreamViewType": "NEW_IMAGE",
+        },
         "TableName": "proverbs-store",
       },
       "Type": "AWS::DynamoDB::Table",
       "UpdateReplacePolicy": "Delete",
+    },
+    "pushdailynotification2240C61E": {
+      "DependsOn": [
+        "pushdailynotificationServiceRoleDefaultPolicy47850492",
+        "pushdailynotificationServiceRole1FD23F6A",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "b00173de87def04d3390d5bb08f90fd58151d6bc9fcf6f91d7c2a3da046da1e9.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "FCM_SECRET_NAME": "fcm-server-creds",
+            "TABLE_NAME": {
+              "Ref": "proverbsstore7682A597",
+            },
+          },
+        },
+        "FunctionName": "push-daily-notification",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "pushdailynotificationServiceRole1FD23F6A",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+        "Timeout": 300,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "pushdailynotificationServiceRole1FD23F6A": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "pushdailynotificationServiceRoleDefaultPolicy47850492": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:fcm-server-creds-??????",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "pushdailynotificationServiceRoleDefaultPolicy47850492",
+        "Roles": [
+          {
+            "Ref": "pushdailynotificationServiceRole1FD23F6A",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "pushdailyproverb35302875": {
+      "DependsOn": [
+        "pushdailyproverbServiceRoleDefaultPolicyFDA4289C",
+        "pushdailyproverbServiceRoleE10D6EE1",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "009e42779c0814e4d699d81d5dc5e49c9892bb796de2564e18279fef0f77a741.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "FCM_SECRET_NAME": "fcm-server-creds",
+            "TABLE_NAME": {
+              "Ref": "proverbsstore7682A597",
+            },
+          },
+        },
+        "FunctionName": "push-daily-proverb",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "pushdailyproverbServiceRoleE10D6EE1",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+        "Timeout": 300,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "pushdailyproverbDynamoDBEventSourceTestStackproverbsstore0213FC8BA6046612": {
+      "Properties": {
+        "BatchSize": 100,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "proverbsstore7682A597",
+            "StreamArn",
+          ],
+        },
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{"eventName":["INSERT"]}",
+            },
+          ],
+        },
+        "FunctionName": {
+          "Ref": "pushdailyproverb35302875",
+        },
+        "StartingPosition": "TRIM_HORIZON",
+      },
+      "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "pushdailyproverbServiceRoleDefaultPolicyFDA4289C": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:fcm-server-creds-??????",
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": "dynamodb:ListStreams",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "proverbsstore7682A597",
+                  "StreamArn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "pushdailyproverbServiceRoleDefaultPolicyFDA4289C",
+        "Roles": [
+          {
+            "Ref": "pushdailyproverbServiceRoleE10D6EE1",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "pushdailyproverbServiceRoleE10D6EE1": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
     },
   },
   "Rules": {

@@ -18,4 +18,5 @@ new LemuelStack(app, "LemuelStack", {
   env,
   userPool: userManagementStack.userPool,
   apiBibleSecretName: secretStack.apiBibleSecretName,
+  fcmSecretName: secretStack.fcmSecretName,
 });
