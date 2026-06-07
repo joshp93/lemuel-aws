@@ -50,15 +50,6 @@ export class LemuelStack extends cdk.Stack {
       sortKey: { name: "dateCreated", type: dynamodb.AttributeType.STRING },
     });
 
-    table.addGlobalSecondaryIndex({
-      indexName: "device-notif-index",
-      partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
-      sortKey: {
-        name: "notificationsEnabled",
-        type: dynamodb.AttributeType.STRING,
-      },
-    });
-
     // -----------------------------------------------------------
     // Lambda Functions
     // -----------------------------------------------------------
@@ -191,14 +182,14 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
-    const createDeviceNotifConfig = new lambda.Function(
+    const registerDeviceToken = new lambda.Function(
       this,
-      "create-device-notif-config",
+      "register-device-token",
       {
-        functionName: "create-device-notif-config",
+        functionName: "register-device-token",
         runtime: lambda.Runtime.NODEJS_22_X,
         handler: "index.handler",
-        code: lambda.Code.fromAsset("dist/create-device-notif-config"),
+        code: lambda.Code.fromAsset("dist/register-device-token"),
         environment: {
           TABLE_NAME: table.tableName,
         },
@@ -216,22 +207,6 @@ export class LemuelStack extends cdk.Stack {
       },
       timeout: cdk.Duration.minutes(5),
     });
-
-    const pushDailyNotification = new lambda.Function(
-      this,
-      "push-daily-notification",
-      {
-        functionName: "push-daily-notification",
-        runtime: lambda.Runtime.NODEJS_22_X,
-        handler: "index.handler",
-        code: lambda.Code.fromAsset("dist/push-daily-notification"),
-        environment: {
-          TABLE_NAME: table.tableName,
-          FCM_SECRET_NAME: props.fcmSecretName,
-        },
-        timeout: cdk.Duration.minutes(5),
-      },
-    );
 
     // -----------------------------------------------------------
     // API Gateway
@@ -300,26 +275,19 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
-    const deviceNotifConfigModel = api.addModel(
-      "CreateDeviceNotificationConfigModel",
-      {
-        contentType: "application/json",
-        modelName: "CreateDeviceNotificationConfigModel",
-        schema: {
-          schema: apigateway.JsonSchemaVersion.DRAFT4,
-          type: apigateway.JsonSchemaType.OBJECT,
-          properties: {
-            token: { type: apigateway.JsonSchemaType.STRING },
-            platform: { type: apigateway.JsonSchemaType.STRING },
-            notificationsEnabled: {
-              type: apigateway.JsonSchemaType.STRING,
-              enum: ["true", "false"],
-            },
-          },
-          required: ["token", "platform", "notificationsEnabled"],
+    const registerDeviceTokenModel = api.addModel("RegisterDeviceTokenModel", {
+      contentType: "application/json",
+      modelName: "RegisterDeviceTokenModel",
+      schema: {
+        schema: apigateway.JsonSchemaVersion.DRAFT4,
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          token: { type: apigateway.JsonSchemaType.STRING },
+          platform: { type: apigateway.JsonSchemaType.STRING },
         },
+        required: ["token", "platform"],
       },
-    );
+    });
 
     // -----------------------------------------------------------
     // API Methods
@@ -376,18 +344,16 @@ export class LemuelStack extends cdk.Stack {
         requestValidator,
       },
     );
-    accountUuid.addResource("create").addMethod(
-      "POST",
-      new apigateway.LambdaIntegration(accountHandler),
-      {
+    accountUuid
+      .addResource("create")
+      .addMethod("POST", new apigateway.LambdaIntegration(accountHandler), {
         authorizationType: apigateway.AuthorizationType.COGNITO,
         authorizer: cognitoAuthorizer,
         requestParameters: {
           "method.request.path.uuid": true,
         },
         requestValidator,
-      },
-    );
+      });
 
     accountUuid
       .addResource("meditations")
@@ -532,17 +498,17 @@ export class LemuelStack extends cdk.Stack {
       stage: api.deploymentStage,
     });
 
-    // POST /notifications/config
+    // POST /push/register-token
     api.root
-      .addResource("notifications")
-      .addResource("config")
+      .addResource("push")
+      .addResource("register-token")
       .addMethod(
         "POST",
-        new apigateway.LambdaIntegration(createDeviceNotifConfig),
+        new apigateway.LambdaIntegration(registerDeviceToken),
         {
           authorizationType: apigateway.AuthorizationType.NONE,
           requestModels: {
-            "application/json": deviceNotifConfigModel,
+            "application/json": registerDeviceTokenModel,
           },
           requestValidator: bodyValidator,
         },
@@ -558,9 +524,8 @@ export class LemuelStack extends cdk.Stack {
     table.grantReadData(getAvailableVersions);
     table.grantReadData(getProverb);
     table.grantReadData(getProverbs);
-    table.grantWriteData(createDeviceNotifConfig);
+    table.grantWriteData(registerDeviceToken);
     table.grantReadData(pushDailyProverb);
-    table.grantReadData(pushDailyNotification);
 
     const fcmSecret = secretsmanager.Secret.fromSecretNameV2(
       this,
@@ -568,7 +533,6 @@ export class LemuelStack extends cdk.Stack {
       props.fcmSecretName,
     );
     fcmSecret.grantRead(pushDailyProverb);
-    fcmSecret.grantRead(pushDailyNotification);
 
     // -----------------------------------------------------------
     // EventBridge Rules & Event Source Mappings
@@ -577,12 +541,6 @@ export class LemuelStack extends cdk.Stack {
       ruleName: "lemuel-schedule",
       schedule: events.Schedule.cron({ minute: "0", hour: "0" }),
       targets: [new targets.LambdaFunction(chooseProverb)],
-    });
-
-    new events.Rule(this, "lemuel-midday-notification", {
-      ruleName: "lemuel-midday-notification",
-      schedule: events.Schedule.cron({ minute: "0", hour: "12" }),
-      targets: [new targets.LambdaFunction(pushDailyNotification)],
     });
 
     pushDailyProverb.addEventSource(

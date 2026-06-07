@@ -2,55 +2,32 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
   QueryCommand,
-  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { DeviceNotificationConfigEntitySchema } from "../models/proverbStoreSchemas";
+import { DeviceTokenEntitySchema } from "../models/proverbStoreSchemas";
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-interface DeviceTokenResult {
+export interface DeviceTokenResult {
   token: string;
-  notificationsEnabled: string;
+  platform: string;
 }
 
-/** Scans the proverbs-store table for all device notification config records (pk = "device-notif-config").
- *  Returns token and notificationsEnabled for every registered device. */
+/** Queries the proverbs-store table partition key for all device token records.
+ *  Returns token and platform for every registered device. */
 export const queryAllDeviceTokens = async (
   tableName: string,
 ): Promise<DeviceTokenResult[]> => {
   const result = await client.send(
-    new ScanCommand({
+    new QueryCommand({
       TableName: tableName,
-      FilterExpression: "pk = :pk",
+      KeyConditionExpression: "pk = :pk",
       ExpressionAttributeValues: {
-        ":pk": "device-notif-config",
+        ":pk": "device-token",
       },
     }),
   );
 
   return (result.Items ?? []).map((item) =>
-    DeviceNotificationConfigEntitySchema.parse(item),
+    DeviceTokenEntitySchema.parse(item),
   );
-};
-
-/** Queries the device-notif-index GSI for configs where notificationsEnabled = "true".
- *  Returns only the raw FCM tokens of opted-in devices. */
-export const queryEnabledDeviceTokens = async (
-  tableName: string,
-): Promise<{ token: string }[]> => {
-  const result = await client.send(
-    new QueryCommand({
-      TableName: tableName,
-      IndexName: "device-notif-index",
-      KeyConditionExpression: "pk = :pk AND notificationsEnabled = :enabled",
-      ExpressionAttributeValues: {
-        ":pk": "device-notif-config",
-        ":enabled": "true",
-      },
-    }),
-  );
-
-  return (result.Items ?? []).map((item) => ({
-    token: DeviceNotificationConfigEntitySchema.parse(item).token,
-  }));
 };

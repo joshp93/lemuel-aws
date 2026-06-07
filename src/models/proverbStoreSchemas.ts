@@ -86,16 +86,14 @@ export const MeditationEntitySchema = z.object({
 
 export type MeditationEntity = z.infer<typeof MeditationEntitySchema>;
 
-/** Schema for a device notification configuration record in the proverbs-store DynamoDB table.
- *  PK is "device-notif-config", SK is sha256 hash of the FCM device token. */
-export const DeviceNotificationConfigEntitySchema = z.object({
-  pk: z.literal("device-notif-config"),
+/** Schema for a registered device FCM token in the proverbs-store DynamoDB table.
+ *  PK is "device-token", SK is sha256 hash of the FCM device token. */
+export const DeviceTokenEntitySchema = z.object({
+  pk: z.literal("device-token"),
   sk: z.string(),
   token: z.string(),
   platform: z.string(),
-  notificationsEnabled: z.enum(["true", "false"]),
+  createdAt: z.string(),
 });
 
-export type DeviceNotificationConfigEntity = z.infer<
-  typeof DeviceNotificationConfigEntitySchema
->;
+export type DeviceTokenEntity = z.infer<typeof DeviceTokenEntitySchema>;

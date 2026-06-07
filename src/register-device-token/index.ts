@@ -1,12 +1,12 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { createHash } from "crypto";
-import { DeviceNotificationConfigEntitySchema } from "../models/proverbStoreSchemas";
+import { DeviceTokenEntitySchema } from "../models/proverbStoreSchemas";
 import { EnvSchema, EventBodySchema } from "./schemas";
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-/** Registers or updates a device notification configuration by storing the FCM token, platform, and opt-in status.
+/** Registers or updates a device FCM token by storing the token and platform.
  *  The sort key is a sha256 hash of the token. Returns { success: true } on success. */
 export const handler = async (event: {
   body?: string;
@@ -16,17 +16,16 @@ export const handler = async (event: {
 
   const sk = createHash("sha256").update(body.token).digest("hex");
 
-  const item = DeviceNotificationConfigEntitySchema.parse({
-    pk: "device-notif-config",
+  const item = DeviceTokenEntitySchema.parse({
+    pk: "device-token",
     sk,
     token: body.token,
     platform: body.platform,
-    notificationsEnabled: body.notificationsEnabled,
+    createdAt: new Date().toISOString(),
   });
 
-  console.log("[create-device-notif-config] Config received:", {
+  console.log("[register-device-token] Token registered:", {
     platform: body.platform,
-    notificationsEnabled: body.notificationsEnabled,
   });
 
   await client.send(
@@ -36,7 +35,7 @@ export const handler = async (event: {
     }),
   );
 
-  console.log("[create-device-notif-config] Config stored successfully");
+  console.log("[register-device-token] Token stored successfully");
 
   return {
     statusCode: 200,

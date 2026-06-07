@@ -5,16 +5,19 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
 ## Stacks
 
 ### LemuelSecretStack (`lib/lemuel-secret-stack.ts`)
+
 - Secrets Manager secret for API.Bible credentials (`api-bible-creds`)
 - Secrets Manager secret for FCM server credentials (`fcm-server-creds`)
 
 ### LemuelUserManagementStack (`lib/lemuel-user-management-stack.ts`)
+
 - Cognito User Pool for user authentication
 - User Pool Client with SRP authentication
 - User Pool Domain for hosted UI
 
 ### LemuelStack (`lib/lemuel-stack.ts`)
-- DynamoDB table for storing proverbs with global secondary indexes (version-index, proverb-notes-index, user-notes-index, device-notif-index)
+
+- DynamoDB table for storing proverbs with global secondary indexes (version-index, proverb-notes-index, user-notes-index)
 - DynamoDB Stream (NEW_IMAGE) on proverbs-store table
 - Lambda functions:
   - `fetch-proverbs-for-version` - fetches Proverbs from API.Bible for a specific Bible version
@@ -29,18 +32,16 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
   - `account-handler` - handles account operations (GET /accounts/{uuid}, POST /accounts/{uuid}/create)
   - `note-handler` - handles note CRUD operations
   - `log-handler` - handles client log submissions
-  - `create-device-notif-config` - registers a device FCM token and notification opt-in status
+  - `register-device-token` - registers a device FCM token
   - `push-daily-proverb` - DynamoDB Stream trigger that sends silent FCM data push when daily-proverb is chosen
-  - `push-daily-notification` - EventBridge cron trigger that sends visible FCM notification to opted-in devices
 - REST API Gateway endpoints:
   - `GET /{version}` - returns daily proverb (no auth required)
   - `GET /accounts/{uuid}` - returns user account details (Cognito auth)
   - `POST /accounts/{uuid}/create` - creates user account record (Cognito auth)
   - `POST /auth/check-user-exists` - checks user existence (rate limited)
-  - `POST /notifications/config` - registers device token and notification preferences (no auth)
+  - `POST /push/register-token` - registers device FCM token (no auth)
 - EventBridge cron rules:
-  - `lemuel-schedule` (0 0 * * ? *) triggers choose-proverb daily
-  - `lemuel-midday-notification` (0 12 * * ? *) triggers push-daily-notification
+  - `lemuel-schedule` triggers choose-proverb daily
 
 ## API Endpoints
 
@@ -54,8 +55,8 @@ This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
   - Response: Account record JSON with `accountCreatedDate`, `totalMeditations`, `totalNotes`
 - `POST /accounts/{uuid}/create` - Creates user account record in DynamoDB (Cognito auth required)
   - Response: `{"success": true}`
-- `POST /notifications/config` - Registers a device FCM token and notification preferences (no auth required)
-  - Request: `{"token": "fcm-token", "platform": "android", "notificationsEnabled": "true"|"false"}`
+- `POST /push/register-token` - Registers a device FCM token (no auth required)
+  - Request: `{"token": "fcm-token", "platform": "android"}`
   - Response: `{"success": true}`
 
 ## Lambda Function Structure
@@ -96,6 +97,7 @@ This project uses jest with aws-sdk-client-mock. Please don't run user tests unl
 Argument of type 'typeof BatchWriteCommand' is not assignable to parameter of type 'new (input: BatchWriteCommandInput) => AwsCommand<any, any, any, any>'.
 ...
 ```
+
 The fix for this type error is to permanently delete node_modules, delete pnpm-lock file, then run `pnpm i`. If that doesn't work, stop and tell the developer.
 
 **Please keep this file up to date.**

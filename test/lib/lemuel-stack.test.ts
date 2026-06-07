@@ -44,21 +44,6 @@ describe("LemuelStack", () => {
     });
   });
 
-  it("should create device-notif-index GSI", () => {
-    const template = createStack();
-
-    const tables = template.findResources("AWS::DynamoDB::Table");
-    const table = tables.proverbsstore7682A597;
-    const gsis = table.Properties.GlobalSecondaryIndexes as Record<string, unknown>[];
-    const index = gsis.find((gsi) => gsi.IndexName === "device-notif-index");
-
-    expect(index).toBeDefined();
-    expect(index!.KeySchema).toEqual([
-      { AttributeName: "pk", KeyType: "HASH" },
-      { AttributeName: "notificationsEnabled", KeyType: "RANGE" },
-    ]);
-  });
-
   it("should create Lambda functions for all handlers", () => {
     const template = createStack();
 
@@ -97,17 +82,12 @@ describe("LemuelStack", () => {
     const template = createStack();
 
     template.hasResourceProperties("AWS::Lambda::Function", {
-      FunctionName: "create-device-notif-config",
+      FunctionName: "register-device-token",
       Runtime: "nodejs22.x",
     });
 
     template.hasResourceProperties("AWS::Lambda::Function", {
       FunctionName: "push-daily-proverb",
-      Runtime: "nodejs22.x",
-    });
-
-    template.hasResourceProperties("AWS::Lambda::Function", {
-      FunctionName: "push-daily-notification",
       Runtime: "nodejs22.x",
     });
   });
@@ -120,23 +100,23 @@ describe("LemuelStack", () => {
     });
   });
 
-  it("should create CreateDeviceNotificationConfigModel", () => {
+  it("should create RegisterDeviceTokenModel", () => {
     const template = createStack();
 
     template.hasResourceProperties("AWS::ApiGateway::Model", {
-      Name: "CreateDeviceNotificationConfigModel",
+      Name: "RegisterDeviceTokenModel",
     });
   });
 
-  it("should create POST /notifications/config endpoint", () => {
+  it("should create POST /push/register-token endpoint", () => {
     const template = createStack();
 
     template.hasResourceProperties("AWS::ApiGateway::Resource", {
-      PathPart: "notifications",
+      PathPart: "push",
     });
 
     template.hasResourceProperties("AWS::ApiGateway::Resource", {
-      PathPart: "config",
+      PathPart: "register-token",
     });
 
     template.hasResourceProperties("AWS::ApiGateway::Method", {
@@ -151,16 +131,6 @@ describe("LemuelStack", () => {
     template.hasResourceProperties("AWS::Events::Rule", {
       Name: "lemuel-schedule",
       ScheduleExpression: "cron(0 0 * * ? *)",
-      State: "ENABLED",
-    });
-  });
-
-  it("should create an EventBridge rule for midday notification", () => {
-    const template = createStack();
-
-    template.hasResourceProperties("AWS::Events::Rule", {
-      Name: "lemuel-midday-notification",
-      ScheduleExpression: "cron(0 12 * * ? *)",
       State: "ENABLED",
     });
   });
