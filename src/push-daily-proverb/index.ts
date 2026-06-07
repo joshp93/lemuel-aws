@@ -1,5 +1,5 @@
 import { queryAllDeviceTokens } from "../shared/deviceTokens";
-import { getAccessToken, getFcmCreds, sendToAllTokens } from "../shared/fcm";
+import { sendToAllTokens } from "../shared/fcm";
 import { DynamoDBStreamEventSchema, EnvSchema } from "./schemas";
 
 /** Handler triggered by DynamoDB Stream on daily-proverb INSERT. Sends a silent FCM data message
@@ -12,7 +12,10 @@ export const handler = async (event: unknown): Promise<void> => {
   if (!record) return;
 
   if (record.eventName !== "INSERT") {
-    console.log("[push-daily-proverb] Skipping: eventName is", record.eventName);
+    console.log(
+      "[push-daily-proverb] Skipping: eventName is",
+      record.eventName,
+    );
     return;
   }
 
@@ -24,7 +27,12 @@ export const handler = async (event: unknown): Promise<void> => {
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
   if (keys.sk.S !== tomorrow) {
-    console.log("[push-daily-proverb] Skipping: sk is", keys.sk.S, "expected", tomorrow);
+    console.log(
+      "[push-daily-proverb] Skipping: sk is",
+      keys.sk.S,
+      "expected",
+      tomorrow,
+    );
     return;
   }
 
@@ -47,17 +55,13 @@ export const handler = async (event: unknown): Promise<void> => {
   const message = {
     data: {
       type: "daily-proverb",
-      ref,
     },
   };
-
-  const credentials = await getFcmCreds(env.FCM_SECRET_NAME);
-  const accessToken = await getAccessToken(credentials);
 
   await sendToAllTokens(
     tokens.map((t) => t.token),
     message,
-    credentials.project_id,
+    process.env.FCM_SECRET_NAME!,
   );
 
   console.log("[push-daily-proverb] Silent push complete");
