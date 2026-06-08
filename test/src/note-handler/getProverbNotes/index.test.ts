@@ -22,18 +22,17 @@ describe("getProverbNotesHandler", () => {
       pathParameters: { ref: "Proverbs3:5" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await getProverbNotesHandler(
-      createDocClient(),
-      env,
-      event,
-    );
+    const result = await getProverbNotesHandler(createDocClient(), env, event);
 
     expect(result.statusCode).toBe(200);
 
     const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
     expect(queryCall.IndexName).toBe("proverb-notes-index");
-    expect(queryCall.KeyConditionExpression).toBe("ref = :ref");
-    expect(queryCall.ExpressionAttributeValues![":ref"]).toBe("Proverbs3:5");
+    expect(queryCall.KeyConditionExpression).toBe("#reference = :reference");
+    expect(queryCall.ExpressionAttributeNames!["#reference"]).toBe("ref");
+    expect(queryCall.ExpressionAttributeValues![":reference"]).toBe(
+      "Proverbs3:5",
+    );
     expect(queryCall.ScanIndexForward).toBe(false);
   });
 
@@ -68,8 +67,13 @@ describe("getProverbNotesHandler", () => {
   it("passes lastKey from query param as ExclusiveStartKey", async () => {
     ddbMock.on(QueryCommand).resolves({ Items: [] });
 
-    const exclusiveStartKey = { ref: "Proverbs3:5", dateCreated: "2024-01-01T00:00:00.000Z" };
-    const lastKey = Buffer.from(JSON.stringify(exclusiveStartKey)).toString("base64");
+    const exclusiveStartKey = {
+      ref: "Proverbs3:5",
+      dateCreated: "2024-01-01T00:00:00.000Z",
+    };
+    const lastKey = Buffer.from(JSON.stringify(exclusiveStartKey)).toString(
+      "base64",
+    );
 
     const event = {
       pathParameters: { ref: "Proverbs3:5" },
@@ -89,11 +93,7 @@ describe("getProverbNotesHandler", () => {
       pathParameters: { ref: "Proverbs3:5" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await getProverbNotesHandler(
-      createDocClient(),
-      env,
-      event,
-    );
+    const result = await getProverbNotesHandler(createDocClient(), env, event);
 
     const body = JSON.parse(result.body);
     expect(body.items).toEqual([]);
@@ -107,11 +107,7 @@ describe("getProverbNotesHandler", () => {
       pathParameters: { ref: "Proverbs3:5" },
     } as unknown as APIGatewayProxyEvent;
 
-    const result = await getProverbNotesHandler(
-      createDocClient(),
-      env,
-      event,
-    );
+    const result = await getProverbNotesHandler(createDocClient(), env, event);
 
     expect(result.statusCode).toBe(500);
   });

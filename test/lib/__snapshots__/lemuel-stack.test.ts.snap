@@ -4245,7 +4245,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "a0380906f8dcef90b7d300731d5fad5af5847429e1d05ad1edd4603e7fa1f94b.zip",
+          "S3Key": "36ae7522e20059ce06dcde7be7f583811e59cd403437436404d786a87bee3f7c.zip",
         },
         "Environment": {
           "Variables": {

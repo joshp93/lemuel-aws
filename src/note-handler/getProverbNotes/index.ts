@@ -1,8 +1,8 @@
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
-import { parseGetProverbNotesRequest } from "./parseRequest";
 import { buildGetProverbNotesResponse } from "./buildResponse";
+import { parseGetProverbNotesRequest } from "./parseRequest";
 
 /**
  * Handles GET /notes/proverbs/{ref}
@@ -31,8 +31,9 @@ export const getProverbNotesHandler = async (
       new QueryCommand({
         TableName: env.TABLE_NAME,
         IndexName: "proverb-notes-index",
-        KeyConditionExpression: "ref = :ref",
-        ExpressionAttributeValues: { ":ref": params.ref },
+        KeyConditionExpression: "#reference = :reference",
+        ExpressionAttributeNames: { "#reference": "ref" },
+        ExpressionAttributeValues: { ":reference": params.ref },
         Limit: params.limit,
         ExclusiveStartKey: params.exclusiveStartKey,
         ScanIndexForward: params.scanForward,
