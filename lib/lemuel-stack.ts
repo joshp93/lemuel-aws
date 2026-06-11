@@ -539,7 +539,7 @@ export class LemuelStack extends cdk.Stack {
     // -----------------------------------------------------------
     new events.Rule(this, "lemuel-schedule", {
       ruleName: "lemuel-schedule",
-      schedule: events.Schedule.cron({ minute: "0", hour: "0" }),
+      schedule: events.Schedule.cron({ minute: "0", hour: "6" }),
       targets: [new targets.LambdaFunction(chooseProverb)],
     });
 

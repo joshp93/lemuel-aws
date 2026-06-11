@@ -130,7 +130,7 @@ describe("LemuelStack", () => {
 
     template.hasResourceProperties("AWS::Events::Rule", {
       Name: "lemuel-schedule",
-      ScheduleExpression: "cron(0 0 * * ? *)",
+      ScheduleExpression: "cron(0 6 * * ? *)",
       State: "ENABLED",
     });
   });

@@ -3991,7 +3991,7 @@ exports[`LemuelStack should match snapshot 1`] = `
     "lemuelschedule1C0FCCC8": {
       "Properties": {
         "Name": "lemuel-schedule",
-        "ScheduleExpression": "cron(0 0 * * ? *)",
+        "ScheduleExpression": "cron(0 6 * * ? *)",
         "State": "ENABLED",
         "Targets": [
           {
@@ -4487,7 +4487,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "cce39950c8faaf55d0696177001f4a8c3f34f4dbd46af3d81ead5931533e18b9.zip",
+          "S3Key": "b9563d7bb46fd2e3a49e7cf0d84d782b0976a70ee0b27544944e24ea2cacee0f.zip",
         },
         "Environment": {
           "Variables": {

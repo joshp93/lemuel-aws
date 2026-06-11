@@ -56,6 +56,19 @@ export const handler = async (event: unknown): Promise<void> => {
     data: {
       type: "daily-proverb",
     },
+    android: {
+      priority: "high" as const,
+    },
+    apns: {
+      headers: {
+        "apns-priority": "10",
+      },
+      payload: {
+        aps: {
+          "content-available": 1,
+        },
+      },
+    },
   };
 
   await sendToAllTokens(

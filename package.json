@@ -1,7 +1,7 @@
 {
   "name": "lemuel",
   "version": "1.0.0",
-  "packageManager": "pnpm@11.5.2",
+  "packageManager": "pnpm@11.5.3",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "pretest": "pnpm typecheck",
