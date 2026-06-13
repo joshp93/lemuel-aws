@@ -1,6 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { createAccountHandler } from "./createAccount/index";
 import { getAccountDetailsHandler } from "./getAccountDetails/index";
 import { AccountHandlerEnvSchema } from "./models";

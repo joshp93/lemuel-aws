@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { handler } from "../../../src/account-handler/index";
 
 jest.mock("../../../src/account-handler/getAccountDetails/index", () => ({

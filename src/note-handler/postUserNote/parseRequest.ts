@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 
 /**
  * Extracts and validates the request body for the postUserNote endpoint.

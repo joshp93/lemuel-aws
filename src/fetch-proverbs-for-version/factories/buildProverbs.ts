@@ -1,7 +1,7 @@
 import { REFS } from "../constants/refs";
-import { ContentElement } from "../models/apiBible";
+import type { ContentElement } from "../models/apiBible";
 import { parseChapterContent } from "../transforms/parseChapterContent";
-import { Proverb } from "../types";
+import type { Proverb } from "../types";
 
 /**
  * Extracts the chapter number from a reference string like "Proverbs 10:1".

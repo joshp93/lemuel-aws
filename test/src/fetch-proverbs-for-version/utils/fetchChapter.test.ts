@@ -1,4 +1,7 @@
-import { ChapterFetchError, fetchChapter } from "../../../../src/fetch-proverbs-for-version/utils/fetchChapter";
+import {
+  ChapterFetchError,
+  fetchChapter,
+} from "../../../../src/fetch-proverbs-for-version/utils/fetchChapter";
 
 global.fetch = jest.fn();
 
@@ -17,7 +20,11 @@ describe("fetchChapter", () => {
             type: "tag",
             name: "para",
             items: [
-              { type: "text", text: "The proverbs of Solomon.", attrs: { verseId: "PRO.10.1" } },
+              {
+                type: "text",
+                text: "The proverbs of Solomon.",
+                attrs: { verseId: "PRO.10.1" },
+              },
             ],
           },
         ],

@@ -1,4 +1,4 @@
-import { BiblesResponse, Bible } from "../models/apiBible";
+import type { Bible, BiblesResponse } from "../models/apiBible";
 
 /**
  * Error thrown when a requested Bible version is not found in the API response.
@@ -8,7 +8,9 @@ export class BibleNotFoundError extends Error {
   public readonly availableVersions: string[];
 
   constructor(version: string, availableVersions: string[]) {
-    super(`Bible version "${version}" not found. Available versions: ${availableVersions.join(", ")}`);
+    super(
+      `Bible version "${version}" not found. Available versions: ${availableVersions.join(", ")}`,
+    );
     this.name = "BibleNotFoundError";
     this.version = version;
     this.availableVersions = availableVersions;

@@ -1,10 +1,10 @@
 import {
-  DynamoDBDocumentClient,
+  type DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostUserNoteRequest } from "./parseRequest";

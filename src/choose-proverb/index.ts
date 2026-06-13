@@ -1,8 +1,8 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
-  DynamoDBDocumentClient,
   BatchGetCommand,
   BatchWriteCommand,
+  DynamoDBDocumentClient,
 } from "@aws-sdk/lib-dynamodb";
 import {
   DailyProverbEntitySchema,

@@ -1,9 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import {
-  DynamoDBDocumentClient,
-  GetCommand,
-} from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { getAccountDetailsHandler } from "../../../../src/account-handler/getAccountDetails/index";
 import type { AccountHandlerEnv } from "../../../../src/account-handler/models";

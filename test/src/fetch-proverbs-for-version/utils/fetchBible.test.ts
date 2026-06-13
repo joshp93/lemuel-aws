@@ -1,4 +1,7 @@
-import { BibleNotFoundError, fetchBible } from "../../../../src/fetch-proverbs-for-version/utils/fetchBible";
+import {
+  BibleNotFoundError,
+  fetchBible,
+} from "../../../../src/fetch-proverbs-for-version/utils/fetchBible";
 
 global.fetch = jest.fn();
 
@@ -24,7 +27,11 @@ describe("fetchBible", () => {
       text: () => Promise.resolve(""),
     });
 
-    const result = await fetchBible("https://rest.api.bible", "test-key", "web");
+    const result = await fetchBible(
+      "https://rest.api.bible",
+      "test-key",
+      "web",
+    );
 
     expect(result.id).toBe("WEB-BIBLE-ID");
     expect(result.abbreviation).toBe("web");
@@ -81,7 +88,11 @@ describe("fetchBible", () => {
       text: () => Promise.resolve(""),
     });
 
-    const result = await fetchBible("https://rest.api.bible", "test-key", "NIV");
+    const result = await fetchBible(
+      "https://rest.api.bible",
+      "test-key",
+      "NIV",
+    );
 
     expect(result.id).toBe("NIV-BIBLE-ID");
   });

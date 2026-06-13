@@ -2,7 +2,7 @@ import {
   GetSecretValueCommand,
   SecretsManagerClient,
 } from "@aws-sdk/client-secrets-manager";
-import { Secret } from "../types";
+import type { Secret } from "../types";
 
 /**
  * Retrieves the API.Bible credentials from AWS Secrets Manager.

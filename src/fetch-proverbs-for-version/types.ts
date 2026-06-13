@@ -1,5 +1,5 @@
 import z from "zod";
-import {
+import type {
   BiblesResponse,
   ChaptersResponse,
   ContentElement,
@@ -31,4 +31,9 @@ export interface Proverb {
   proverb: string;
 }
 
-export type { BiblesResponse, ChaptersResponse, ContentElement, ContentTextItem };
+export type {
+  BiblesResponse,
+  ChaptersResponse,
+  ContentElement,
+  ContentTextItem,
+};

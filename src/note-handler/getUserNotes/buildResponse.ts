@@ -1,5 +1,5 @@
-import { QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyResult } from "aws-lambda";
+import type { QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
+import type { APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 
 /**
@@ -19,15 +19,14 @@ export const buildGetUserNotesResponse = (
 
   let lastKey: string | undefined;
   if (result.LastEvaluatedKey) {
-    lastKey = Buffer.from(
-      JSON.stringify(result.LastEvaluatedKey),
-    ).toString("base64");
+    lastKey = Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString(
+      "base64",
+    );
   }
 
-  console.log(
-    `[getUserNotes] Building response with ${items.length} items`,
-    { hasMore: !!lastKey },
-  );
+  console.log(`[getUserNotes] Building response with ${items.length} items`, {
+    hasMore: !!lastKey,
+  });
 
   return {
     statusCode: 200,

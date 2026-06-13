@@ -1,6 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DailyProverbEntitySchema } from "../models/proverbStoreSchemas";
 
 export const handler = async (
@@ -13,13 +13,14 @@ export const handler = async (
     ? parseInt(event.queryStringParameters.limit, 10)
     : undefined;
 
-  const scanForward =
-    event.queryStringParameters?.scanForward === "true";
+  const scanForward = event.queryStringParameters?.scanForward === "true";
 
   let exclusiveStartKey: Record<string, unknown> | undefined;
   if (event.queryStringParameters?.lastKey) {
     exclusiveStartKey = JSON.parse(
-      Buffer.from(event.queryStringParameters.lastKey, "base64").toString("utf-8"),
+      Buffer.from(event.queryStringParameters.lastKey, "base64").toString(
+        "utf-8",
+      ),
     );
   }
 
@@ -42,7 +43,9 @@ export const handler = async (
 
   let lastKey: string | undefined;
   if (result.LastEvaluatedKey) {
-    lastKey = Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString("base64");
+    lastKey = Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString(
+      "base64",
+    );
   }
 
   return {

@@ -7,11 +7,14 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import {
   ProverbEntitySchema,
-  RefsEntity,
+  type RefsEntity,
   VersionCitationSchema,
   VersionEntitySchema,
 } from "../models/proverbStoreSchemas";
-import { LoadProverbsEvent, LoadProverbsEventSchema } from "./eventSchemas";
+import {
+  type LoadProverbsEvent,
+  LoadProverbsEventSchema,
+} from "./eventSchemas";
 
 export const handler = async (event: LoadProverbsEvent): Promise<void> => {
   console.debug("Event:", JSON.stringify(event));

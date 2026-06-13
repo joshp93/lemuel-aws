@@ -1,11 +1,12 @@
+import type {
+  ContentElement,
+  ContentTextItem,
+} from "../../../../src/fetch-proverbs-for-version/models/apiBible";
 import { extractText } from "../../../../src/fetch-proverbs-for-version/transforms/extractText";
-import { ContentElement, ContentTextItem } from "../../../../src/fetch-proverbs-for-version/models/apiBible";
 
 describe("extractText", () => {
   it("extracts text from a single text item", () => {
-    const items: ContentTextItem[] = [
-      { type: "text", text: "Hello world" },
-    ];
+    const items: ContentTextItem[] = [{ type: "text", text: "Hello world" }];
     expect(extractText(items)).toBe("Hello world");
   });
 

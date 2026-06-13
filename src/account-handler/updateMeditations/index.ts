@@ -1,12 +1,12 @@
 import {
-  DynamoDBDocumentClient,
+  type DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import type { AccountHandlerEnv, UpdateMeditationsResponse } from "../models";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { MeditationEntitySchema } from "../../models/proverbStoreSchemas";
+import type { AccountHandlerEnv, UpdateMeditationsResponse } from "../models";
 
 export const updateMeditationsHandler = async (
   client: DynamoDBDocumentClient,

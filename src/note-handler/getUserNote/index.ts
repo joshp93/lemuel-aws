@@ -1,5 +1,5 @@
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { type DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import type { NoteHandlerEnv } from "../schemas";
 

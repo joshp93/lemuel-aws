@@ -1,6 +1,6 @@
+import { createHash } from "node:crypto";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { createHash } from "crypto";
 import { DeviceTokenEntitySchema } from "../models/proverbStoreSchemas";
 import { EnvSchema, EventBodySchema } from "./schemas";
 

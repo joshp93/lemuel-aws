@@ -1,3 +1,5 @@
+import * as fs from "node:fs";
+import * as path from "node:path";
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
@@ -5,8 +7,6 @@ import {
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
-import * as fs from "fs";
-import * as path from "path";
 import { LoadProverbsEventSchema } from "../../../src/load-proverbs/eventSchemas";
 import { handler } from "../../../src/load-proverbs/index";
 
@@ -62,7 +62,7 @@ describe(handler.name, () => {
       const call = ddbMock.commandCalls(BatchWriteCommand)[i];
       const batchStart = i * 25;
       const batchEnd = Math.min(batchStart + 25, total);
-      const requestItems = call.args[0].input.RequestItems!["TestTable"];
+      const requestItems = call.args[0].input.RequestItems!.TestTable;
       expect(requestItems.length).toBe(batchEnd - batchStart);
 
       for (const item of requestItems) {

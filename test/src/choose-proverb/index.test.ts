@@ -1,7 +1,7 @@
 import {
-  DynamoDBDocumentClient,
   BatchGetCommand,
   BatchWriteCommand,
+  DynamoDBDocumentClient,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 import { handler } from "../../../src/choose-proverb/index";
@@ -28,9 +28,7 @@ describe("choose-proverb handler", () => {
   });
 
   it("today missing — writes both today + tomorrow entities, 2 usedRefs added", async () => {
-    ddbMock.on(BatchGetCommand).resolves(
-      buildBatchGetResponse([refsItem]),
-    );
+    ddbMock.on(BatchGetCommand).resolves(buildBatchGetResponse([refsItem]));
     ddbMock.on(BatchWriteCommand).resolves({});
 
     await handler();
@@ -90,9 +88,7 @@ describe("choose-proverb handler", () => {
       usedRefs: ["Proverbs10:1", "Proverbs10:2"],
     };
 
-    ddbMock.on(BatchGetCommand).resolves(
-      buildBatchGetResponse([allUsedRefs]),
-    );
+    ddbMock.on(BatchGetCommand).resolves(buildBatchGetResponse([allUsedRefs]));
     ddbMock.on(BatchWriteCommand).resolves({});
 
     await handler();

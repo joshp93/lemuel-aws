@@ -4,10 +4,10 @@ import {
   getChaptersFromRefs,
 } from "./factories/buildProverbs";
 import {
-  FetchProverbsForVersionEvent,
+  type FetchProverbsForVersionEvent,
   FetchProverbsForVersionEventSchema,
-  Output,
-  Proverb,
+  type Output,
+  type Proverb,
 } from "./types";
 import { fetchBible } from "./utils/fetchBible";
 import { fetchChapter } from "./utils/fetchChapter";

@@ -1,3 +1,11 @@
 {
-  "cSpell.words": ["loadproverbs", "notif"]
+  "cSpell.words": ["loadproverbs", "notif"],
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  }
 }

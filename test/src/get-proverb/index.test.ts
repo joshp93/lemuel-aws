@@ -1,5 +1,5 @@
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent } from "aws-lambda";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { handler } from "../../../src/get-proverb/index";
 

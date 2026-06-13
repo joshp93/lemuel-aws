@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 
 export class LemuelSecretStack extends cdk.Stack {
   readonly apiBibleSecretName: string;

@@ -1,10 +1,10 @@
 import {
+  buildProverbsFromChapter,
   extractChapterFromRef,
   getChaptersFromRefs,
   parseRef,
-  buildProverbsFromChapter,
 } from "../../../../src/fetch-proverbs-for-version/factories/buildProverbs";
-import { ContentElement } from "../../../../src/fetch-proverbs-for-version/models/apiBible";
+import type { ContentElement } from "../../../../src/fetch-proverbs-for-version/models/apiBible";
 
 describe("extractChapterFromRef", () => {
   it("extracts chapter number from valid ref", () => {
@@ -36,11 +36,7 @@ describe("getChaptersFromRefs", () => {
   });
 
   it("returns sorted chapters", () => {
-    const refs = [
-      "Proverbs 22:1",
-      "Proverbs 10:1",
-      "Proverbs 15:1",
-    ];
+    const refs = ["Proverbs 22:1", "Proverbs 10:1", "Proverbs 15:1"];
     const result = getChaptersFromRefs(refs);
     expect(result).toEqual([10, 15, 22]);
   });
@@ -50,11 +46,7 @@ describe("getChaptersFromRefs", () => {
   });
 
   it("handles refs with verse ranges", () => {
-    const refs = [
-      "Proverbs 10:1-5",
-      "Proverbs 10:6",
-      "Proverbs 11:1",
-    ];
+    const refs = ["Proverbs 10:1-5", "Proverbs 10:6", "Proverbs 11:1"];
     const result = getChaptersFromRefs(refs);
     expect(result).toEqual([10, 11]);
   });
@@ -131,7 +123,9 @@ describe("buildProverbsFromChapter", () => {
 
     const result = buildProverbsFromChapter(content, 10);
 
-    const proverb10_1_3 = result.find((p: { ref: string }) => p.ref === "Proverbs 10:1-3");
+    const proverb10_1_3 = result.find(
+      (p: { ref: string }) => p.ref === "Proverbs 10:1-3",
+    );
     if (proverb10_1_3) {
       expect(proverb10_1_3.proverb).toContain("Verse 1 text");
       expect(proverb10_1_3.proverb).toContain("Verse 2 text");

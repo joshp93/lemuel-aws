@@ -1,4 +1,4 @@
-import { ContentElement, ContentTextItem } from "../models/apiBible";
+import type { ContentElement, ContentTextItem } from "../models/apiBible";
 
 /**
  * Recursively extracts all text content from a list of content elements.

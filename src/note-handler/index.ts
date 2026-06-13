@@ -1,11 +1,11 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { NoteHandlerEnvSchema } from "./schemas";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getProverbNotesHandler } from "./getProverbNotes/index";
 import { getUserNoteHandler } from "./getUserNote/index";
 import { getUserNotesHandler } from "./getUserNotes/index";
 import { postUserNoteHandler } from "./postUserNote/index";
+import { NoteHandlerEnvSchema } from "./schemas";
 
 /**
  * Routes incoming API Gateway requests to the appropriate note handler
@@ -22,7 +22,10 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
   console.log(
     `[note-handler] Routing request: ${event.httpMethod} ${event.resource}`,
-    { pathParams: event.pathParameters, queryParams: event.queryStringParameters },
+    {
+      pathParams: event.pathParameters,
+      queryParams: event.queryStringParameters,
+    },
   );
 
   try {

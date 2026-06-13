@@ -1,5 +1,9 @@
-import { CognitoIdentityProviderClient, AdminGetUserCommand, UserNotFoundException } from "@aws-sdk/client-cognito-identity-provider";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  AdminGetUserCommand,
+  CognitoIdentityProviderClient,
+  UserNotFoundException,
+} from "@aws-sdk/client-cognito-identity-provider";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
 
 const envSchema = z.object({
@@ -13,7 +17,7 @@ type CheckUserExistsResponse = {
 };
 
 export const handler = async (
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   try {
     const env = envSchema.parse(process.env);
@@ -35,9 +39,9 @@ export const handler = async (
         new AdminGetUserCommand({
           UserPoolId: env.USER_POOL_ID,
           Username: email,
-        })
+        }),
       );
-      
+
       // User exists
       const response: CheckUserExistsResponse = { exists: true };
       return {

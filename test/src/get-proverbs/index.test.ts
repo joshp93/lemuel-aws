@@ -1,8 +1,5 @@
-import {
-  DynamoDBDocumentClient,
-  QueryCommand,
-} from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { handler } from "../../../src/get-proverbs/index";
 
@@ -71,7 +68,9 @@ describe("get-proverbs handler", () => {
     });
 
     const exclusiveStartKey = { pk: "daily-proverb", sk: "2025-05-01" };
-    const lastKey = Buffer.from(JSON.stringify(exclusiveStartKey)).toString("base64");
+    const lastKey = Buffer.from(JSON.stringify(exclusiveStartKey)).toString(
+      "base64",
+    );
 
     const event = {
       queryStringParameters: { lastKey },

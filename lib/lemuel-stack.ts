@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
-import * as cognito from "aws-cdk-lib/aws-cognito";
+import type * as cognito from "aws-cdk-lib/aws-cognito";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
@@ -8,7 +8,7 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as eventSources from "aws-cdk-lib/aws-lambda-event-sources";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 
 interface LemuelStackProps extends cdk.StackProps {
   userPool: cognito.IUserPool;

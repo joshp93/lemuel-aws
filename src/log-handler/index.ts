@@ -1,6 +1,6 @@
 import { Logger } from "@aws-lambda-powertools/logger";
-import { LogLevel } from "@aws-lambda-powertools/logger/types";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import type { LogLevel } from "@aws-lambda-powertools/logger/types";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 const logger = new Logger();
 

@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 
 /**
  * Extracts and validates path parameters and pagination query parameters
@@ -21,8 +21,7 @@ export const parseGetUserNotesRequest = (
   });
 
   const uuid = event.pathParameters?.uuid ?? "";
-  const scanForward =
-    event.queryStringParameters?.scanForward === "true" ? true : false;
+  const scanForward = event.queryStringParameters?.scanForward === "true";
 
   let limit: number | undefined;
   if (event.queryStringParameters?.limit) {

@@ -4,7 +4,7 @@ import {
   GetCommand,
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent } from "aws-lambda";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { createAccountHandler } from "../../../../src/account-handler/createAccount/index";
 import type { AccountHandlerEnv } from "../../../../src/account-handler/models";

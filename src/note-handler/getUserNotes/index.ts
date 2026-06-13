@@ -1,8 +1,11 @@
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  type DynamoDBDocumentClient,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
-import { parseGetUserNotesRequest } from "./parseRequest";
 import { buildGetUserNotesResponse } from "./buildResponse";
+import { parseGetUserNotesRequest } from "./parseRequest";
 
 /**
  * Handles GET /notes/users/{uuid}

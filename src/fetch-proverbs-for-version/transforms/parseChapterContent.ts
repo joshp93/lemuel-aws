@@ -1,4 +1,4 @@
-import { ContentElement, ContentTextItem } from "../models/apiBible";
+import type { ContentElement, ContentTextItem } from "../models/apiBible";
 
 /**
  * Extracts the verse number from a verse reference string.

@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { handler } from "../../../src/log-handler/index";
 
 describe("log-handler handler", () => {

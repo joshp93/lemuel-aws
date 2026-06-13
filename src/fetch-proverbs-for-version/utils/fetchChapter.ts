@@ -1,4 +1,4 @@
-import { ChaptersResponse } from "../models/apiBible";
+import type { ChaptersResponse } from "../models/apiBible";
 
 /**
  * Error thrown when fetching a chapter fails.

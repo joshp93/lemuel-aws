@@ -1,4 +1,4 @@
-import { ContentElement } from "../../../../src/fetch-proverbs-for-version/models/apiBible";
+import type { ContentElement } from "../../../../src/fetch-proverbs-for-version/models/apiBible";
 import { parseChapterContent } from "../../../../src/fetch-proverbs-for-version/transforms/parseChapterContent";
 import { VERSE_MOCK } from "../mocks";
 

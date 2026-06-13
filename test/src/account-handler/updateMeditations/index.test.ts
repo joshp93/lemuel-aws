@@ -5,7 +5,7 @@ import {
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { APIGatewayProxyEvent } from "aws-lambda";
+import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import type { AccountHandlerEnv } from "../../../../src/account-handler/models";
 import { updateMeditationsHandler } from "../../../../src/account-handler/updateMeditations/index";
