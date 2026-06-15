@@ -837,7 +837,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "0dc57b19baac62e43a7ab2d4e583b84feed35be675159eff7d96118be78a1f9d.zip",
+          "S3Key": "a1e4e12ca2c05b4f327bcdca9d6019093d61956923c928c46e9b0b661d16c67c.zip",
         },
         "Environment": {
           "Variables": {
@@ -1087,7 +1087,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       "Type": "AWS::IAM::Role",
       "UpdateReplacePolicy": "Retain",
     },
-    "lemuelapiDeployment2137DA7A6bea6539fe9b0b1e2a108f4bea83c1ba": {
+    "lemuelapiDeployment2137DA7A0de495376621f177d46d0459880a19d3": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
         "lemuelapiversionGET9CB1814C",
@@ -1164,7 +1164,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7A6bea6539fe9b0b1e2a108f4bea83c1ba",
+          "Ref": "lemuelapiDeployment2137DA7A0de495376621f177d46d0459880a19d3",
         },
         "MethodSettings": [
           {
@@ -2470,10 +2470,7 @@ exports[`LemuelStack should match snapshot 1`] = `
     },
     "lemuelapigetproverbsGETD7392087": {
       "Properties": {
-        "AuthorizationType": "COGNITO_USER_POOLS",
-        "AuthorizerId": {
-          "Ref": "CognitoAuthorizerF3215DBC",
-        },
+        "AuthorizationType": "NONE",
         "HttpMethod": "GET",
         "Integration": {
           "IntegrationHttpMethod": "POST",
@@ -2505,6 +2502,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         "RequestParameters": {
           "method.request.querystring.lastKey": false,
           "method.request.querystring.limit": false,
+          "method.request.querystring.month": false,
           "method.request.querystring.scanForward": false,
         },
         "RequestValidatorId": {

@@ -94,4 +94,46 @@ describe("get-proverbs handler", () => {
     const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
     expect(queryCall.Limit).toBe(5);
   });
+
+  it("filters by month using begins_with when month param is supplied", async () => {
+    ddbMock.on(QueryCommand).resolves({
+      Items: [
+        { pk: "daily-proverb", sk: "2026-05-01", ref: "Proverbs10:1" },
+        { pk: "daily-proverb", sk: "2026-05-15", ref: "Proverbs10:2" },
+      ],
+    });
+
+    const event = {
+      queryStringParameters: { month: "2026-05" },
+    } as unknown as APIGatewayProxyEvent;
+    const result = await handler(event);
+
+    expect(result.statusCode).toBe(200);
+    const body = JSON.parse(result.body);
+    expect(body.items).toHaveLength(2);
+
+    const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
+    expect(queryCall.KeyConditionExpression).toBe(
+      "pk = :pk AND begins_with(sk, :monthPrefix)",
+    );
+    expect(queryCall.ExpressionAttributeValues).toEqual({
+      ":pk": "daily-proverb",
+      ":monthPrefix": "2026-05",
+    });
+  });
+
+  it("does not filter by month when month param is omitted", async () => {
+    ddbMock.on(QueryCommand).resolves({
+      Items: [],
+    });
+
+    const event = {} as unknown as APIGatewayProxyEvent;
+    await handler(event);
+
+    const queryCall = ddbMock.commandCalls(QueryCommand)[0].args[0].input;
+    expect(queryCall.KeyConditionExpression).toBe("pk = :pk");
+    expect(queryCall.ExpressionAttributeValues).toEqual({
+      ":pk": "daily-proverb",
+    });
+  });
 });

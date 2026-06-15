@@ -15,6 +15,8 @@ export const handler = async (
 
   const scanForward = event.queryStringParameters?.scanForward === "true";
 
+  const month = event.queryStringParameters?.month;
+
   let exclusiveStartKey: Record<string, unknown> | undefined;
   if (event.queryStringParameters?.lastKey) {
     exclusiveStartKey = JSON.parse(
@@ -24,13 +26,21 @@ export const handler = async (
     );
   }
 
+  const expressionAttributeValues: Record<string, string> = {
+    ":pk": "daily-proverb",
+  };
+
+  let keyConditionExpression = "pk = :pk";
+  if (month) {
+    keyConditionExpression = "pk = :pk AND begins_with(sk, :monthPrefix)";
+    expressionAttributeValues[":monthPrefix"] = month;
+  }
+
   const result = await client.send(
     new QueryCommand({
       TableName: tableName,
-      KeyConditionExpression: "pk = :pk",
-      ExpressionAttributeValues: {
-        ":pk": "daily-proverb",
-      },
+      KeyConditionExpression: keyConditionExpression,
+      ExpressionAttributeValues: expressionAttributeValues,
       Limit: limit,
       ExclusiveStartKey: exclusiveStartKey,
       ScanIndexForward: scanForward,

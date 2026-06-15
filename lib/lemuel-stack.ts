@@ -319,12 +319,12 @@ export class LemuelStack extends cdk.Stack {
     api.root
       .addResource("get-proverbs")
       .addMethod("GET", new apigateway.LambdaIntegration(getProverbs), {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
+        authorizationType: apigateway.AuthorizationType.NONE,
         requestParameters: {
           "method.request.querystring.limit": false,
           "method.request.querystring.lastKey": false,
           "method.request.querystring.scanForward": false,
+          "method.request.querystring.month": false,
         },
         requestValidator,
       });
