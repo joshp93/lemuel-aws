@@ -247,8 +247,9 @@ export class LemuelStack extends cdk.Stack {
         type: apigateway.JsonSchemaType.OBJECT,
         properties: {
           note: { type: apigateway.JsonSchemaType.STRING },
+          date: { type: apigateway.JsonSchemaType.STRING },
         },
-        required: ["note"],
+        required: ["note", "date"],
       },
     });
 

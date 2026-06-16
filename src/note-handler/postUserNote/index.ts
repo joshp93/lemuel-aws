@@ -34,6 +34,7 @@ export const postUserNoteHandler = async (
       pk: uuid,
       sk: ref,
       note: body.note,
+      date: body.date,
       dateCreated,
       uuid,
       ref,

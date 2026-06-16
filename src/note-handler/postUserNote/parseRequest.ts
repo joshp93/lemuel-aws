@@ -1,22 +1,17 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
 
 /**
- * Extracts and validates the request body for the postUserNote endpoint.
+ * Extracts the request body for the postUserNote endpoint.
+ *
+ * Validation is handled by the API Gateway JSON schema (NoteModel),
+ * so `note` and `date` are guaranteed to be present.
  *
  * @param event - The API Gateway proxy event
  * @returns The parsed note body
- * @throws If the body is invalid or note field is missing
  */
 export const parsePostUserNoteRequest = (
   event: APIGatewayProxyEvent,
-): { note: string } => {
-  console.log(`[postUserNote] Parsing request body`);
-
+): { note: string; date: string } => {
   const body = JSON.parse(event.body ?? "{}");
-
-  if (typeof body.note !== "string" || body.note.trim().length === 0) {
-    throw new Error("note body parameter is required");
-  }
-
-  return { note: body.note };
+  return { note: body.note, date: body.date };
 };

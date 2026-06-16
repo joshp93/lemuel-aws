@@ -66,6 +66,11 @@ export const NoteEntitySchema = z.object({
   dateCreated: z.iso
     .datetime()
     .describe("ISO date string of when the note was created"),
+  date: z
+    .string()
+    .describe(
+      "The date of the daily proverb this note was created for, e.g. 2026-06-16",
+    ),
   uuid: z
     .string()
     .describe("The cognito uuid of the user — mirrors pk for GSI access"),

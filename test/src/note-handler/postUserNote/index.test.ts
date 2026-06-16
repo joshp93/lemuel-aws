@@ -36,7 +36,7 @@ describe("postUserNoteHandler", () => {
         uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
         ref: "Proverbs3:5",
       },
-      body: JSON.stringify({ note: "Trust in the Lord" }),
+      body: JSON.stringify({ note: "Trust in the Lord", date: "2024-01-01" }),
     } as unknown as APIGatewayProxyEvent;
 
     const result = await postUserNoteHandler(createDocClient(), env, event);
@@ -49,6 +49,7 @@ describe("postUserNoteHandler", () => {
       note: "Trust in the Lord",
       uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
       ref: "Proverbs3:5",
+      date: "2024-01-01",
       dateCreated: "2024-01-01T12:00:00.000Z",
     });
 
@@ -59,6 +60,7 @@ describe("postUserNoteHandler", () => {
       note: "Trust in the Lord",
       uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
       ref: "Proverbs3:5",
+      date: "2024-01-01",
       dateCreated: "2024-01-01T12:00:00.000Z",
     });
 
@@ -114,7 +116,7 @@ describe("postUserNoteHandler", () => {
         uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
         ref: "Proverbs3:5",
       },
-      body: JSON.stringify({ note: "Trust" }),
+      body: JSON.stringify({ note: "Trust", date: "2024-01-01" }),
     } as unknown as APIGatewayProxyEvent;
 
     const result = await postUserNoteHandler(createDocClient(), env, event);
@@ -135,7 +137,7 @@ describe("postUserNoteHandler", () => {
         uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
         ref: "Proverbs3:5",
       },
-      body: JSON.stringify({ note: "my note" }),
+      body: JSON.stringify({ note: "my note", date: "2024-01-01" }),
     } as unknown as APIGatewayProxyEvent;
 
     const result = await postUserNoteHandler(createDocClient(), env, event);

@@ -21,6 +21,7 @@ describe("getUserNoteHandler", () => {
       sk: "Proverbs1:1",
       note: "my note",
       dateCreated: "2024-01-01T00:00:00.000Z",
+      date: "2024-01-01",
       uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
       ref: "Proverbs1:1",
     };
