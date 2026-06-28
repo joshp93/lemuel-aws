@@ -35,7 +35,8 @@ describe(handler.name, () => {
   };
 
   it("Should batch write proverbs in groups of 25 with correct PK/SK/proverb", async () => {
-    const parsed = LoadProverbsEventSchema.parse(JSON.parse(testJson));
+    const eventData = JSON.parse(testJson);
+    const parsed = LoadProverbsEventSchema.parse([eventData]);
     ddbMock.on(BatchWriteCommand).resolves({
       UnprocessedItems: {},
       ItemCollectionMetrics: {},
@@ -52,7 +53,7 @@ describe(handler.name, () => {
 
     await handler(parsed);
 
-    const total = parsed.proverbs.length;
+    const total = parsed[0].proverbs.length;
     const expectedBatches = Math.ceil(total / 25);
     expect(ddbMock.commandCalls(BatchWriteCommand).length).toBe(
       expectedBatches,
@@ -77,7 +78,8 @@ describe(handler.name, () => {
   });
 
   it("Should create versions item if it doesn't exist", async () => {
-    const parsed = LoadProverbsEventSchema.parse(JSON.parse(testJson));
+    const eventData = JSON.parse(testJson);
+    const parsed = LoadProverbsEventSchema.parse([eventData]);
     ddbMock.on(BatchWriteCommand).resolves({
       UnprocessedItems: {},
       ItemCollectionMetrics: {},
@@ -102,7 +104,8 @@ describe(handler.name, () => {
   });
 
   it("Should append version to existing versions list", async () => {
-    const parsed = LoadProverbsEventSchema.parse(JSON.parse(testJson));
+    const eventData = JSON.parse(testJson);
+    const parsed = LoadProverbsEventSchema.parse([eventData]);
     ddbMock.on(BatchWriteCommand).resolves({
       UnprocessedItems: {},
       ItemCollectionMetrics: {},
@@ -127,7 +130,8 @@ describe(handler.name, () => {
   });
 
   it("Should not update versions if already in list", async () => {
-    const parsed = LoadProverbsEventSchema.parse(JSON.parse(testJson));
+    const eventData = JSON.parse(testJson);
+    const parsed = LoadProverbsEventSchema.parse([eventData]);
     ddbMock.on(BatchWriteCommand).resolves({
       UnprocessedItems: {},
       ItemCollectionMetrics: {},

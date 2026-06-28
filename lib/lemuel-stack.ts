@@ -177,6 +177,7 @@ export class LemuelStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("dist/load-proverbs"),
+      timeout: cdk.Duration.seconds(30),
       environment: {
         TABLE_NAME: table.tableName,
       },

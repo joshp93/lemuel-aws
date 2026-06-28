@@ -1,4 +1,5 @@
 import type { Bible, BiblesResponse } from "../models/apiBible";
+import { fetchWithRetry } from "./retry";
 
 /**
  * Error thrown when a requested Bible version is not found in the API response.
@@ -32,7 +33,7 @@ export const fetchBible = async (
 ): Promise<Bible> => {
   const url = `${baseUrl}/v1/bibles?language=eng&abbreviation=${version}`;
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     headers: {
       "api-key": apiKey,
     },
@@ -57,5 +58,6 @@ export const fetchBible = async (
     throw new BibleNotFoundError(version, availableVersions);
   }
 
+  console.log(`Found bible: ${matchingBible.name} (${matchingBible.id})`);
   return matchingBible;
 };

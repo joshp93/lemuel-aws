@@ -1,4 +1,5 @@
 import type { ChaptersResponse } from "../models/apiBible";
+import { fetchWithRetry } from "./retry";
 
 /**
  * Error thrown when fetching a chapter fails.
@@ -34,7 +35,7 @@ export const fetchChapter = async (
 ): Promise<ChaptersResponse> => {
   const url = `${baseUrl}/v1/bibles/${bibleId}/chapters/PRO.${chapter}?content-type=json`;
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     headers: {
       "api-key": apiKey,
     },
@@ -45,5 +46,7 @@ export const fetchChapter = async (
     throw new ChapterFetchError(chapter, response.status, response.statusText);
   }
 
-  return (await response.json()) as ChaptersResponse;
+  const data = (await response.json()) as ChaptersResponse;
+  console.log(`Fetched chapter ${chapter}: ${data.data.verseCount} verses`);
+  return data;
 };

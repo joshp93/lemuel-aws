@@ -465,12 +465,13 @@ describe("fetch-proverbs-for-version handler", () => {
 
     const consoleLogSpy = jest.spyOn(console, "log");
 
-    const result = await handler({ version: "web" });
+    const result = await handler([{ version: "web" }]);
 
     expect(consoleLogSpy).toHaveBeenCalled();
-    expect(typeof result).toBe("object");
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(1);
 
-    const output = result as any;
+    const output = result[0];
 
     expect(output.version).toBe("web");
     expect(Array.isArray(output.proverbs)).toBe(true);
@@ -495,9 +496,7 @@ describe("fetch-proverbs-for-version handler", () => {
     jest.resetModules();
     handler = require("../../../src/fetch-proverbs-for-version/index").handler;
 
-    await expect(handler({} as { version: string })).rejects.toThrow(
-      "Invalid input",
-    );
+    await expect(handler([{} as { version: string }])).rejects.toThrow();
   });
 
   it("Should throw if API_BIBLE_SECRET_NAME is not set", async () => {
@@ -505,7 +504,7 @@ describe("fetch-proverbs-for-version handler", () => {
     jest.resetModules();
     handler = require("../../../src/fetch-proverbs-for-version/index").handler;
 
-    await expect(handler({ version: "web" })).rejects.toThrow(
+    await expect(handler([{ version: "web" }])).rejects.toThrow(
       "API_BIBLE_SECRET_NAME environment variable not set",
     );
   });
@@ -538,7 +537,7 @@ describe("fetch-proverbs-for-version handler", () => {
       );
     });
 
-    await expect(handler({ version: "nonexistent" })).rejects.toThrow(
+    await expect(handler([{ version: "nonexistent" }])).rejects.toThrow(
       'Bible version "nonexistent" not found',
     );
   });

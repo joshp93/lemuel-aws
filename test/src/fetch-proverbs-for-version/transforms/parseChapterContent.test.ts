@@ -141,4 +141,33 @@ describe("parseChapterContent", () => {
       ]),
     );
   });
+
+  it("does not add space before punctuation when text is split across items", () => {
+    const content: ContentElement[] = [
+      {
+        type: "tag",
+        name: "para",
+        attrs: {},
+        items: [
+          {
+            type: "text",
+            text: "be zealous for the fear of the",
+            attrs: { verseId: "PRO.23.17" },
+          },
+          {
+            type: "text",
+            text: "Lord",
+            attrs: { verseId: "PRO.23.17" },
+          },
+          {
+            type: "text",
+            text: ".",
+            attrs: { verseId: "PRO.23.17" },
+          },
+        ],
+      },
+    ];
+    const result = parseChapterContent(content);
+    expect(result.get(17)).toBe("be zealous for the fear of the Lord.");
+  });
 });

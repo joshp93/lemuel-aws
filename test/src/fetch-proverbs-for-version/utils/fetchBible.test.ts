@@ -58,8 +58,8 @@ describe("fetchBible", () => {
     ).rejects.toThrow(BibleNotFoundError);
   });
 
-  it("throws error when fetch fails", async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+  it("throws error when fetch fails after retries", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 500,
       statusText: "Internal Server Error",

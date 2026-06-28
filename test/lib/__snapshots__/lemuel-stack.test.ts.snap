@@ -453,7 +453,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "c79a3592a8b930f81bab605745cddfbfc8c62143fbf5dc264aac7bcd1e6b1b65.zip",
+          "S3Key": "d6219099036e51082a1a75233fc3629ffae9be40ec777dc9db0bd20518dcac7c.zip",
         },
         "Environment": {
           "Variables": {
@@ -4038,7 +4038,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "c16903767f267b472e514eef2951ecb28405fdc175b97391def4c69d18b82fff.zip",
+          "S3Key": "9038153e7c84e7a032dfb1f18eee29d8dfb399d409aab6764320403aef62cd89.zip",
         },
         "Environment": {
           "Variables": {
@@ -4056,6 +4056,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           ],
         },
         "Runtime": "nodejs22.x",
+        "Timeout": 30,
       },
       "Type": "AWS::Lambda::Function",
     },

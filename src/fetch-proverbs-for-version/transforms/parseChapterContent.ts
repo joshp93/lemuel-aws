@@ -93,7 +93,17 @@ const appendText = (
   if (name === "para" && existingEndsWithPunctuation) {
     return existing ? `${existing}\n${newText}` : newText;
   }
-  return existing ? `${existing} ${newText}` : newText;
+  if (existing) {
+    const firstChar = newText[0];
+    const newTextStartsWithPunctuation =
+      firstChar !== undefined &&
+      /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(firstChar);
+    if (newTextStartsWithPunctuation) {
+      return `${existing}${newText}`;
+    }
+    return `${existing} ${newText}`;
+  }
+  return newText;
 };
 
 /**

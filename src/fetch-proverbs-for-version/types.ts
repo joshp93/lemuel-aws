@@ -6,20 +6,26 @@ import type {
   ContentTextItem,
 } from "./models/apiBible";
 
-export const FetchProverbsForVersionEventSchema = z.object({
+export const VersionInputSchema = z.object({
   version: z.string().min(1, "Version is required").lowercase(),
   citation: z.string().optional(),
 });
+
+export const FetchProverbsForVersionEventSchema = z.array(VersionInputSchema);
 
 export type FetchProverbsForVersionEvent = z.infer<
   typeof FetchProverbsForVersionEventSchema
 >;
 
-export interface Output {
+export type VersionInput = z.infer<typeof VersionInputSchema>;
+
+export interface VersionOutput {
   version: string;
   proverbs: Proverb[];
   citation?: string;
 }
+
+export type Output = VersionOutput[];
 
 export interface Secret {
   apiKey: string;

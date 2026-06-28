@@ -1,25 +1,19 @@
-import { REFS } from "./constants/refs";
-import {
-  buildProverbsFromChapter,
-  getChaptersFromRefs,
-} from "./factories/buildProverbs";
+import { fetchSingleVersion } from "./services/fetchSingleVersion";
 import {
   type FetchProverbsForVersionEvent,
   FetchProverbsForVersionEventSchema,
   type Output,
-  type Proverb,
+  type VersionOutput,
 } from "./types";
-import { fetchBible } from "./utils/fetchBible";
-import { fetchChapter } from "./utils/fetchChapter";
 import { getSecret } from "./utils/getSecret";
 
 /**
- * Lambda handler that fetches Proverbs from API.Bible for a specific version.
- * Retrieves the Bible ID from the bibles endpoint, then fetches chapter data
- * and extracts proverb text for all configured references.
+ * Lambda handler that fetches Proverbs from API.Bible for one or more Bible versions.
+ * Accepts an array of version and citation objects, fetches proverbs for each version,
+ * and returns an array of per-version results.
  *
- * @param event - The Lambda event containing version and optional citation
- * @returns Output object with version, proverbs array, and optional citation
+ * @param event - Array of version input objects, each with a version abbreviation and optional citation
+ * @returns Array of VersionOutput objects containing the fetched proverbs
  */
 export const handler = async (
   event: FetchProverbsForVersionEvent,
@@ -27,49 +21,18 @@ export const handler = async (
   console.debug("Event:", JSON.stringify(event));
 
   const parsed = FetchProverbsForVersionEventSchema.parse(event);
-  const { version } = parsed;
 
   const secretName = process.env.API_BIBLE_SECRET_NAME!;
   const secret = await getSecret(secretName);
   const { apiKey, baseUrl } = secret;
 
-  console.log(`Starting fetch for version: ${version}`);
   console.log(`Using base URL: ${baseUrl}`);
 
-  const bible = await fetchBible(baseUrl, apiKey, version);
-  const bibleId = bible.id;
-  const versionName = bible.abbreviationLocal.toLowerCase();
-  console.log(`Found matching bible: ${bible.name} (ID: ${bibleId})`);
-
-  const chapters = getChaptersFromRefs(REFS);
-  console.log(`Building chapter list from ${REFS.length} proverb references`);
-  console.log(`Prepared to fetch ${chapters.length} chapters`);
-
-  const proverbs: Proverb[] = [];
-
-  for (const chapter of chapters) {
-    console.log(`Fetching chapter ${chapter}...`);
-
-    const chapterData = await fetchChapter(baseUrl, apiKey, bibleId, chapter);
-    const content = chapterData.data.content || [];
-
-    const chapterProverbs = buildProverbsFromChapter(content, chapter);
-    proverbs.push(...chapterProverbs);
-
-    console.log(
-      `Chapter ${chapter} complete - collected ${chapterProverbs.length} proverbs`,
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  const results: VersionOutput[] = [];
+  for (const versionInput of parsed) {
+    const result = await fetchSingleVersion(apiKey, baseUrl, versionInput);
+    results.push(result);
   }
 
-  const output: Output = {
-    version: versionName,
-    ...(parsed.citation && { citation: parsed.citation }),
-    proverbs,
-  };
-
-  console.log(`Fetch complete - total proverbs: ${proverbs.length}`);
-
-  return output;
+  return results;
 };
