@@ -1,103 +1,88 @@
-# Proverb for the day backend
+# lemuel — Backend (AWS CDK / TypeScript)
 
-This is an AWS CDK project using TypeScript and pnpm. It includes two stacks:
+Infrastructure-as-code (CDK v2) + Lambda backend powering the Lemuel daily proverb app.
 
-## Stacks
+## Stacks (3)
 
 ### LemuelSecretStack (`lib/lemuel-secret-stack.ts`)
-
-- Secrets Manager secret for API.Bible credentials (`api-bible-creds`)
-- Secrets Manager secret for FCM server credentials (`fcm-server-creds`)
+- `api-bible-creds` — API key for API.Bible
+- `fcm-server-creds` — Firebase Cloud Messaging server credentials
 
 ### LemuelUserManagementStack (`lib/lemuel-user-management-stack.ts`)
-
-- Cognito User Pool for user authentication
-- User Pool Client with SRP authentication
-- User Pool Domain for hosted UI
+- Cognito User Pool (email sign-in, self-sign-up)
+- Web Client with Cognito auth
+- User Pool Domain (`lemuel`)
 
 ### LemuelStack (`lib/lemuel-stack.ts`)
+- DynamoDB table `proverbs-store` with 3 GSIs: `version-index`, `proverb-notes-index`, `user-notes-index`
+- 12 Lambda functions (via `tsup` bundling)
+- REST API Gateway (12 endpoints, Cognito auth on protected routes)
+- EventBridge cron rule (`lemuel-schedule`, 6 AM daily)
+- DynamoDB Stream → `push-daily-proverb` (INSERT on `daily-proverb`)
 
-- DynamoDB table for storing proverbs with global secondary indexes (version-index, proverb-notes-index, user-notes-index)
-- DynamoDB Stream (NEW_IMAGE) on proverbs-store table
-- Lambda functions:
-  - `fetch-proverbs-for-version` - fetches Proverbs from API.Bible for a specific Bible version
-    - Event: `{ "version": "kjv", "citation": "King James Version" }`
-    - Output: `{ "version": "kjv", "proverbs": [{ "ref": "Proverbs 1:1", "proverb": "The proverbs of Solomon..." }], "citation": "..." }`
-    - Uses API_BIBLE_SECRET_NAME env var (Secrets Manager)
-  - `get-available-versions` - retrieves list of available Bible versions from DynamoDB
-  - `load-proverbs` - loads proverbs into DynamoDB from JSON
-  - `choose-proverb` - selects random daily proverb
-  - `get-proverb` - retrieves the daily proverb
-  - `check-user-exists` - checks if a user exists in Cognito
-  - `account-handler` - handles account operations (GET /accounts/{uuid}, POST /accounts/{uuid}/create)
-  - `note-handler` - handles note CRUD operations
-  - `log-handler` - handles client log submissions
-  - `register-device-token` - registers a device FCM token
-  - `push-daily-proverb` - DynamoDB Stream trigger that sends silent FCM data push when daily-proverb is chosen
-- REST API Gateway endpoints:
-  - `GET /{version}` - returns daily proverb (no auth required)
-  - `GET /accounts/{uuid}` - returns user account details (Cognito auth)
-  - `POST /accounts/{uuid}/create` - creates user account record (Cognito auth)
-  - `POST /auth/check-user-exists` - checks user existence (rate limited)
-  - `POST /push/register-token` - registers device FCM token (no auth)
-- EventBridge cron rules:
-  - `lemuel-schedule` triggers choose-proverb daily
+## Lambda functions
 
-## API Endpoints
+| Function | Trigger | Description |
+|---|---|---|
+| `fetch-proverbs-for-version` | Direct invoke | Fetches all 31 Proverbs chapters from API.Bible for N versions. Retry logic, chapter parsing, structured output. |
+| `load-proverbs` | Direct invoke | Batch-writes fetched proverbs into DynamoDB. Creates proverb items, refs metadata (allRefs/usedRefs), versions list, citations. |
+| `choose-proverb` | EventBridge cron (6 AM) | Picks random unused proverb ref for today + tomorrow. Updates refs tracker to prevent repeats. |
+| `get-proverb` | `GET /{version}` | Returns daily proverb by version + optional `?date=`. Includes citation. |
+| `get-proverbs` | `GET /get-proverbs` | Paginated listing of daily-proverb entries (`?month=`, `?limit=`, `?lastKey=`). Base64 cursor. |
+| `get-available-versions` | `GET /available-versions` | Sorted list of Bible version abbreviations in the database. |
+| `check-user-exists` | `POST /auth/check-user-exists` | Rate-limited (10/s, 20 burst, 10K/day). Checks Cognito for email. |
+| `account-handler` | `GET/POST /accounts/{uuid}/...` | Multi-route: GET account details, POST create, POST meditations |
+| `note-handler` | `GET/POST /notes/...` | Multi-route: CRUD for per-proverb notes (user + community) |
+| `log-handler` | `POST /logs` | Accepts client-side logs via AWS Powertools Logger. Returns 202. |
+| `register-device-token` | `POST /push/register-token` | Stores FCM device token (sha256 hash key). |
+| `push-daily-proverb` | DynamoDB Stream | On daily-proverb INSERT, sends silent FCM data push to all registered tokens (batched). |
 
-- `GET /available-versions` - Returns list of available Bible versions (no auth required)
-- `GET /{version}` - Returns daily proverb (no auth required)
-- `POST /auth/check-user-exists` - Checks if user exists in Cognito
-  - Request: `{"email": "user@example.com"}`
-  - Response: `{"exists": true}` or `{"exists": false}`
-  - Rate limited: 10 req/s, 20 burst, 10,000/day
-- `GET /accounts/{uuid}` - Returns user account details from DynamoDB (Cognito auth required)
-  - Response: Account record JSON with `accountCreatedDate`, `totalMeditations`, `totalNotes`
-- `POST /accounts/{uuid}/create` - Creates user account record in DynamoDB (Cognito auth required)
-  - Response: `{"success": true}`
-- `POST /push/register-token` - Registers a device FCM token (no auth required)
-  - Request: `{"token": "fcm-token", "platform": "android"}`
-  - Response: `{"success": true}`
+## API endpoints
 
-## Lambda Function Structure
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `GET` | `/available-versions` | None | List available Bible versions |
+| `GET` | `/{version}` | None | Get daily proverb (optional `?date=`) |
+| `GET` | `/get-proverbs` | None | Paginated proverb calendar |
+| `POST` | `/auth/check-user-exists` | Rate-limited | Check if email is registered |
+| `GET` | `/accounts/{uuid}` | Cognito | Get user account details |
+| `POST` | `/accounts/{uuid}/create` | Cognito | Create user account record |
+| `POST` | `/accounts/{uuid}/meditations/{date}` | Cognito | Record a meditation completion |
+| `GET` | `/notes/users/{uuid}` | Cognito | List user's notes (paginated) |
+| `GET` | `/notes/users/{uuid}/{ref}` | Cognito | Get single note by user+ref |
+| `POST` | `/notes/users/{uuid}/{ref}` | Cognito | Create/update a note (upsert) |
+| `GET` | `/notes/proverbs/{ref}` | Cognito | Community notes for a proverb (paginated) |
+| `POST` | `/logs` | None | Submit client-side logs |
+| `POST` | `/push/register-token` | None | Register FCM device token |
 
-Each Lambda lives in its own directory under `src/<function-name>/`:
+## Lambda code structure
 
 ```
 src/<function-name>/
   index.ts              # Handler orchestrator
-  schemas.ts            # Zod schemas + types for env, events, responses
-  factories/            # Domain logic that builds/transforms objects
-    buildRecord.ts
+  schemas.ts            # Zod schemas for env, events, responses
+  factories/            # Domain logic builders
   transforms/           # Pure data transformations
-  utils/                # I/O helpers (AWS SDK, HTTP calls)
+  utils/                # I/O helpers (AWS SDK, HTTP)
   constants/            # Static data
+  models/               # Type definitions (when not shared)
 ```
 
-### Conventions (Functional Programming Style)
-
-- **One function per code file** with `export const` named exports (no `export default`)
-- **Handlers orchestrate only**: validate input with Zod, call factories/utils, return response
-- **Factories** build/transform domain objects (e.g., `buildAccountRecord(uuid)`)
-- **Shared entity schemas** (DynamoDB row shapes) live in `src/models/proverbStoreSchemas.ts`
-- **Per-Lambda schemas** (env, events, responses) go in a local `schemas.ts`
-- **Zod at boundaries** — validate env vars, events, and DynamoDB reads; don't validate internal operations
-- **Simple Lambdas** (single DynamoDB op) use only `schemas.ts` + `index.ts`
-- **Complex Lambdas** (multi-step, I/O, transformations) extract into `factories/`, `transforms/`, `utils/`, `constants/`
-
-## Environment Variables
-
-Lambda functions use Zod schemas to validate environment variables at runtime.
+**Conventions** (functional style):
+- One function per file, `export const` named exports (no `export default`)
+- Handlers: validate with Zod → call factories/utils → return response
+- Shared DynamoDB schemas: `src/models/proverbStoreSchemas.ts`
+- Zod at boundaries only (env, events, DynamoDB reads)
+- Simple Lambdas (single DynamoDB op) = `schemas.ts` + `index.ts` only
+- Complex Lambdas = extract into `factories/`, `transforms/`, `utils/`, `constants/`
 
 ## Testing
 
-This project uses jest with aws-sdk-client-mock. Please don't run user tests unless the developer asks as this slows down the feedback loop.
+- Jest + `aws-sdk-client-mock`
+- CDK stack tests with snapshot assertions
+- Test files mirror source at `test/src/<function-name>/`
+- Missing tests: `updateMeditations`, `postUserNote`, `register-device-token`
 
-```
-Argument of type 'typeof BatchWriteCommand' is not assignable to parameter of type 'new (input: BatchWriteCommandInput) => AwsCommand<any, any, any, any>'.
-...
-```
+## Known issues
 
-The fix for this type error is to permanently delete node_modules, delete pnpm-lock file, then run `pnpm i`. If that doesn't work, stop and tell the developer.
-
-**Please keep this file up to date.**
+- `BatchWriteCommand` type error with `aws-sdk-client-mock`: delete `node_modules` + `pnpm-lock.yaml`, run `pnpm i`. If that doesn't fix it, notify the developer.
