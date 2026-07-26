@@ -46,7 +46,7 @@ export const getProverbNotesHandler = async (
     console.log(
       `[getProverbNotes] Query returned ${result.Items?.length ?? 0} items`,
     );
-    return buildGetProverbNotesResponse(result);
+    return buildGetProverbNotesResponse(result, params.userId);
   } catch (error) {
     console.error(`[getProverbNotes] Error:`, error);
     return {

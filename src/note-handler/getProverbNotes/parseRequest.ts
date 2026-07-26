@@ -5,7 +5,7 @@ import type { APIGatewayProxyEvent } from "aws-lambda";
  * for the getProverbNotes endpoint.
  *
  * @param event - The API Gateway proxy event
- * @returns Parsed ref, limit, exclusiveStartKey, and scanForward
+ * @returns Parsed ref, limit, exclusiveStartKey, scanForward, and optional userId
  */
 export const parseGetProverbNotesRequest = (
   event: APIGatewayProxyEvent,
@@ -14,6 +14,7 @@ export const parseGetProverbNotesRequest = (
   limit?: number;
   exclusiveStartKey?: Record<string, unknown>;
   scanForward: boolean;
+  userId: string | undefined;
 } => {
   console.log(`[getProverbNotes] Parsing request`, {
     pathParams: event.pathParameters,
@@ -37,5 +38,7 @@ export const parseGetProverbNotesRequest = (
     );
   }
 
-  return { ref, limit, exclusiveStartKey, scanForward };
+  const userId = event.queryStringParameters?.userId ?? undefined;
+
+  return { ref, limit, exclusiveStartKey, scanForward, userId };
 };

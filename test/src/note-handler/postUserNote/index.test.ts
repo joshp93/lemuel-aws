@@ -51,6 +51,7 @@ describe("postUserNoteHandler", () => {
       ref: "Proverbs3:5",
       date: "2024-01-01",
       dateCreated: "2024-01-01T12:00:00.000Z",
+      isPrivate: false,
     });
 
     const putCall = ddbMock.commandCalls(PutCommand)[0].args[0].input;
@@ -62,6 +63,7 @@ describe("postUserNoteHandler", () => {
       ref: "Proverbs3:5",
       date: "2024-01-01",
       dateCreated: "2024-01-01T12:00:00.000Z",
+      isPrivate: false,
     });
 
     const queryCalls = ddbMock.commandCalls(QueryCommand);
@@ -126,6 +128,37 @@ describe("postUserNoteHandler", () => {
     const updateCalls = ddbMock.commandCalls(UpdateCommand);
     expect(updateCalls[0].args[0].input.ExpressionAttributeValues).toEqual({
       ":count": 0,
+    });
+  });
+
+  it("stores isPrivate when creating a private note", async () => {
+    ddbMock.on(PutCommand).resolves({});
+    ddbMock.on(QueryCommand).resolves({ Count: 1 });
+    ddbMock.on(UpdateCommand).resolves({});
+
+    const event = {
+      pathParameters: {
+        uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
+        ref: "Proverbs3:5",
+      },
+      body: JSON.stringify({
+        note: "Private thoughts",
+        date: "2024-01-01",
+        isPrivate: true,
+      }),
+    } as unknown as APIGatewayProxyEvent;
+
+    const result = await postUserNoteHandler(createDocClient(), env, event);
+
+    expect(result.statusCode).toBe(200);
+    const body = JSON.parse(result.body);
+    expect(body.isPrivate).toBe(true);
+
+    const putCall = ddbMock.commandCalls(PutCommand)[0].args[0].input;
+    expect(putCall.Item).toMatchObject({
+      pk: "66a20224-c0d1-70f3-58f9-4671e44cac10",
+      sk: "Proverbs3:5",
+      isPrivate: true,
     });
   });
 

@@ -1087,7 +1087,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       "Type": "AWS::IAM::Role",
       "UpdateReplacePolicy": "Retain",
     },
-    "lemuelapiDeployment2137DA7A3d78e400ae88a1891ae4c1954c47cdb7": {
+    "lemuelapiDeployment2137DA7Ae681ac446d805e0387f0480ece0a8a42": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
         "lemuelapiversionGET9CB1814C",
@@ -1164,7 +1164,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7A3d78e400ae88a1891ae4c1954c47cdb7",
+          "Ref": "lemuelapiDeployment2137DA7Ae681ac446d805e0387f0480ece0a8a42",
         },
         "MethodSettings": [
           {
@@ -1229,6 +1229,9 @@ exports[`LemuelStack should match snapshot 1`] = `
           "properties": {
             "date": {
               "type": "string",
+            },
+            "isPrivate": {
+              "type": "boolean",
             },
             "note": {
               "type": "string",
@@ -2900,6 +2903,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "method.request.querystring.lastKey": false,
           "method.request.querystring.limit": false,
           "method.request.querystring.scanForward": false,
+          "method.request.querystring.userId": false,
         },
         "RequestValidatorId": {
           "Ref": "lemuelapiRequestValidator9BC748F4",

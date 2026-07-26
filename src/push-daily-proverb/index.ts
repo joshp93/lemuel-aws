@@ -58,6 +58,9 @@ export const handler = async (event: unknown): Promise<void> => {
     },
     android: {
       priority: "high" as const,
+      ttl: "86400s",
+      collapseKey: "lemuel-daily-proverb",
+      direct_boot_ok: true,
     },
     apns: {
       headers: {

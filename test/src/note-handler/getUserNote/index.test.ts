@@ -24,6 +24,7 @@ describe("getUserNoteHandler", () => {
       date: "2024-01-01",
       uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
       ref: "Proverbs1:1",
+      isPrivate: false,
     };
     ddbMock.on(GetCommand).resolves({ Item: mockItem });
 

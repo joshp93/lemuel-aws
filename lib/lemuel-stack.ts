@@ -249,6 +249,7 @@ export class LemuelStack extends cdk.Stack {
         properties: {
           note: { type: apigateway.JsonSchemaType.STRING },
           date: { type: apigateway.JsonSchemaType.STRING },
+          isPrivate: { type: apigateway.JsonSchemaType.BOOLEAN },
         },
         required: ["note", "date"],
       },
@@ -386,6 +387,7 @@ export class LemuelStack extends cdk.Stack {
           "method.request.querystring.limit": false,
           "method.request.querystring.lastKey": false,
           "method.request.querystring.scanForward": false,
+          "method.request.querystring.userId": false,
         },
         requestValidator,
       },

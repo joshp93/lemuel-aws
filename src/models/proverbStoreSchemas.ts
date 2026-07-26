@@ -78,6 +78,10 @@ export const NoteEntitySchema = z.object({
     .string()
     .min(1)
     .describe("The proverb reference — mirrors sk for GSI access"),
+  isPrivate: z
+    .boolean()
+    .default(false)
+    .describe("Whether the note is only visible to the author"),
 });
 
 export type NoteEntity = z.infer<typeof NoteEntitySchema>;

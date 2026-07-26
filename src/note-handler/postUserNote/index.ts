@@ -38,6 +38,7 @@ export const postUserNoteHandler = async (
       dateCreated,
       uuid,
       ref,
+      isPrivate: body.isPrivate,
     });
 
     await client.send(

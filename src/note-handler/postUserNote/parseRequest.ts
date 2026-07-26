@@ -11,7 +11,11 @@ import type { APIGatewayProxyEvent } from "aws-lambda";
  */
 export const parsePostUserNoteRequest = (
   event: APIGatewayProxyEvent,
-): { note: string; date: string } => {
+): { note: string; date: string; isPrivate: boolean } => {
   const body = JSON.parse(event.body ?? "{}");
-  return { note: body.note, date: body.date };
+  return {
+    note: body.note,
+    date: body.date,
+    isPrivate: body.isPrivate ?? false,
+  };
 };
