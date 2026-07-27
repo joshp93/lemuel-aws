@@ -28,14 +28,26 @@ jest.mock("../../../src/account-handler/updateMeditations/index", () => ({
   }),
 }));
 
+jest.mock("../../../src/account-handler/upsertDisplayName/index", () => ({
+  upsertDisplayNameHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+  }),
+}));
+
 import { createAccountHandler } from "../../../src/account-handler/createAccount/index";
 import { getAccountDetailsHandler } from "../../../src/account-handler/getAccountDetails/index";
 import { updateMeditationsHandler } from "../../../src/account-handler/updateMeditations/index";
+import { upsertDisplayNameHandler } from "../../../src/account-handler/upsertDisplayName/index";
 
 describe("account-handler router", () => {
   beforeEach(() => {
     process.env.TABLE_NAME = "TestTable";
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    delete process.env.TABLE_NAME;
   });
 
   it("routes GET /accounts/{uuid} to getAccountDetailsHandler", async () => {
@@ -72,6 +84,18 @@ describe("account-handler router", () => {
     await handler(event);
 
     expect(updateMeditationsHandler).toHaveBeenCalled();
+  });
+
+  it("routes PUT /accounts/{uuid}/display-name to upsertDisplayNameHandler", async () => {
+    const event = {
+      httpMethod: "PUT",
+      resource: "/accounts/{uuid}/display-name",
+      pathParameters: { uuid: "user-123" },
+    } as unknown as APIGatewayProxyEvent;
+
+    await handler(event);
+
+    expect(upsertDisplayNameHandler).toHaveBeenCalled();
   });
 
   it("returns 405 for unsupported routes", async () => {

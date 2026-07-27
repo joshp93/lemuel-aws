@@ -13,14 +13,8 @@ export const createAccountHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const uuid = event.pathParameters?.uuid;
-
-    if (!uuid) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "uuid path parameter is required" }),
-      };
-    }
+    const uuid = event.pathParameters!.uuid!;
+    const { displayName } = JSON.parse(event.body ?? "{}");
 
     const existing = await client.send(
       new GetCommand({
@@ -40,7 +34,7 @@ export const createAccountHandler = async (
     await client.send(
       new PutCommand({
         TableName: env.TABLE_NAME,
-        Item: buildAccountRecord(uuid),
+        Item: buildAccountRecord(uuid, displayName),
       }),
     );
 

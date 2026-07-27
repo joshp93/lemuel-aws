@@ -1,6 +1,10 @@
-import type { QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
+import type {
+  DynamoDBDocumentClient,
+  QueryCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
+import { collectDisplayNames } from "../../shared/displayNames";
 
 /**
  * Builds the API Gateway response from the DynamoDB GSI query result.
@@ -10,12 +14,21 @@ import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
  * @param result - The DynamoDB QueryCommand output
  * @returns An APIGatewayProxyResult with items and optional lastKey
  */
-export const buildGetUserNotesResponse = (
+export const buildGetUserNotesResponse = async (
+  client: DynamoDBDocumentClient,
+  tableName: string,
   result: QueryCommandOutput,
-): APIGatewayProxyResult => {
+): Promise<APIGatewayProxyResult> => {
   const items = (result.Items ?? []).map((item) =>
     NoteEntitySchema.parse(item),
   );
+
+  const uuids = [...new Set(items.map((n) => n.uuid))];
+  const displayNames = await collectDisplayNames(client, tableName, uuids);
+  const enriched = items.map((item) => ({
+    ...item,
+    displayName: displayNames[item.uuid] ?? "",
+  }));
 
   let lastKey: string | undefined;
   if (result.LastEvaluatedKey) {
@@ -24,12 +37,15 @@ export const buildGetUserNotesResponse = (
     );
   }
 
-  console.log(`[getUserNotes] Building response with ${items.length} items`, {
-    hasMore: !!lastKey,
-  });
+  console.log(
+    `[getUserNotes] Building response with ${enriched.length} items`,
+    {
+      hasMore: !!lastKey,
+    },
+  );
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ items, lastKey }),
+    body: JSON.stringify({ items: enriched, lastKey }),
   };
 };

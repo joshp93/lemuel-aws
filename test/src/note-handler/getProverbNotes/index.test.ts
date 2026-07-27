@@ -1,5 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  BatchGetCommand,
+  DynamoDBDocumentClient,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { getProverbNotesHandler } from "../../../../src/note-handler/getProverbNotes/index";
@@ -13,6 +17,7 @@ describe("getProverbNotesHandler", () => {
 
   beforeEach(() => {
     ddbMock.reset();
+    ddbMock.on(BatchGetCommand).resolves({ Responses: { TestTable: [] } });
   });
 
   it("queries proverb-notes-index by ref with ScanIndexForward defaulting to false", async () => {

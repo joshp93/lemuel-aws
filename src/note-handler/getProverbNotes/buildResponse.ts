@@ -1,7 +1,11 @@
-import type { QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
+import type {
+  DynamoDBDocumentClient,
+  QueryCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyResult } from "aws-lambda";
 import type { NoteEntity } from "../../models/proverbStoreSchemas";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
+import { collectDisplayNames } from "../../shared/displayNames";
 
 /**
  * Filters a list of note entities to exclude private notes that don't belong
@@ -30,14 +34,23 @@ export const filterNotesForUser = (
  *                 owned by this user are included in the community response.
  * @returns An APIGatewayProxyResult with items and optional lastKey
  */
-export const buildGetProverbNotesResponse = (
+export const buildGetProverbNotesResponse = async (
+  client: DynamoDBDocumentClient,
+  tableName: string,
   result: QueryCommandOutput,
   userId: string | undefined,
-): APIGatewayProxyResult => {
+): Promise<APIGatewayProxyResult> => {
   const items = filterNotesForUser(
     (result.Items ?? []).map((item) => NoteEntitySchema.parse(item)),
     userId,
   );
+
+  const uuids = [...new Set(items.map((n) => n.uuid))];
+  const displayNames = await collectDisplayNames(client, tableName, uuids);
+  const enriched = items.map((item) => ({
+    ...item,
+    displayName: displayNames[item.uuid] ?? "",
+  }));
 
   let lastKey: string | undefined;
   if (result.LastEvaluatedKey) {
@@ -47,12 +60,12 @@ export const buildGetProverbNotesResponse = (
   }
 
   console.log(
-    `[getProverbNotes] Building response with ${items.length} items`,
+    `[getProverbNotes] Building response with ${enriched.length} items`,
     { hasMore: !!lastKey, userId: userId ?? "anonymous" },
   );
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ items, lastKey }),
+    body: JSON.stringify({ items: enriched, lastKey }),
   };
 };

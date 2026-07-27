@@ -7,14 +7,22 @@ export const NoteHandlerEnvSchema = z.object({
 
 export type NoteHandlerEnv = z.infer<typeof NoteHandlerEnvSchema>;
 
+type NoteWithDisplayName = NoteEntity & { displayName: string };
+
 /** Paginated list of notes for a given proverb reference */
-export type GetProverbNotesResponse = { items: NoteEntity[]; lastKey?: string };
+export type GetProverbNotesResponse = {
+  items: NoteWithDisplayName[];
+  lastKey?: string;
+};
 
 /** A single note identified by user uuid and proverb ref */
-export type GetUserNoteResponse = NoteEntity;
+export type GetUserNoteResponse = NoteWithDisplayName;
 
 /** Paginated list of notes for a given user */
-export type GetUserNotesResponse = { items: NoteEntity[]; lastKey?: string };
+export type GetUserNotesResponse = {
+  items: NoteWithDisplayName[];
+  lastKey?: string;
+};
 
 /** The created/updated note entity */
 export type CreateNoteResponse = NoteEntity;

@@ -46,7 +46,7 @@ export const getUserNotesHandler = async (
     console.log(
       `[getUserNotes] Query returned ${result.Items?.length ?? 0} items`,
     );
-    return buildGetUserNotesResponse(result);
+    return buildGetUserNotesResponse(client, env.TABLE_NAME, result);
   } catch (error) {
     console.error(`[getUserNotes] Error:`, error);
     return {

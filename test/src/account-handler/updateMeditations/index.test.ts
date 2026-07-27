@@ -12,7 +12,9 @@ import { updateMeditationsHandler } from "../../../../src/account-handler/update
 
 describe("updateMeditationsHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
-  const env: AccountHandlerEnv = { TABLE_NAME: "TestTable" };
+  const env: AccountHandlerEnv = {
+    TABLE_NAME: "TestTable",
+  };
 
   beforeEach(() => {
     ddbMock.resetHistory();

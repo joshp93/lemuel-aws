@@ -38,7 +38,7 @@ describe("getUserNoteHandler", () => {
     const result = await getUserNoteHandler(createDocClient(), env, event);
 
     expect(result.statusCode).toBe(200);
-    expect(JSON.parse(result.body)).toEqual(mockItem);
+    expect(JSON.parse(result.body)).toEqual({ ...mockItem, displayName: "" });
   });
 
   it("returns 404 when note is not found", async () => {

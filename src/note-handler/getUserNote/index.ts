@@ -37,10 +37,21 @@ export const getUserNoteHandler = async (
     }
 
     const entity = NoteEntitySchema.parse(result.Item);
+
+    const accountResult = await client.send(
+      new GetCommand({
+        TableName: env.TABLE_NAME,
+        Key: { pk: uuid, sk: "account" },
+      }),
+    );
+
     console.log(`[getUserNote] Note found`, { uuid, ref });
     return {
       statusCode: 200,
-      body: JSON.stringify(entity),
+      body: JSON.stringify({
+        ...entity,
+        displayName: accountResult.Item?.displayName ?? "",
+      }),
     };
   } catch (error) {
     console.error(`[getUserNote] Error:`, error);

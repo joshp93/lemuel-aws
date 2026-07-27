@@ -7,7 +7,8 @@ const createStack = () => {
   const app = new cdk.App();
   const userManagementStack = new LemuelUserManagementStack(app, "UserMgmt");
   const stack = new LemuelStack(app, "TestStack", {
-    userPool: userManagementStack.userPool,
+    userPoolId: userManagementStack.userPool.userPoolId,
+    userPoolArn: userManagementStack.userPool.userPoolArn,
     apiBibleSecretName: "test-api-bible-creds",
     fcmSecretName: "fcm-server-creds",
   });

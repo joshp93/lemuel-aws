@@ -5,6 +5,7 @@ import { createAccountHandler } from "./createAccount/index";
 import { getAccountDetailsHandler } from "./getAccountDetails/index";
 import { AccountHandlerEnvSchema } from "./models";
 import { updateMeditationsHandler } from "./updateMeditations/index";
+import { upsertDisplayNameHandler } from "./upsertDisplayName/index";
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -26,6 +27,8 @@ export const handler = async (
         return createAccountHandler(client, env, event);
       case "POST /accounts/{uuid}/meditations/{date}":
         return updateMeditationsHandler(client, env, event);
+      case "PUT /accounts/{uuid}/display-name":
+        return upsertDisplayNameHandler(client, env, event);
       default:
         console.warn(`[account-handler] Unsupported route: ${route}`);
         return {

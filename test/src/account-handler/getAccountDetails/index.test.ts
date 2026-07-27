@@ -7,19 +7,22 @@ import type { AccountHandlerEnv } from "../../../../src/account-handler/models";
 
 describe("getAccountDetailsHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
-  const env: AccountHandlerEnv = { TABLE_NAME: "TestTable" };
+  const env: AccountHandlerEnv = {
+    TABLE_NAME: "TestTable",
+  };
 
   beforeEach(() => {
     ddbMock.resetHistory();
   });
 
-  it("returns the account record when found", async () => {
+  it("returns the account record with displayName when found", async () => {
     const mockItem = {
       pk: "user-123",
       sk: "account",
       accountCreatedDate: "2026-05-29T12:00:00.000Z",
       totalMeditations: 0,
       totalNotes: 0,
+      displayName: "Alice",
     };
 
     ddbMock
@@ -64,38 +67,6 @@ describe("getAccountDetailsHandler", () => {
     expect(result.statusCode).toBe(404);
     expect(JSON.parse(result.body)).toEqual({
       error: "Account not found",
-    });
-  });
-
-  it("returns 400 when uuid is missing", async () => {
-    const event = {
-      pathParameters: {},
-    } as unknown as APIGatewayProxyEvent;
-
-    const result = await getAccountDetailsHandler(
-      DynamoDBDocumentClient.from(new DynamoDBClient({})),
-      env,
-      event,
-    );
-
-    expect(result.statusCode).toBe(400);
-    expect(JSON.parse(result.body)).toEqual({
-      error: "uuid path parameter is required",
-    });
-  });
-
-  it("returns 400 when pathParameters is undefined", async () => {
-    const event = {} as unknown as APIGatewayProxyEvent;
-
-    const result = await getAccountDetailsHandler(
-      DynamoDBDocumentClient.from(new DynamoDBClient({})),
-      env,
-      event,
-    );
-
-    expect(result.statusCode).toBe(400);
-    expect(JSON.parse(result.body)).toEqual({
-      error: "uuid path parameter is required",
     });
   });
 

@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
-import type * as cognito from "aws-cdk-lib/aws-cognito";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
@@ -11,7 +11,8 @@ import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import type { Construct } from "constructs";
 
 interface LemuelStackProps extends cdk.StackProps {
-  userPool: cognito.IUserPool;
+  userPoolId?: string;
+  userPoolArn?: string;
   apiBibleSecretName: string;
   fcmSecretName: string;
 }
@@ -110,19 +111,21 @@ export class LemuelStack extends cdk.Stack {
       handler: "index.handler",
       code: lambda.Code.fromAsset("dist/check-user-exists"),
       environment: {
-        USER_POOL_ID: props.userPool.userPoolId,
+        ...(props.userPoolId ? { USER_POOL_ID: props.userPoolId } : {}),
       },
     });
 
-    checkUserExists.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ["cognito-idp:AdminGetUser"],
-        resources: [
-          `arn:aws:cognito-idp:${this.region}:${this.account}:userpool/${props.userPool.userPoolId}`,
-        ],
-      }),
-    );
+    if (props.userPoolId) {
+      checkUserExists.addToRolePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: ["cognito-idp:AdminGetUser"],
+          resources: [
+            `arn:aws:cognito-idp:${this.region}:${this.account}:userpool/${props.userPoolId}`,
+          ],
+        }),
+      );
+    }
 
     const logHandler = new lambda.Function(this, "log-handler", {
       functionName: "log-handler",
@@ -167,6 +170,17 @@ export class LemuelStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("dist/note-handler"),
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+
+    const migrateUserUuids = new lambda.Function(this, "migrate-user-uuids", {
+      functionName: "migrate-user-uuids",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: "index.handler",
+      code: lambda.Code.fromAsset("dist/migrate-user-uuids"),
+      timeout: cdk.Duration.minutes(5),
       environment: {
         TABLE_NAME: table.tableName,
       },
@@ -231,14 +245,20 @@ export class LemuelStack extends cdk.Stack {
       validateRequestParameters: true,
     });
 
-    const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
-      this,
-      "CognitoAuthorizer",
-      {
-        cognitoUserPools: [props.userPool],
-        authorizerName: "lemuel-cognito-authorizer",
-      },
-    );
+    const userPool = props.userPoolArn
+      ? cognito.UserPool.fromUserPoolArn(
+          this,
+          "imported-user-pool",
+          props.userPoolArn,
+        )
+      : undefined;
+
+    const cognitoAuthorizer = userPool
+      ? new apigateway.CognitoUserPoolsAuthorizer(this, "CognitoAuthorizer", {
+          cognitoUserPools: [userPool],
+          authorizerName: "lemuel-cognito-authorizer",
+        })
+      : undefined;
 
     const noteModel = api.addModel("NoteModel", {
       contentType: "application/json",
@@ -292,6 +312,48 @@ export class LemuelStack extends cdk.Stack {
       },
     });
 
+    const createAccountModel = api.addModel("CreateAccountModel", {
+      contentType: "application/json",
+      modelName: "CreateAccountModel",
+      schema: {
+        schema: apigateway.JsonSchemaVersion.DRAFT4,
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          displayName: {
+            type: apigateway.JsonSchemaType.STRING,
+            minLength: 1,
+            maxLength: 50,
+          },
+        },
+        required: ["displayName"],
+      },
+    });
+
+    const displayNameModel = api.addModel("DisplayNameModel", {
+      contentType: "application/json",
+      modelName: "DisplayNameModel",
+      schema: {
+        schema: apigateway.JsonSchemaVersion.DRAFT4,
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          displayName: {
+            type: apigateway.JsonSchemaType.STRING,
+            minLength: 1,
+            maxLength: 50,
+          },
+        },
+        required: ["displayName"],
+      },
+    });
+
+    const auth = (required: boolean): apigateway.MethodOptions =>
+      required && cognitoAuthorizer
+        ? {
+            authorizationType: apigateway.AuthorizationType.COGNITO,
+            authorizer: cognitoAuthorizer,
+          }
+        : { authorizationType: apigateway.AuthorizationType.NONE };
+
     // -----------------------------------------------------------
     // API Methods
     // -----------------------------------------------------------
@@ -339,8 +401,7 @@ export class LemuelStack extends cdk.Stack {
       "GET",
       new apigateway.LambdaIntegration(accountHandler),
       {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
+        ...auth(true),
         requestParameters: {
           "method.request.path.uuid": true,
         },
@@ -350,25 +411,39 @@ export class LemuelStack extends cdk.Stack {
     accountUuid
       .addResource("create")
       .addMethod("POST", new apigateway.LambdaIntegration(accountHandler), {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
+        ...auth(true),
         requestParameters: {
           "method.request.path.uuid": true,
         },
-        requestValidator,
+        requestModels: {
+          "application/json": createAccountModel,
+        },
+        requestValidator: bodyValidator,
       });
 
     accountUuid
       .addResource("meditations")
       .addResource("{date}")
       .addMethod("POST", new apigateway.LambdaIntegration(accountHandler), {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
+        ...auth(true),
         requestParameters: {
           "method.request.path.uuid": true,
           "method.request.path.date": true,
         },
         requestValidator,
+      });
+
+    accountUuid
+      .addResource("display-name")
+      .addMethod("PUT", new apigateway.LambdaIntegration(accountHandler), {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+        },
+        requestModels: {
+          "application/json": displayNameModel,
+        },
+        requestValidator: bodyValidator,
       });
 
     // Notes
@@ -380,8 +455,7 @@ export class LemuelStack extends cdk.Stack {
       "GET",
       new apigateway.LambdaIntegration(noteHandler),
       {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
+        ...auth(true),
         requestParameters: {
           "method.request.path.ref": true,
           "method.request.querystring.limit": false,
@@ -396,8 +470,7 @@ export class LemuelStack extends cdk.Stack {
     const users = notes.addResource("users");
     const usersUuid = users.addResource("{uuid}");
     usersUuid.addMethod("GET", new apigateway.LambdaIntegration(noteHandler), {
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-      authorizer: cognitoAuthorizer,
+      ...auth(true),
       requestParameters: {
         "method.request.path.uuid": true,
         "method.request.querystring.limit": false,
@@ -412,8 +485,7 @@ export class LemuelStack extends cdk.Stack {
       "GET",
       new apigateway.LambdaIntegration(noteHandler),
       {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
+        ...auth(true),
         requestParameters: {
           "method.request.path.uuid": true,
           "method.request.path.ref": true,
@@ -426,8 +498,7 @@ export class LemuelStack extends cdk.Stack {
       "POST",
       new apigateway.LambdaIntegration(noteHandler),
       {
-        authorizationType: apigateway.AuthorizationType.COGNITO,
-        authorizer: cognitoAuthorizer,
+        ...auth(true),
         requestParameters: {
           "method.request.path.uuid": true,
           "method.request.path.ref": true,
@@ -521,6 +592,7 @@ export class LemuelStack extends cdk.Stack {
     // -----------------------------------------------------------
     // IAM Grants
     // -----------------------------------------------------------
+    table.grantReadWriteData(migrateUserUuids);
     table.grantReadWriteData(chooseProverb);
     table.grantReadWriteData(loadProverbsLambda);
     table.grantReadWriteData(accountHandler);
