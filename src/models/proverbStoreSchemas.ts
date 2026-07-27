@@ -96,15 +96,6 @@ export const MeditationEntitySchema = z.object({
 
 export type MeditationEntity = z.infer<typeof MeditationEntitySchema>;
 
-export const DisplayNameEntitySchema = z.object({
-  pk: z.string().describe("display-name#{uuid}"),
-  sk: z.string().describe("display-name#{uuid}"),
-  displayName: z.string().min(1).max(50),
-  updatedAt: z.string(),
-});
-
-export type DisplayNameEntity = z.infer<typeof DisplayNameEntitySchema>;
-
 /** Schema for a registered device FCM token in the proverbs-store DynamoDB table.
  *  PK is "device-token", SK is sha256 hash of the FCM device token. */
 export const DeviceTokenEntitySchema = z.object({

@@ -22,12 +22,17 @@ export const getAccountDetailsHandler = async (
     );
 
     if (!result.Item) {
+      console.log("[getAccountDetails] No account found for uuid:", uuid);
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Account not found" }),
       };
     }
 
+    console.log(
+      "[getAccountDetails] Raw DynamoDB item:",
+      JSON.stringify(result.Item),
+    );
     const entity = AccountEntitySchema.parse(result.Item);
 
     return {

@@ -35,7 +35,15 @@ jest.mock("../../../src/account-handler/upsertDisplayName/index", () => ({
   }),
 }));
 
+jest.mock("../../../src/account-handler/deleteAccount/index", () => ({
+  deleteAccountHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+  }),
+}));
+
 import { createAccountHandler } from "../../../src/account-handler/createAccount/index";
+import { deleteAccountHandler } from "../../../src/account-handler/deleteAccount/index";
 import { getAccountDetailsHandler } from "../../../src/account-handler/getAccountDetails/index";
 import { updateMeditationsHandler } from "../../../src/account-handler/updateMeditations/index";
 import { upsertDisplayNameHandler } from "../../../src/account-handler/upsertDisplayName/index";
@@ -43,11 +51,13 @@ import { upsertDisplayNameHandler } from "../../../src/account-handler/upsertDis
 describe("account-handler router", () => {
   beforeEach(() => {
     process.env.TABLE_NAME = "TestTable";
+    process.env.USER_POOL_ID = "test-pool-id";
     jest.clearAllMocks();
   });
 
   afterEach(() => {
     delete process.env.TABLE_NAME;
+    delete process.env.USER_POOL_ID;
   });
 
   it("routes GET /accounts/{uuid} to getAccountDetailsHandler", async () => {
@@ -98,9 +108,24 @@ describe("account-handler router", () => {
     expect(upsertDisplayNameHandler).toHaveBeenCalled();
   });
 
-  it("returns 405 for unsupported routes", async () => {
+  it("routes DELETE /accounts/{uuid} to deleteAccountHandler", async () => {
     const event = {
       httpMethod: "DELETE",
+      resource: "/accounts/{uuid}",
+      pathParameters: { uuid: "user-123" },
+      requestContext: {
+        authorizer: { claims: { sub: "user-123" } },
+      },
+    } as unknown as APIGatewayProxyEvent;
+
+    await handler(event);
+
+    expect(deleteAccountHandler).toHaveBeenCalled();
+  });
+
+  it("returns 405 for unsupported routes", async () => {
+    const event = {
+      httpMethod: "PATCH",
       resource: "/accounts/{uuid}",
     } as unknown as APIGatewayProxyEvent;
 

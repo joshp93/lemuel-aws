@@ -38,10 +38,17 @@ export const collectDisplayNames = async (
 
   const displayNames: Record<string, string> = {};
   const responses = result?.Responses?.[tableName] ?? [];
+  const foundUuids = new Set<string>();
 
   for (const item of responses) {
-    if (item.displayName) {
-      displayNames[item.pk as string] = item.displayName as string;
+    const uuid = item.pk as string;
+    foundUuids.add(uuid);
+    displayNames[uuid] = (item.displayName as string) ?? "";
+  }
+
+  for (const uuid of uniqueUuids) {
+    if (!foundUuids.has(uuid)) {
+      displayNames[uuid] = "";
     }
   }
 

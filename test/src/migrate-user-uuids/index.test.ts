@@ -1,7 +1,6 @@
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
   PutCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -68,20 +67,6 @@ describe("migrate-user-uuids handler", () => {
       return { Items: [] };
     });
 
-    ddbMock.on(GetCommand).callsFake((cmd) => {
-      if ((cmd.input?.Key?.pk || cmd.Key?.pk) === "display-name#old-uuid") {
-        return {
-          Item: {
-            pk: "display-name#old-uuid",
-            sk: "display-name#old-uuid",
-            displayName: "John",
-            updatedAt: "2024-01-01T00:00:00Z",
-          },
-        };
-      }
-      return {};
-    });
-
     ddbMock.on(PutCommand).resolves({});
     ddbMock.on(DeleteCommand).resolves({});
 
@@ -89,7 +74,7 @@ describe("migrate-user-uuids handler", () => {
       migrations: [{ oldUuid: "old-uuid", newUuid: "new-uuid" }],
     });
 
-    expect(result.migrated).toBe(5);
+    expect(result.migrated).toBe(4);
 
     const putCalls = ddbMock.commandCalls(PutCommand);
     const putItems = putCalls.map((c) => c.args[0].input.Item);
@@ -111,16 +96,9 @@ describe("migrate-user-uuids handler", () => {
         uuid: "new-uuid",
       }),
     );
-    expect(putItems).toContainEqual(
-      expect.objectContaining({
-        pk: "display-name#new-uuid",
-        sk: "display-name#new-uuid",
-        displayName: "John",
-      }),
-    );
 
     const deleteCalls = ddbMock.commandCalls(DeleteCommand);
-    expect(deleteCalls).toHaveLength(5);
+    expect(deleteCalls).toHaveLength(4);
   });
 
   it("handles user with only account and notes (no meditations or display name)", async () => {
@@ -156,7 +134,6 @@ describe("migrate-user-uuids handler", () => {
       return { Items: [] };
     });
 
-    ddbMock.on(GetCommand).resolves({});
     ddbMock.on(PutCommand).resolves({});
     ddbMock.on(DeleteCommand).resolves({});
 
@@ -190,7 +167,6 @@ describe("migrate-user-uuids handler", () => {
       return { Items: [] };
     });
 
-    ddbMock.on(GetCommand).resolves({});
     ddbMock.on(PutCommand).resolves({});
     ddbMock.on(DeleteCommand).resolves({});
 
@@ -208,7 +184,6 @@ describe("migrate-user-uuids handler", () => {
     process.env.TABLE_NAME = "TestTable";
 
     ddbMock.on(QueryCommand).resolves({ Items: [] });
-    ddbMock.on(GetCommand).resolves({});
 
     const result = await handler({
       migrations: [{ oldUuid: "no-data-user", newUuid: "new-uuid" }],

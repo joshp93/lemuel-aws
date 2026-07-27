@@ -14,6 +14,7 @@ describe("updateMeditationsHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
   const env: AccountHandlerEnv = {
     TABLE_NAME: "TestTable",
+    USER_POOL_ID: "test-pool-id",
   };
 
   beforeEach(() => {

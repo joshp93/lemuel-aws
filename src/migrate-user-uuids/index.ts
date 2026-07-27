@@ -2,7 +2,6 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
   PutCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -79,28 +78,6 @@ async function migrateUser(
     const newPk = `meditation#${newUuid}`;
     const newItem = { ...item, pk: newPk } as Record<string, unknown>;
     if (newItem.uuid === oldUuid) newItem.uuid = newUuid;
-
-    await client.send(new PutCommand({ TableName: tableName, Item: newItem }));
-    await client.send(
-      new DeleteCommand({
-        TableName: tableName,
-        Key: { pk: item.pk, sk: item.sk },
-      }),
-    );
-    count++;
-  }
-
-  const displayNameGet = await client.send(
-    new GetCommand({
-      TableName: tableName,
-      Key: { pk: `display-name#${oldUuid}`, sk: `display-name#${oldUuid}` },
-    }),
-  );
-
-  if (displayNameGet.Item) {
-    const item = displayNameGet.Item;
-    const newPkSk = `display-name#${newUuid}`;
-    const newItem = { ...item, pk: newPkSk, sk: newPkSk };
 
     await client.send(new PutCommand({ TableName: tableName, Item: newItem }));
     await client.send(

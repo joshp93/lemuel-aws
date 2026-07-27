@@ -2,6 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { createAccountHandler } from "./createAccount/index";
+import { deleteAccountHandler } from "./deleteAccount/index";
 import { getAccountDetailsHandler } from "./getAccountDetails/index";
 import { AccountHandlerEnvSchema } from "./models";
 import { updateMeditationsHandler } from "./updateMeditations/index";
@@ -27,6 +28,8 @@ export const handler = async (
         return createAccountHandler(client, env, event);
       case "POST /accounts/{uuid}/meditations/{date}":
         return updateMeditationsHandler(client, env, event);
+      case "DELETE /accounts/{uuid}":
+        return deleteAccountHandler(client, env, event);
       case "PUT /accounts/{uuid}/display-name":
         return upsertDisplayNameHandler(client, env, event);
       default:

@@ -1,4 +1,4 @@
-export const buildAccountRecord = (uuid: string, displayName: string) => ({
+export const buildAccountRecord = (uuid: string, displayName = "") => ({
   pk: uuid,
   sk: "account",
   accountCreatedDate: new Date().toISOString(),

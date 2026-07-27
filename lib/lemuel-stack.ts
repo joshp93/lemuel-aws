@@ -162,8 +162,21 @@ export class LemuelStack extends cdk.Stack {
       code: lambda.Code.fromAsset("dist/account-handler"),
       environment: {
         TABLE_NAME: table.tableName,
+        ...(props.userPoolId ? { USER_POOL_ID: props.userPoolId } : {}),
       },
     });
+
+    if (props.userPoolId) {
+      accountHandler.addToRolePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: ["cognito-idp:AdminDeleteUser"],
+          resources: [
+            `arn:aws:cognito-idp:${this.region}:${this.account}:userpool/${props.userPoolId}`,
+          ],
+        }),
+      );
+    }
 
     const noteHandler = new lambda.Function(this, "note-handler", {
       functionName: "note-handler",
@@ -399,6 +412,17 @@ export class LemuelStack extends cdk.Stack {
     const accountUuid = accounts.addResource("{uuid}");
     accountUuid.addMethod(
       "GET",
+      new apigateway.LambdaIntegration(accountHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+        },
+        requestValidator,
+      },
+    );
+    accountUuid.addMethod(
+      "DELETE",
       new apigateway.LambdaIntegration(accountHandler),
       {
         ...auth(true),

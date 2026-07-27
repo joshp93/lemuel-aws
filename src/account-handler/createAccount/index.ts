@@ -14,7 +14,14 @@ export const createAccountHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   try {
     const uuid = event.pathParameters!.uuid!;
-    const { displayName } = JSON.parse(event.body ?? "{}");
+    const body = JSON.parse(event.body ?? "{}");
+    const { displayName } = body;
+
+    console.log("[createAccount] Request body:", JSON.stringify(body));
+    console.log(
+      "[createAccount] Extracted displayName:",
+      JSON.stringify(displayName),
+    );
 
     const existing = await client.send(
       new GetCommand({
@@ -24,6 +31,7 @@ export const createAccountHandler = async (
     );
 
     if (existing.Item) {
+      console.log("[createAccount] Account already exists, skipping creation");
       const response: CreateAccountResponse = { success: true };
       return {
         statusCode: 200,
@@ -31,13 +39,17 @@ export const createAccountHandler = async (
       };
     }
 
+    const item = buildAccountRecord(uuid, displayName);
+    console.log("[createAccount] Storing item:", JSON.stringify(item));
+
     await client.send(
       new PutCommand({
         TableName: env.TABLE_NAME,
-        Item: buildAccountRecord(uuid, displayName),
+        Item: item,
       }),
     );
 
+    console.log("[createAccount] Account created successfully");
     const response: CreateAccountResponse = { success: true };
 
     return {
