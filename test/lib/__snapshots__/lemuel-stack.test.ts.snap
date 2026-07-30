@@ -64,7 +64,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "6776114bb6d9dc7342e127f9e05710ee193c459f25f3339a4650899fd70852aa.zip",
+          "S3Key": "e063865ee8be4761c94da4eb4a0e84c7762661ba16915eefdde4676d389d8bed.zip",
         },
         "Environment": {
           "Variables": {
@@ -335,7 +335,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "721f171021d7890f4e48ca811a0866615670a42b13770b96e2bd32e3226ffcc8.zip",
+          "S3Key": "ed9fde80262041af55031efdeab7dcd2eefbe7a8ee63339a9783ff0c26fb0273.zip",
         },
         "Environment": {
           "Variables": {
@@ -583,7 +583,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "bb15f95d010507a62524e5f9963cc8613723078e28f3bee66e925a17e44a401f.zip",
+          "S3Key": "8ad2b7fa15157eee2854a109368c093bfdc4d716e8e2bea6f6f1b63e137c1c5d.zip",
         },
         "Environment": {
           "Variables": {
@@ -723,7 +723,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "4245dca4839647e79f27596ca9640242100c0915cd08d1732df24fe069fc9f90.zip",
+          "S3Key": "7cbdc0ed5319bdbdaf34d555c34ef6e7efb3e813fa57646dcef3d1cc4208bb66.zip",
         },
         "Environment": {
           "Variables": {
@@ -863,7 +863,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "7766621772b2adeeff540f197838ed59daf1ef4184cd7a1d58f623c249de5bb0.zip",
+          "S3Key": "ef6fb36965bea5d808ff600e27710681723416c0b504457ecbe66ebfd2edccbd.zip",
         },
         "Environment": {
           "Variables": {
@@ -1137,7 +1137,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Model",
     },
-    "lemuelapiDeployment2137DA7Ad4da04b40747e43e9f37e185288eb4f0": {
+    "lemuelapiDeployment2137DA7A3f1f31b6386db53e8d571eb31ddf527d": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
         "lemuelapiCreateAccountModel5688414D",
@@ -1182,6 +1182,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapinotesproverbsOPTIONSE60EDB97",
         "lemuelapinotesproverbs549C4A50",
         "lemuelapinotes425421B8",
+        "lemuelapinotesusersuuidrefDELETE427AFD51",
         "lemuelapinotesusersuuidrefGETCFE7C079",
         "lemuelapinotesusersuuidrefOPTIONSDF868843",
         "lemuelapinotesusersuuidrefPOST91873DB1",
@@ -1220,7 +1221,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7Ad4da04b40747e43e9f37e185288eb4f0",
+          "Ref": "lemuelapiDeployment2137DA7A3f1f31b6386db53e8d571eb31ddf527d",
         },
         "MethodSettings": [
           {
@@ -3677,6 +3678,134 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Resource",
     },
+    "lemuelapinotesusersuuidrefDELETE427AFD51": {
+      "Properties": {
+        "AuthorizationType": "COGNITO_USER_POOLS",
+        "AuthorizerId": {
+          "Ref": "CognitoAuthorizerF3215DBC",
+        },
+        "HttpMethod": "DELETE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "notehandler2C39A02E",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "RequestParameters": {
+          "method.request.path.ref": true,
+          "method.request.path.uuid": true,
+        },
+        "RequestValidatorId": {
+          "Ref": "lemuelapiRequestValidator9BC748F4",
+        },
+        "ResourceId": {
+          "Ref": "lemuelapinotesusersuuidrefC6171CA8",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapinotesusersuuidrefDELETEApiPermissionTestStacklemuelapiBB28E280DELETEnotesusersuuidref28659D76": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "notehandler2C39A02E",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/DELETE/notes/users/*/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapinotesusersuuidrefDELETEApiPermissionTestTestStacklemuelapiBB28E280DELETEnotesusersuuidref85C67340": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "notehandler2C39A02E",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/DELETE/notes/users/*/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
     "lemuelapinotesusersuuidrefGETApiPermissionTestStacklemuelapiBB28E280GETnotesusersuuidref0CF08823": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -4438,7 +4567,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "db6252e043c518a7441892e8877199423654fc92564cc795545a9ccbc6b8ec76.zip",
+          "S3Key": "82e90b2f83d5de22628ac88963eec5fd9c0eac517ca6366a5358caca47d6544c.zip",
         },
         "Environment": {
           "Variables": {
@@ -4793,7 +4922,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "fcb28a79ae473496c5e898023d5b63a11874d12f3a3faafbd9d02d581416ba01.zip",
+          "S3Key": "6558540dbf7f36b9eda41c53278cffd9f6068225d4c5af8239bdd3e5af0588d3.zip",
         },
         "Environment": {
           "Variables": {
@@ -5035,7 +5164,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "21ca35d783a7974eddaec616d291338b21428475110e49f62a4256a4475f47f0.zip",
+          "S3Key": "c70ec84fa0a8510b085d462739832f5bb7bf99b6ee819598d31075cbdce9de7e.zip",
         },
         "Environment": {
           "Variables": {
@@ -5246,7 +5375,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "45fb5170ed3da2212404a922fc1b5f8eb559a5f7300f65cbc901b861e131bde2.zip",
+          "S3Key": "b78b4ee7be71ae285db5e2f9000d8e38da00acb6fae338ee0512ae2160b9e0c7.zip",
         },
         "Environment": {
           "Variables": {

@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { deleteUserNoteHandler } from "./deleteUserNote/index";
 import { getProverbNotesHandler } from "./getProverbNotes/index";
 import { getUserNoteHandler } from "./getUserNote/index";
 import { getUserNotesHandler } from "./getUserNotes/index";
@@ -16,6 +17,7 @@ import { NoteHandlerEnvSchema } from "./schemas";
  *  - GET  /notes/users/{uuid}       → getUserNotes
  *  - GET  /notes/users/{uuid}/{ref} → getUserNote
  *  - POST /notes/users/{uuid}/{ref} → postUserNote
+ *  - DELETE /notes/users/{uuid}/{ref} → deleteUserNote
  */
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -42,6 +44,8 @@ export const handler = async (
         return getUserNoteHandler(client, env, event);
       case "POST /notes/users/{uuid}/{ref}":
         return postUserNoteHandler(client, env, event);
+      case "DELETE /notes/users/{uuid}/{ref}":
+        return deleteUserNoteHandler(client, env, event);
       default:
         console.warn(`[note-handler] Unsupported route: ${route}`);
         return {

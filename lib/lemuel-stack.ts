@@ -533,6 +533,18 @@ export class LemuelStack extends cdk.Stack {
         requestValidator: bodyValidator,
       },
     );
+    usersUuidRef.addMethod(
+      "DELETE",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+        },
+        requestValidator,
+      },
+    );
 
     // POST /logs
     const logsResource = api.root.addResource("logs");
