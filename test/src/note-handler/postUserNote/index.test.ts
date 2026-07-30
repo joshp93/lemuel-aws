@@ -45,7 +45,7 @@ describe("postUserNoteHandler", () => {
     const body = JSON.parse(result.body);
     expect(body).toMatchObject({
       pk: "66a20224-c0d1-70f3-58f9-4671e44cac10",
-      sk: "Proverbs3:5",
+      sk: "Proverbs3:5#2024-01-01",
       note: "Trust in the Lord",
       uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
       ref: "Proverbs3:5",
@@ -57,7 +57,7 @@ describe("postUserNoteHandler", () => {
     const putCall = ddbMock.commandCalls(PutCommand)[0].args[0].input;
     expect(putCall.Item).toMatchObject({
       pk: "66a20224-c0d1-70f3-58f9-4671e44cac10",
-      sk: "Proverbs3:5",
+      sk: "Proverbs3:5#2024-01-01",
       note: "Trust in the Lord",
       uuid: "66a20224-c0d1-70f3-58f9-4671e44cac10",
       ref: "Proverbs3:5",
@@ -157,7 +157,7 @@ describe("postUserNoteHandler", () => {
     const putCall = ddbMock.commandCalls(PutCommand)[0].args[0].input;
     expect(putCall.Item).toMatchObject({
       pk: "66a20224-c0d1-70f3-58f9-4671e44cac10",
-      sk: "Proverbs3:5",
+      sk: "Proverbs3:5#2024-01-01",
       isPrivate: true,
     });
   });

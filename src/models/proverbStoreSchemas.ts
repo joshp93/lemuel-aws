@@ -62,7 +62,10 @@ export type AccountEntity = z.infer<typeof AccountEntitySchema>;
 
 export const NoteEntitySchema = z.object({
   pk: z.string().describe("The cognito uuid of the user who created the note"),
-  sk: z.string().min(1).describe("The proverb reference, e.g. Proverbs3:5"),
+  sk: z
+    .string()
+    .min(1)
+    .describe("The proverb reference and date, e.g. Proverbs3:5#2026-06-16"),
   note: z.string().min(1).describe("The content of the note"),
   dateCreated: z.iso
     .datetime()

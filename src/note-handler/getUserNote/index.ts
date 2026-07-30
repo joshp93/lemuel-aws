@@ -19,12 +19,14 @@ export const getUserNoteHandler = async (
   try {
     const uuid = event.pathParameters?.uuid ?? "";
     const ref = event.pathParameters?.ref ?? "";
-    console.log(`[getUserNote] Fetching note`, { uuid, ref });
+    const date = event.queryStringParameters?.date ?? "";
+    const sk = date ? `${ref}#${date}` : ref;
+    console.log(`[getUserNote] Fetching note`, { uuid, ref, date, sk });
 
     const result = await client.send(
       new GetCommand({
         TableName: env.TABLE_NAME,
-        Key: { pk: uuid, sk: ref },
+        Key: { pk: uuid, sk },
       }),
     );
 

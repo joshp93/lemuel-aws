@@ -32,7 +32,7 @@ export const postUserNoteHandler = async (
 
     const entity = NoteEntitySchema.parse({
       pk: uuid,
-      sk: ref,
+      sk: `${ref}#${body.date}`,
       note: body.note,
       date: body.date,
       dateCreated,
