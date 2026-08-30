@@ -17,5 +17,11 @@ export default defineConfig({
     "gaxios",
     "gcp-metadata",
     "gtoken",
+    "react",
+    "react-is",
+    "@use-voltra/android-server",
+    "@use-voltra/android",
+    "@use-voltra/server",
+    "@use-voltra/core",
   ],
 });

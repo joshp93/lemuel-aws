@@ -27,6 +27,7 @@
     "@types/aws-lambda": "8.10.152",
     "@types/jest": "^29.5.14",
     "@types/node": "22.7.9",
+    "@types/react": "^19.2.18",
     "@types/utf8": "^3.0.3",
     "aws-cdk": "2.1120.0",
     "aws-lambda": "1.0.7",
@@ -42,8 +43,11 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "2.33.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.1041.0",
+    "@use-voltra/android": "1.4.1",
+    "@use-voltra/android-server": "1.4.1",
     "aws-cdk-lib": "2.250.0",
     "constructs": "^10.0.0",
-    "google-auth-library": "^9.15.0"
+    "google-auth-library": "^9.15.0",
+    "react": "^19.2.8"
   }
 }

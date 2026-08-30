@@ -11,6 +11,7 @@ The backend handles everything the mobile app needs:
 - **Notes** — Stores rich-text notes that users write about each proverb, and serves community notes
 - **Meditations** — Tracks when users complete a meditation session
 - **Push notifications** — Sends a silent push to everyone's phone when a new daily proverb is chosen (the app then schedules a local notification at the user's preferred time)
+- **Server-driven widgets** — Renders Voltra Android widget JSON for the home screen widget via `GET /widgets/render`. The widget fetches updates independently every 60 minutes via WorkManager, protected by a shared HMAC secret.
 - **Multiple Bible versions** — Supports KJV, NIV, ESV, and more
 
 ## Architecture
@@ -32,11 +33,13 @@ graph TB
             NT[Notes<br/>note-handler]
             PS[Push<br/>register-device-token<br/>push-daily-proverb]
             LG[Logs<br/>log-handler]
+            WD[Widget<br/>server-widget-handler]
             AD[Admin<br/>fetch-proverbs-for-version<br/>load-proverbs<br/>choose-proverb]
         end
 
         subgraph "Data"
             DB[(DynamoDB<br/>proverbs-store<br/>3 GSIs)]
+            SCT[Secrets Manager]
         end
 
         subgraph "Auth"
@@ -60,7 +63,16 @@ graph TB
     GW --> NT
     GW --> PS
     GW --> LG
+    GW --> WD
     PV --> DB
+    AC --> DB
+    AC --> COG
+    NT --> DB
+    PS --> DB
+    PS --> FCM
+    WD --> DB
+    WD --> SCT
+    FCM --> App
     AC --> DB
     AC --> COG
     NT --> DB
@@ -148,9 +160,10 @@ sequenceDiagram
 ```
 
 - **3 CDK stacks**: Secrets, User Management (Cognito), and Main (DynamoDB + Lambdas + API)
-- **12 Lambda functions** — Each focused on a single responsibility
+- **13 Lambda functions** — Each focused on a single responsibility
 - **DynamoDB** with 3 global secondary indexes (version-index, proverb-notes-index, user-notes-index)
 - **EventBridge** cron runs daily at 6 AM to pick the next proverb
+- **Server-driven widgets** — `server-widget-handler` renders Voltra JSON served at `GET /widgets/render`, authenticated via HMAC secret in Secrets Manager
 
 ## Development
 

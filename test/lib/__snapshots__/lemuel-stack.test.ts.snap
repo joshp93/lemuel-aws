@@ -1137,7 +1137,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Model",
     },
-    "lemuelapiDeployment2137DA7A3f1f31b6386db53e8d571eb31ddf527d": {
+    "lemuelapiDeployment2137DA7A9584c7903a69ffa1a2d5b48a2125e34e": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
         "lemuelapiCreateAccountModel5688414D",
@@ -1198,6 +1198,11 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapipushregistertokenPOST5FDAA2AE",
         "lemuelapipushregistertoken2261B45D",
         "lemuelapipush39DA7644",
+        "lemuelapiwidgetsOPTIONS82918935",
+        "lemuelapiwidgetsrenderGET0468CFA0",
+        "lemuelapiwidgetsrenderOPTIONSB051D8E3",
+        "lemuelapiwidgetsrenderF6764F4E",
+        "lemuelapiwidgetsC8ECF891",
         "lemuelapiDisplayNameModel68041565",
         "lemuelapiLogModelA896F382",
         "lemuelapiNoteModelE7B26908",
@@ -1221,7 +1226,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7A3f1f31b6386db53e8d571eb31ddf527d",
+          "Ref": "lemuelapiDeployment2137DA7A9584c7903a69ffa1a2d5b48a2125e34e",
         },
         "MethodSettings": [
           {
@@ -4519,6 +4524,240 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Method",
     },
+    "lemuelapiwidgetsC8ECF891": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "lemuelapi762B60E0",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "widgets",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapiwidgetsOPTIONS82918935": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapiwidgetsC8ECF891",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiwidgetsrenderF6764F4E": {
+      "Properties": {
+        "ParentId": {
+          "Ref": "lemuelapiwidgetsC8ECF891",
+        },
+        "PathPart": "render",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "lemuelapiwidgetsrenderGET0468CFA0": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "GET",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "serverwidgethandlerF1D74B5B",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "RequestParameters": {
+          "method.request.querystring.family": false,
+          "method.request.querystring.platform": true,
+          "method.request.querystring.theme": false,
+          "method.request.querystring.widgetId": true,
+        },
+        "RequestValidatorId": {
+          "Ref": "lemuelapiRequestValidator9BC748F4",
+        },
+        "ResourceId": {
+          "Ref": "lemuelapiwidgetsrenderF6764F4E",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiwidgetsrenderGETApiPermissionTestStacklemuelapiBB28E280GETwidgetsrender0EF9C6EF": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "serverwidgethandlerF1D74B5B",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/GET/widgets/render",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiwidgetsrenderGETApiPermissionTestTestStacklemuelapiBB28E280GETwidgetsrender2B0AE582": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "serverwidgethandlerF1D74B5B",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/GET/widgets/render",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiwidgetsrenderOPTIONSB051D8E3": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "lemuelapiwidgetsrenderF6764F4E",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
     "lemuelschedule1C0FCCC8": {
       "Properties": {
         "Name": "lemuel-schedule",
@@ -5474,6 +5713,174 @@ exports[`LemuelStack should match snapshot 1`] = `
         ],
       },
       "Type": "AWS::IAM::Policy",
+    },
+    "serverwidgethandlerF1D74B5B": {
+      "DependsOn": [
+        "serverwidgethandlerServiceRoleDefaultPolicyAB2917A8",
+        "serverwidgethandlerServiceRoleFBB07D2D",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "f6e9fa7cbf2386d94226d82d0ea500bba1f78f96ef94e20afa04bb8961521b8f.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "proverbsstore7682A597",
+            },
+            "WIDGET_SERVER_SECRET_NAME": "widget-server-credentials",
+          },
+        },
+        "FunctionName": "server-widget-handler",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "serverwidgethandlerServiceRoleFBB07D2D",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "serverwidgethandlerServiceRoleDefaultPolicyAB2917A8": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:widget-server-credentials-??????",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "serverwidgethandlerServiceRoleDefaultPolicyAB2917A8",
+        "Roles": [
+          {
+            "Ref": "serverwidgethandlerServiceRoleFBB07D2D",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "serverwidgethandlerServiceRoleFBB07D2D": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
     },
   },
   "Rules": {

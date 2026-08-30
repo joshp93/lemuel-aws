@@ -15,6 +15,7 @@ interface LemuelStackProps extends cdk.StackProps {
   userPoolArn?: string;
   apiBibleSecretName: string;
   fcmSecretName: string;
+  widgetServerSecretName: string;
 }
 
 export class LemuelStack extends cdk.Stack {
@@ -235,6 +236,21 @@ export class LemuelStack extends cdk.Stack {
       },
       timeout: cdk.Duration.minutes(5),
     });
+
+    const serverWidgetHandler = new lambda.Function(
+      this,
+      "server-widget-handler",
+      {
+        functionName: "server-widget-handler",
+        runtime: lambda.Runtime.NODEJS_22_X,
+        handler: "index.handler",
+        code: lambda.Code.fromAsset("dist/server-widget-handler"),
+        environment: {
+          TABLE_NAME: table.tableName,
+          WIDGET_SERVER_SECRET_NAME: props.widgetServerSecretName,
+        },
+      },
+    );
 
     // -----------------------------------------------------------
     // API Gateway
@@ -625,6 +641,21 @@ export class LemuelStack extends cdk.Stack {
         },
       );
 
+    // GET /widgets/render — Voltra server-driven widget endpoint
+    api.root
+      .addResource("widgets")
+      .addResource("render")
+      .addMethod("GET", new apigateway.LambdaIntegration(serverWidgetHandler), {
+        authorizationType: apigateway.AuthorizationType.NONE,
+        requestParameters: {
+          "method.request.querystring.widgetId": true,
+          "method.request.querystring.platform": true,
+          "method.request.querystring.theme": false,
+          "method.request.querystring.family": false,
+        },
+        requestValidator,
+      });
+
     // -----------------------------------------------------------
     // IAM Grants
     // -----------------------------------------------------------
@@ -638,6 +669,7 @@ export class LemuelStack extends cdk.Stack {
     table.grantReadData(getProverbs);
     table.grantWriteData(registerDeviceToken);
     table.grantReadData(pushDailyProverb);
+    table.grantReadData(serverWidgetHandler);
 
     const fcmSecret = secretsmanager.Secret.fromSecretNameV2(
       this,
@@ -645,6 +677,13 @@ export class LemuelStack extends cdk.Stack {
       props.fcmSecretName,
     );
     fcmSecret.grantRead(pushDailyProverb);
+
+    const widgetServerSecret = secretsmanager.Secret.fromSecretNameV2(
+      this,
+      "imported-widget-server-secret",
+      props.widgetServerSecretName,
+    );
+    widgetServerSecret.grantRead(serverWidgetHandler);
 
     // -----------------------------------------------------------
     // EventBridge Rules & Event Source Mappings

@@ -14,6 +14,12 @@ importers:
       '@aws-sdk/client-cognito-identity-provider':
         specifier: ^3.1041.0
         version: 3.1048.0
+      '@use-voltra/android':
+        specifier: 1.4.1
+        version: 1.4.1(react@19.2.8)
+      '@use-voltra/android-server':
+        specifier: 1.4.1
+        version: 1.4.1(react@19.2.8)
       aws-cdk-lib:
         specifier: 2.250.0
         version: 2.250.0(constructs@10.6.0)
@@ -23,6 +29,9 @@ importers:
       google-auth-library:
         specifier: ^9.15.0
         version: 9.15.1
+      react:
+        specifier: ^19.2.8
+        version: 19.2.8
     devDependencies:
       '@aws-sdk/client-dynamodb':
         specifier: 3.879.0
@@ -45,6 +54,9 @@ importers:
       '@types/node':
         specifier: 22.7.9
         version: 22.7.9
+      '@types/react':
+        specifier: ^19.2.18
+        version: 19.2.18
       '@types/utf8':
         specifier: ^3.0.3
         version: 3.0.3
@@ -1132,6 +1144,9 @@ packages:
   '@types/node@22.7.9':
     resolution: {integrity: sha512-jrTfRC7FM6nChvU7X2KqcrgquofrWLFDeYC1hKfwNWomVvrn7JIksqf344WN2X/y8xrgqBd2dJATZV4GbatBfg==}
 
+  '@types/react@19.2.18':
+    resolution: {integrity: sha512-AnzbBERsrLKtk2XSfTbYRLjQPdy116Sty4q+T+Bp3IC4l6jNBvreVPAHmpq9qhXQM7CXZPjLVmGMw9sy+hxQ3w==}
+
   '@types/sinon@17.0.4':
     resolution: {integrity: sha512-RHnIrhfPO3+tJT0s7cFaXGZvsL4bbR3/k7z3P312qMS4JaS2Tk+KiwiLx1S0rQ56ERj00u1/BtdyVd0FY+Pdew==}
 
@@ -1152,6 +1167,24 @@ packages:
 
   '@types/yargs@17.0.35':
     resolution: {integrity: sha512-qUHkeCyQFxMXg79wQfTtfndEC+N9ZZg76HJftDJp+qH2tV7Gj4OJi7l+PiWwJ+pWtW8GwSmqsDj/oymhrTWXjg==}
+
+  '@use-voltra/android-server@1.4.1':
+    resolution: {integrity: sha512-1HGZX4E33JCTqQYFSYw08I9xn2t5lKQPv41H9dtsCGpOTEbdwE6nzqOLQt6LjBVOalAHkRSNPhlcd16w9/s1aw==}
+    peerDependencies:
+      react: '*'
+
+  '@use-voltra/android@1.4.1':
+    resolution: {integrity: sha512-y5IpgMkEvhh+Xk7WUhwyay5L7CZfHfvrmAI0ul9NLHXh8dYtPgAbB3HazH7XJMx0Lxhqa+IiGz6zp/3gNkJHXw==}
+    peerDependencies:
+      react: '*'
+
+  '@use-voltra/core@1.4.1':
+    resolution: {integrity: sha512-yvyY19K3viFxhNaBHmuiKBFEvy/zx+VyARQaDtjx+F0nLA7kBIRraIK8snVEBVgajtPXt4mLLYc31zdQQtIxBg==}
+    peerDependencies:
+      react: '*'
+
+  '@use-voltra/server@1.4.1':
+    resolution: {integrity: sha512-OEctpdbzFVgdf7H6tfVtqjyD/x6W6NbnYiRLqVlL8TREoHCCyc7eApWLYeZm6e+Hag7QlbLqTpEj0wM0VqkRSA==}
 
   acorn-walk@8.3.5:
     resolution: {integrity: sha512-HEHNfbars9v4pgpW6SO1KSPkfoS0xVOM/9UzkJltjlsHZmJasxg8aXkuZa7SMf8vKGIBhpUsPluQSqhJFCqebw==}
@@ -1413,6 +1446,9 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
+
+  csstype@3.2.3:
+    resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -2174,6 +2210,13 @@ packages:
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
+
+  react-is@19.2.8:
+    resolution: {integrity: sha512-s5un28nYxKJw5gvUHyW5PCC28CvBqLu9r3cWgzHT4Vo/5fqqkFcdRYsGcKf50WMPpjjFZS5d76fn3YCo2njKwQ==}
+
+  react@19.2.8:
+    resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
+    engines: {node: '>=0.10.0'}
 
   readdirp@4.1.2:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
@@ -3965,6 +4008,10 @@ snapshots:
     dependencies:
       undici-types: 6.19.8
 
+  '@types/react@19.2.18':
+    dependencies:
+      csstype: 3.2.3
+
   '@types/sinon@17.0.4':
     dependencies:
       '@types/sinonjs__fake-timers': 15.0.1
@@ -3982,6 +4029,25 @@ snapshots:
   '@types/yargs@17.0.35':
     dependencies:
       '@types/yargs-parser': 21.0.3
+
+  '@use-voltra/android-server@1.4.1(react@19.2.8)':
+    dependencies:
+      '@use-voltra/android': 1.4.1(react@19.2.8)
+      '@use-voltra/core': 1.4.1(react@19.2.8)
+      '@use-voltra/server': 1.4.1
+      react: 19.2.8
+
+  '@use-voltra/android@1.4.1(react@19.2.8)':
+    dependencies:
+      '@use-voltra/core': 1.4.1(react@19.2.8)
+      react: 19.2.8
+
+  '@use-voltra/core@1.4.1(react@19.2.8)':
+    dependencies:
+      react: 19.2.8
+      react-is: 19.2.8
+
+  '@use-voltra/server@1.4.1': {}
 
   acorn-walk@8.3.5:
     dependencies:
@@ -4254,6 +4320,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  csstype@3.2.3: {}
 
   debug@4.4.3:
     dependencies:
@@ -5180,6 +5248,10 @@ snapshots:
   querystring@0.2.0: {}
 
   react-is@18.3.1: {}
+
+  react-is@19.2.8: {}
+
+  react@19.2.8: {}
 
   readdirp@4.1.2: {}
 

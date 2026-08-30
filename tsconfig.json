@@ -5,6 +5,7 @@
     "isolatedModules": true,
     "moduleResolution": "NodeNext",
     "lib": ["es2022"],
+    "jsx": "react-jsx",
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
