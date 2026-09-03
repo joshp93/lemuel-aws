@@ -7,13 +7,14 @@ import { getWidgetHandler } from "./getWidgetHandler";
  * Receives GET requests from the Voltra WorkManager background worker
  * (see {@link https://www.use-voltra.dev/v1/android/development/server-driven-widgets}),
  * constructs a Fetch {@link Request} from the API Gateway event, and delegates
- * to the Voltra widget server handler for authentication, rendering, and
- * serialisation.
+ * to the Voltra widget server handler for rendering and serialisation.
  */
 export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  const handler = await getWidgetHandler();
+  console.debug("[server-widget-handler] Request received");
+
+  const handler = getWidgetHandler();
 
   const qs = event.queryStringParameters ?? {};
   const params = new URLSearchParams();
@@ -28,8 +29,18 @@ export const handler = async (
     headers: new Headers((event.headers ?? {}) as Record<string, string>),
   });
 
+  console.debug("[server-widget-handler] Delegating to Voltra handler", {
+    widgetId: qs.widgetId,
+    version: request.headers.get("x-bible-version"),
+  });
+
   const response = await handler(request);
   const body = await response.text();
+
+  console.debug("[server-widget-handler] Response", {
+    statusCode: response.status,
+    bodyLength: body.length,
+  });
 
   return {
     statusCode: response.status,

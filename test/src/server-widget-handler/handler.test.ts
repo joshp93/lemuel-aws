@@ -7,9 +7,7 @@ jest.mock("../../../src/server-widget-handler/getWidgetHandler", () => ({
 
 import { getWidgetHandler } from "../../../src/server-widget-handler/getWidgetHandler";
 
-const mockGetHandler = getWidgetHandler as jest.MockedFunction<
-  typeof getWidgetHandler
->;
+const mockGetHandler = getWidgetHandler as jest.Mock;
 
 describe("server-widget-handler", () => {
   beforeEach(() => {
@@ -21,7 +19,7 @@ describe("server-widget-handler", () => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-    mockGetHandler.mockResolvedValue(async () => mockResponse);
+    mockGetHandler.mockReturnValue(async () => mockResponse);
 
     const event = {
       httpMethod: "GET",
@@ -43,7 +41,7 @@ describe("server-widget-handler", () => {
     const mockResponse = new Response(JSON.stringify({ empty: true }), {
       status: 200,
     });
-    mockGetHandler.mockResolvedValue(async () => mockResponse);
+    mockGetHandler.mockReturnValue(async () => mockResponse);
 
     const event = {
       httpMethod: "GET",
@@ -59,7 +57,7 @@ describe("server-widget-handler", () => {
 
   it("passes headers through to the fetch request", async () => {
     let capturedRequest: Request | undefined;
-    mockGetHandler.mockResolvedValue(async (req: Request) => {
+    mockGetHandler.mockReturnValue(async (req: Request) => {
       capturedRequest = req;
       return new Response("{}", { status: 200 });
     });
@@ -82,7 +80,7 @@ describe("server-widget-handler", () => {
 
   it("returns the status code from the voltra handler", async () => {
     const mockResponse = new Response("", { status: 401 });
-    mockGetHandler.mockResolvedValue(async () => mockResponse);
+    mockGetHandler.mockReturnValue(async () => mockResponse);
 
     const event = {
       httpMethod: "GET",

@@ -7,7 +7,6 @@ Infrastructure-as-code (CDK v2) + Lambda backend powering the Lemuel daily prove
 ### LemuelSecretStack (`lib/lemuel-secret-stack.ts`)
 - `api-bible-creds` — API key for API.Bible
 - `fcm-server-creds` — Firebase Cloud Messaging server credentials
-- `widget-server-credentials` — HMAC secret for server-driven widget authentication
 
 ### LemuelUserManagementStack (`lib/lemuel-user-management-stack.ts`)
 - Cognito User Pool (email sign-in, self-sign-up)
@@ -37,7 +36,7 @@ Infrastructure-as-code (CDK v2) + Lambda backend powering the Lemuel daily prove
 | `log-handler` | `POST /logs` | Accepts client-side logs via AWS Powertools Logger. Returns 202. |
 | `register-device-token` | `POST /push/register-token` | Stores FCM device token (sha256 hash key). |
 | `push-daily-proverb` | DynamoDB Stream | On daily-proverb INSERT, sends silent FCM data push to all registered tokens (batched). |
-| `server-widget-handler` | `GET /widgets/render` | Server-driven Voltra Android widget handler. Validates HMAC token against Secrets Manager, reads `X-Bible-Version` header, renders Voltra JSX into JSON. |
+| `server-widget-handler` | `GET /widgets/render` | Rate-limited server-driven Voltra Android widget handler. Reads `X-Bible-Version` header, renders Voltra JSX into JSON. |
 
 ## API endpoints
 
@@ -56,7 +55,7 @@ Infrastructure-as-code (CDK v2) + Lambda backend powering the Lemuel daily prove
 | `GET` | `/notes/proverbs/{ref}` | Cognito | Community notes for a proverb (paginated) |
 | `POST` | `/logs` | None | Submit client-side logs |
 | `POST` | `/push/register-token` | None | Register FCM device token |
-| `GET` | `/widgets/render` | HMAC (Bearer) | Server-driven widget rendering (Voltra JSX → JSON) |
+| `GET` | `/widgets/render` | Rate-limited | Server-driven widget rendering (Voltra JSX → JSON) |
 
 ## Lambda code structure
 

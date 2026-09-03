@@ -5724,14 +5724,13 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "f6e9fa7cbf2386d94226d82d0ea500bba1f78f96ef94e20afa04bb8961521b8f.zip",
+          "S3Key": "f9fac2c9af01e5a80b4665126d963a2cf84e32079efcb0d5e5885cc73132f3b8.zip",
         },
         "Environment": {
           "Variables": {
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
-            "WIDGET_SERVER_SECRET_NAME": "widget-server-credentials",
           },
         },
         "FunctionName": "server-widget-handler",
@@ -5811,33 +5810,6 @@ exports[`LemuelStack should match snapshot 1`] = `
                   ],
                 },
               ],
-            },
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":secretsmanager:",
-                    {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":secret:widget-server-credentials-??????",
-                  ],
-                ],
-              },
             },
           ],
           "Version": "2012-10-17",

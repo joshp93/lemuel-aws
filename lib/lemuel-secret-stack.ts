@@ -5,7 +5,6 @@ import type { Construct } from "constructs";
 export class LemuelSecretStack extends cdk.Stack {
   readonly apiBibleSecretName: string;
   readonly fcmSecretName: string;
-  readonly widgetServerSecretName: string;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -22,15 +21,5 @@ export class LemuelSecretStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
     this.fcmSecretName = fcmSecret.secretName;
-
-    const widgetServerSecret = new secretsmanager.Secret(
-      this,
-      "widget-server-secret",
-      {
-        secretName: "widget-server-credentials",
-        removalPolicy: cdk.RemovalPolicy.DESTROY,
-      },
-    );
-    this.widgetServerSecretName = widgetServerSecret.secretName;
   }
 }

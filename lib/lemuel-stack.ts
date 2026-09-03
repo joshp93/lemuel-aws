@@ -15,7 +15,6 @@ interface LemuelStackProps extends cdk.StackProps {
   userPoolArn?: string;
   apiBibleSecretName: string;
   fcmSecretName: string;
-  widgetServerSecretName: string;
 }
 
 export class LemuelStack extends cdk.Stack {
@@ -247,7 +246,6 @@ export class LemuelStack extends cdk.Stack {
         code: lambda.Code.fromAsset("dist/server-widget-handler"),
         environment: {
           TABLE_NAME: table.tableName,
-          WIDGET_SERVER_SECRET_NAME: props.widgetServerSecretName,
         },
       },
     );
@@ -677,13 +675,6 @@ export class LemuelStack extends cdk.Stack {
       props.fcmSecretName,
     );
     fcmSecret.grantRead(pushDailyProverb);
-
-    const widgetServerSecret = secretsmanager.Secret.fromSecretNameV2(
-      this,
-      "imported-widget-server-secret",
-      props.widgetServerSecretName,
-    );
-    widgetServerSecret.grantRead(serverWidgetHandler);
 
     // -----------------------------------------------------------
     // EventBridge Rules & Event Source Mappings

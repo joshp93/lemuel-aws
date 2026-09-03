@@ -11,7 +11,6 @@ const createStack = () => {
     userPoolArn: userManagementStack.userPool.userPoolArn,
     apiBibleSecretName: "test-api-bible-creds",
     fcmSecretName: "fcm-server-creds",
-    widgetServerSecretName: "widget-server-credentials",
   });
   return Template.fromStack(stack);
 };

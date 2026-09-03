@@ -20,5 +20,4 @@ new LemuelStack(app, "LemuelStack", {
   userPoolArn: userManagementStack.userPool.userPoolArn,
   apiBibleSecretName: secretStack.apiBibleSecretName,
   fcmSecretName: secretStack.fcmSecretName,
-  widgetServerSecretName: secretStack.widgetServerSecretName,
 });

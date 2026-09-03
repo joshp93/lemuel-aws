@@ -11,7 +11,7 @@ The backend handles everything the mobile app needs:
 - **Notes** — Stores rich-text notes that users write about each proverb, and serves community notes
 - **Meditations** — Tracks when users complete a meditation session
 - **Push notifications** — Sends a silent push to everyone's phone when a new daily proverb is chosen (the app then schedules a local notification at the user's preferred time)
-- **Server-driven widgets** — Renders Voltra Android widget JSON for the home screen widget via `GET /widgets/render`. The widget fetches updates independently every 60 minutes via WorkManager, protected by a shared HMAC secret.
+- **Server-driven widgets** — Renders Voltra Android widget JSON for the home screen widget via `GET /widgets/render`. The widget fetches updates independently every 60 minutes via WorkManager, with rate limiting at the API Gateway level.
 - **Multiple Bible versions** — Supports KJV, NIV, ESV, and more
 
 ## Architecture
@@ -163,7 +163,7 @@ sequenceDiagram
 - **13 Lambda functions** — Each focused on a single responsibility
 - **DynamoDB** with 3 global secondary indexes (version-index, proverb-notes-index, user-notes-index)
 - **EventBridge** cron runs daily at 6 AM to pick the next proverb
-- **Server-driven widgets** — `server-widget-handler` renders Voltra JSON served at `GET /widgets/render`, authenticated via HMAC secret in Secrets Manager
+- **Server-driven widgets** — `server-widget-handler` renders Voltra JSON served at `GET /widgets/render`, rate-limited at the API Gateway level
 
 ## Development
 
