@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Note",
+  "type": "object",
+  "properties": {
+    "note": { "type": "string" },
+    "date": { "type": "string" },
+    "isPrivate": { "type": "boolean" }
+  },
+  "required": ["note", "date"]
+}

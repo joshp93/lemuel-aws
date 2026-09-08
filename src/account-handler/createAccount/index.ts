@@ -4,8 +4,10 @@ import {
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { parseBody } from "../../shared/parseBody";
 import type { AccountHandlerEnv, CreateAccountResponse } from "../models";
 import { buildAccountRecord } from "./buildAccountRecord";
+import type { CreateAccount } from "./models/types";
 
 export const createAccountHandler = async (
   client: DynamoDBDocumentClient,
@@ -14,7 +16,7 @@ export const createAccountHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   try {
     const uuid = event.pathParameters!.uuid!;
-    const body = JSON.parse(event.body ?? "{}");
+    const body = parseBody<CreateAccount>(event, "displayName");
     const { displayName } = body;
 
     console.log("[createAccount] Request body:", JSON.stringify(body));

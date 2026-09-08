@@ -1,4 +1,6 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
+import { parseBody } from "../../shared/parseBody";
+import type { Note } from "./models/types";
 
 /**
  * Extracts the request body for the postUserNote endpoint.
@@ -12,7 +14,7 @@ import type { APIGatewayProxyEvent } from "aws-lambda";
 export const parsePostUserNoteRequest = (
   event: APIGatewayProxyEvent,
 ): { note: string; date: string; isPrivate: boolean } => {
-  const body = JSON.parse(event.body ?? "{}");
+  const body = parseBody<Note>(event, "note");
   return {
     note: body.note,
     date: body.date,

@@ -16,7 +16,7 @@ Infrastructure-as-code (CDK v2) + Lambda backend powering the Lemuel daily prove
 ### LemuelStack (`lib/lemuel-stack.ts`)
 - DynamoDB table `proverbs-store` with 3 GSIs: `version-index`, `proverb-notes-index`, `user-notes-index`
 - 13 Lambda functions (via `tsup` bundling)
-- REST API Gateway (14 endpoints, Cognito auth on protected routes)
+- REST API Gateway (20 endpoints, Cognito auth on protected routes)
 - EventBridge cron rule (`lemuel-schedule`, 6 AM daily)
 - DynamoDB Stream → `push-daily-proverb` (INSERT on `daily-proverb`)
 
@@ -32,7 +32,7 @@ Infrastructure-as-code (CDK v2) + Lambda backend powering the Lemuel daily prove
 | `get-available-versions` | `GET /available-versions` | Sorted list of Bible version abbreviations in the database. |
 | `check-user-exists` | `POST /auth/check-user-exists` | Rate-limited (10/s, 20 burst, 10K/day). Checks Cognito for email. |
 | `account-handler` | `GET/POST /accounts/{uuid}/...` | Multi-route: GET account details, POST create, POST meditations |
-| `note-handler` | `GET/POST /notes/...` | Multi-route: CRUD for per-proverb notes (user + community) |
+| `note-handler` | `GET/POST/PUT/DELETE /notes/...` | Multi-route: CRUD for per-proverb notes (user + community), reactions, replies |
 | `log-handler` | `POST /logs` | Accepts client-side logs via AWS Powertools Logger. Returns 202. |
 | `register-device-token` | `POST /push/register-token` | Stores FCM device token (sha256 hash key). |
 | `push-daily-proverb` | DynamoDB Stream | On daily-proverb INSERT, sends silent FCM data push to all registered tokens (batched). |
@@ -53,6 +53,12 @@ Infrastructure-as-code (CDK v2) + Lambda backend powering the Lemuel daily prove
 | `GET` | `/notes/users/{uuid}/{ref}` | Cognito | Get single note by user+ref |
 | `POST` | `/notes/users/{uuid}/{ref}` | Cognito | Create/update a note (upsert) |
 | `GET` | `/notes/proverbs/{ref}` | Cognito | Community notes for a proverb (paginated) |
+| `PUT` | `/notes/users/{uuid}/{ref}/reactions` | Cognito | Add/update reaction on a note |
+| `DELETE` | `/notes/users/{uuid}/{ref}/reactions` | Cognito | Remove reaction from a note |
+| `GET` | `/notes/users/{uuid}/{ref}/reactions` | Cognito | Get reactions for a note |
+| `POST` | `/notes/users/{uuid}/{ref}/replies` | Cognito | Create a reply on a note |
+| `GET` | `/notes/users/{uuid}/{ref}/replies` | Cognito | Get paginated replies for a note |
+| `DELETE` | `/notes/users/{uuid}/{ref}/replies/{replySk}` | Cognito | Delete a reply (author only) |
 | `POST` | `/logs` | None | Submit client-side logs |
 | `POST` | `/push/register-token` | None | Register FCM device token |
 | `GET` | `/widgets/render` | Rate-limited | Server-driven widget rendering (Voltra JSX → JSON) |

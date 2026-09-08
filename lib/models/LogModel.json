@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Log",
+  "type": "object",
+  "properties": {
+    "level": { "type": "string", "enum": ["debug", "info", "warn", "error"] },
+    "message": { "type": "string" },
+    "context": { "type": "object" }
+  },
+  "required": ["level", "message"]
+}

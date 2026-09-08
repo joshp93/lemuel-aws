@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Reaction",
+  "type": "object",
+  "properties": {
+    "reactionType": { "type": "string" },
+    "date": { "type": "string" }
+  },
+  "required": ["reactionType", "date"]
+}

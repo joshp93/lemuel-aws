@@ -3,7 +3,9 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { parseBody } from "../../shared/parseBody";
 import type { AccountHandlerEnv } from "../models";
+import type { DisplayName } from "./models/types";
 
 export const upsertDisplayNameHandler = async (
   client: DynamoDBDocumentClient,
@@ -12,7 +14,7 @@ export const upsertDisplayNameHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   try {
     const uuid = event.pathParameters!.uuid;
-    const { displayName } = JSON.parse(event.body ?? "{}");
+    const { displayName } = parseBody<DisplayName>(event, "displayName");
 
     await client.send(
       new UpdateCommand({

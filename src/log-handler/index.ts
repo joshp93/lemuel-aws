@@ -1,6 +1,8 @@
 import { Logger } from "@aws-lambda-powertools/logger";
 import type { LogLevel } from "@aws-lambda-powertools/logger/types";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { parseBody } from "../shared/parseBody";
+import type { Log } from "./models/types";
 
 const logger = new Logger();
 
@@ -15,12 +17,8 @@ export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const body = JSON.parse(event.body ?? "{}");
-    const { level, message, context } = body as {
-      level: string;
-      message: string;
-      context?: Record<string, unknown>;
-    };
+    const body = parseBody<Log>(event, "level");
+    const { level, message, context } = body;
 
     const logMessage = message ?? "No message provided";
     const logMethod = level

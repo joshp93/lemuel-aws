@@ -21,8 +21,9 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "types": ["node", "jest"],
     "outDir": "dist"
   },
-  "exclude": ["node_modules", "dist", "cdk.out"]
+  "exclude": ["node_modules", "dist", "cdk.out", "scripts"]
 }

@@ -9,6 +9,13 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as eventSources from "aws-cdk-lib/aws-lambda-event-sources";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import type { Construct } from "constructs";
+import CreateAccountSchema from "./models/CreateAccountModel.json";
+import DisplayNameSchema from "./models/DisplayNameModel.json";
+import LogSchema from "./models/LogModel.json";
+import NoteSchema from "./models/NoteModel.json";
+import ReactionSchema from "./models/ReactionModel.json";
+import RegisterDeviceTokenSchema from "./models/RegisterDeviceTokenModel.json";
+import ReplySchema from "./models/ReplyModel.json";
 
 interface LemuelStackProps extends cdk.StackProps {
   userPoolId?: string;
@@ -290,16 +297,7 @@ export class LemuelStack extends cdk.Stack {
     const noteModel = api.addModel("NoteModel", {
       contentType: "application/json",
       modelName: "NoteModel",
-      schema: {
-        schema: apigateway.JsonSchemaVersion.DRAFT4,
-        type: apigateway.JsonSchemaType.OBJECT,
-        properties: {
-          note: { type: apigateway.JsonSchemaType.STRING },
-          date: { type: apigateway.JsonSchemaType.STRING },
-          isPrivate: { type: apigateway.JsonSchemaType.BOOLEAN },
-        },
-        required: ["note", "date"],
-      },
+      schema: NoteSchema as apigateway.JsonSchema,
     });
 
     const bodyValidator = api.addRequestValidator("BodyValidator", {
@@ -310,67 +308,37 @@ export class LemuelStack extends cdk.Stack {
     const logModel = api.addModel("LogModel", {
       contentType: "application/json",
       modelName: "LogModel",
-      schema: {
-        schema: apigateway.JsonSchemaVersion.DRAFT4,
-        type: apigateway.JsonSchemaType.OBJECT,
-        properties: {
-          level: {
-            type: apigateway.JsonSchemaType.STRING,
-            enum: ["debug", "info", "warn", "error"],
-          },
-          message: { type: apigateway.JsonSchemaType.STRING },
-          context: { type: apigateway.JsonSchemaType.OBJECT },
-        },
-        required: ["level", "message"],
-      },
+      schema: LogSchema as apigateway.JsonSchema,
     });
 
     const registerDeviceTokenModel = api.addModel("RegisterDeviceTokenModel", {
       contentType: "application/json",
       modelName: "RegisterDeviceTokenModel",
-      schema: {
-        schema: apigateway.JsonSchemaVersion.DRAFT4,
-        type: apigateway.JsonSchemaType.OBJECT,
-        properties: {
-          token: { type: apigateway.JsonSchemaType.STRING },
-          platform: { type: apigateway.JsonSchemaType.STRING },
-        },
-        required: ["token", "platform"],
-      },
+      schema: RegisterDeviceTokenSchema as apigateway.JsonSchema,
     });
 
     const createAccountModel = api.addModel("CreateAccountModel", {
       contentType: "application/json",
       modelName: "CreateAccountModel",
-      schema: {
-        schema: apigateway.JsonSchemaVersion.DRAFT4,
-        type: apigateway.JsonSchemaType.OBJECT,
-        properties: {
-          displayName: {
-            type: apigateway.JsonSchemaType.STRING,
-            minLength: 1,
-            maxLength: 50,
-          },
-        },
-        required: ["displayName"],
-      },
+      schema: CreateAccountSchema as apigateway.JsonSchema,
     });
 
     const displayNameModel = api.addModel("DisplayNameModel", {
       contentType: "application/json",
       modelName: "DisplayNameModel",
-      schema: {
-        schema: apigateway.JsonSchemaVersion.DRAFT4,
-        type: apigateway.JsonSchemaType.OBJECT,
-        properties: {
-          displayName: {
-            type: apigateway.JsonSchemaType.STRING,
-            minLength: 1,
-            maxLength: 50,
-          },
-        },
-        required: ["displayName"],
-      },
+      schema: DisplayNameSchema as apigateway.JsonSchema,
+    });
+
+    const reactionModel = api.addModel("ReactionModel", {
+      contentType: "application/json",
+      modelName: "ReactionModel",
+      schema: ReactionSchema as apigateway.JsonSchema,
+    });
+
+    const replyModel = api.addModel("ReplyModel", {
+      contentType: "application/json",
+      modelName: "ReplyModel",
+      schema: ReplySchema as apigateway.JsonSchema,
     });
 
     const auth = (required: boolean): apigateway.MethodOptions =>
@@ -555,6 +523,99 @@ export class LemuelStack extends cdk.Stack {
         requestParameters: {
           "method.request.path.uuid": true,
           "method.request.path.ref": true,
+        },
+        requestValidator,
+      },
+    );
+
+    // Reactions
+    const reactionsResource = usersUuidRef.addResource("reactions");
+    reactionsResource.addMethod(
+      "PUT",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+        },
+        requestModels: {
+          "application/json": reactionModel,
+        },
+        requestValidator: bodyValidator,
+      },
+    );
+    reactionsResource.addMethod(
+      "DELETE",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+          "method.request.querystring.date": true,
+        },
+        requestValidator,
+      },
+    );
+    reactionsResource.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+          "method.request.querystring.date": true,
+          "method.request.querystring.userId": false,
+        },
+        requestValidator,
+      },
+    );
+
+    // Replies
+    const repliesResource = usersUuidRef.addResource("replies");
+    repliesResource.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+        },
+        requestModels: {
+          "application/json": replyModel,
+        },
+        requestValidator: bodyValidator,
+      },
+    );
+    repliesResource.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+          "method.request.querystring.date": true,
+          "method.request.querystring.limit": false,
+          "method.request.querystring.lastKey": false,
+        },
+        requestValidator,
+      },
+    );
+
+    repliesResource.addMethod(
+      "DELETE",
+      new apigateway.LambdaIntegration(noteHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+          "method.request.path.ref": true,
+          "method.request.querystring.date": true,
+          "method.request.querystring.replySk": true,
         },
         requestValidator,
       },

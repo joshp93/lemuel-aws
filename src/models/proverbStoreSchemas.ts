@@ -86,9 +86,37 @@ export const NoteEntitySchema = z.object({
     .boolean()
     .default(false)
     .describe("Whether the note is only visible to the author"),
+  reactionCounts: z
+    .record(z.string(), z.number())
+    .default({})
+    .describe("Per-emoji reaction counts, e.g. { '🙏': 3, '❤️': 2 }"),
+  replyCount: z.number().default(0).describe("Number of replies on this note"),
 });
 
 export type NoteEntity = z.infer<typeof NoteEntitySchema>;
+
+/** A single emoji reaction on a note. PK is "note#{authorUuid}#{ref}#{date}", SK is "reaction#{reactorUuid}". */
+export const ReactionEntitySchema = z.object({
+  pk: z.string(),
+  sk: z.string(),
+  reactionType: z.enum(["🙏", "❤️", "👍", "💡", "😊"]),
+  reactorUuid: z.string(),
+  createdAt: z.iso.datetime(),
+});
+
+export type ReactionEntity = z.infer<typeof ReactionEntitySchema>;
+
+/** A reply to a note. PK is "note#{authorUuid}#{ref}#{date}", SK is "reply#{createdAt}". */
+export const ReplyEntitySchema = z.object({
+  pk: z.string(),
+  sk: z.string(),
+  content: z.string().min(1),
+  authorUuid: z.string(),
+  displayName: z.string(),
+  createdAt: z.iso.datetime(),
+});
+
+export type ReplyEntity = z.infer<typeof ReplyEntitySchema>;
 
 export const MeditationEntitySchema = z.object({
   pk: z.string(),
