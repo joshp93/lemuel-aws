@@ -50,52 +50,81 @@ export const getAccessToken = async (
 };
 
 /** Sends a single FCM message to a specific device token via the v1 Firebase Messaging API.
- *  Requires a valid access token from the caller to avoid repeated auth per message. */
+ *  Requires a valid access token from the caller to avoid repeated auth per message.
+ *  Times out after 5 seconds via AbortSignal. Returns the HTTP response for the
+ *  caller to inspect error codes (e.g. UNREGISTERED, INVALID_ARGUMENT). */
 export const sendFcmMessage = async (
   token: string,
   message: object,
   projectId: string,
   accessToken: string,
-): Promise<void> => {
-  await fetch(
-    `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        message: {
-          token,
-          ...message,
-        },
-      }),
+): Promise<Response> => {
+  const url = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+  console.log("[FCM] Sending request", {
+    token: token.slice(0, 8),
+    status: "pending",
+  });
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
-  );
+    body: JSON.stringify({
+      message: {
+        token,
+        ...message,
+      },
+    }),
+    signal: AbortSignal.timeout(5000),
+  });
+  console.log("[FCM] Response received", {
+    token: token.slice(0, 8),
+    status: response.status,
+    statusText: response.statusText,
+  });
+  return response;
 };
 
 /** Reads FCM credentials and access token once, then splits tokens into sequential
  *  batches of `batchSize` (default 100) and sends all messages in a batch concurrently
- *  via Promise.allSettled. */
+ *  via Promise.allSettled. Returns the settled results keyed by token for callers to
+ *  inspect and clean up stale tokens. */
 export const sendToAllTokens = async (
   tokens: string[],
   message: object,
   secretName: string,
   batchSize = 100,
-): Promise<void> => {
+): Promise<
+  Array<{ token: string; status: "fulfilled" | "rejected"; reason?: unknown }>
+> => {
   const credentials = await getFcmCreds(secretName);
   const accessToken = await getAccessToken(credentials);
   if (!accessToken) {
     throw new Error("Failed to obtain FCM access token");
   }
 
+  const results: Array<{
+    token: string;
+    status: "fulfilled" | "rejected";
+    reason?: unknown;
+  }> = [];
+
   for (let i = 0; i < tokens.length; i += batchSize) {
     const batch = tokens.slice(i, i + batchSize);
-    await Promise.allSettled(
+    const settled = await Promise.allSettled(
       batch.map((token) =>
         sendFcmMessage(token, message, credentials.project_id, accessToken),
       ),
     );
+    settled.forEach((r, idx) => {
+      results.push({
+        token: batch[idx],
+        status: r.status,
+        reason: r.status === "rejected" ? r.reason : undefined,
+      });
+    });
   }
+
+  return results;
 };

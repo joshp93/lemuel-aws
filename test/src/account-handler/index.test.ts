@@ -21,6 +21,13 @@ jest.mock("../../../src/account-handler/createAccount/index", () => ({
   }),
 }));
 
+jest.mock("../../../src/account-handler/linkDeviceToken/index", () => ({
+  linkDeviceTokenHandler: jest.fn().mockResolvedValue({
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+  }),
+}));
+
 jest.mock("../../../src/account-handler/updateMeditations/index", () => ({
   updateMeditationsHandler: jest.fn().mockResolvedValue({
     statusCode: 200,
@@ -28,8 +35,8 @@ jest.mock("../../../src/account-handler/updateMeditations/index", () => ({
   }),
 }));
 
-jest.mock("../../../src/account-handler/upsertDisplayName/index", () => ({
-  upsertDisplayNameHandler: jest.fn().mockResolvedValue({
+jest.mock("../../../src/account-handler/updateAccount/index", () => ({
+  updateAccountHandler: jest.fn().mockResolvedValue({
     statusCode: 200,
     body: JSON.stringify({ success: true }),
   }),
@@ -45,8 +52,9 @@ jest.mock("../../../src/account-handler/deleteAccount/index", () => ({
 import { createAccountHandler } from "../../../src/account-handler/createAccount/index";
 import { deleteAccountHandler } from "../../../src/account-handler/deleteAccount/index";
 import { getAccountDetailsHandler } from "../../../src/account-handler/getAccountDetails/index";
+import { linkDeviceTokenHandler } from "../../../src/account-handler/linkDeviceToken/index";
+import { updateAccountHandler } from "../../../src/account-handler/updateAccount/index";
 import { updateMeditationsHandler } from "../../../src/account-handler/updateMeditations/index";
-import { upsertDisplayNameHandler } from "../../../src/account-handler/upsertDisplayName/index";
 
 describe("account-handler router", () => {
   beforeEach(() => {
@@ -96,16 +104,16 @@ describe("account-handler router", () => {
     expect(updateMeditationsHandler).toHaveBeenCalled();
   });
 
-  it("routes PUT /accounts/{uuid}/display-name to upsertDisplayNameHandler", async () => {
+  it("routes PUT /accounts/{uuid} to updateAccountHandler", async () => {
     const event = {
       httpMethod: "PUT",
-      resource: "/accounts/{uuid}/display-name",
+      resource: "/accounts/{uuid}",
       pathParameters: { uuid: "user-123" },
     } as unknown as APIGatewayProxyEvent;
 
     await handler(event);
 
-    expect(upsertDisplayNameHandler).toHaveBeenCalled();
+    expect(updateAccountHandler).toHaveBeenCalled();
   });
 
   it("routes DELETE /accounts/{uuid} to deleteAccountHandler", async () => {
@@ -121,6 +129,18 @@ describe("account-handler router", () => {
     await handler(event);
 
     expect(deleteAccountHandler).toHaveBeenCalled();
+  });
+
+  it("routes PUT /accounts/{uuid}/device-tokens to linkDeviceTokenHandler", async () => {
+    const event = {
+      httpMethod: "PUT",
+      resource: "/accounts/{uuid}/device-tokens",
+      pathParameters: { uuid: "user-123" },
+    } as unknown as APIGatewayProxyEvent;
+
+    await handler(event);
+
+    expect(linkDeviceTokenHandler).toHaveBeenCalled();
   });
 
   it("returns 405 for unsupported routes", async () => {

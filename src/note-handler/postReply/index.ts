@@ -1,44 +1,14 @@
 import {
   type DynamoDBDocumentClient,
-  GetCommand,
   PutCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ReplyEntitySchema } from "../../models/proverbStoreSchemas";
+import { fetchDisplayName } from "../../shared/fetchAccountDisplayName";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostReplyRequest } from "./parseRequest";
 
-/**
- * Fetches the display name from the author's account entity.
- *
- * @param client - DynamoDBDocumentClient
- * @param tableName - The DynamoDB table name
- * @param authorUuid - The Cognito sub of the reply author
- * @returns The display name, or "" if not found
- */
-const fetchDisplayName = async (
-  client: DynamoDBDocumentClient,
-  tableName: string,
-  authorUuid: string,
-): Promise<string> => {
-  const result = await client.send(
-    new GetCommand({
-      TableName: tableName,
-      Key: { pk: authorUuid, sk: "account" },
-    }),
-  );
-  return (result.Item?.displayName as string) ?? "";
-};
-
-/**
- * Handles POST /notes/users/{uuid}/{ref}/replies
- *
- * Creates a reply on a note. Fetches the author's display name from their
- * account entity (denormalizing it into the reply), writes the reply entity
- * and a delete-tracking record, and atomically increments the parent Note's
- * replyCount.
- */
 export const postReplyHandler = async (
   client: DynamoDBDocumentClient,
   env: NoteHandlerEnv,
@@ -100,6 +70,21 @@ export const postReplyHandler = async (
         Key: { pk: noteAuthorUuid, sk: `${ref}#${date}` },
         UpdateExpression: "ADD replyCount :incr",
         ExpressionAttributeValues: { ":incr": 1 },
+      }),
+    );
+
+    await client.send(
+      new PutCommand({
+        TableName: env.TABLE_NAME,
+        Item: {
+          pk: "reply-notification",
+          sk: `${createdAt}#${noteAuthorUuid}`,
+          noteAuthorUuid,
+          replyAuthorUuid: userId,
+          ref,
+          date,
+          content,
+        },
       }),
     );
 

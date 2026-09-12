@@ -4,9 +4,10 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { createAccountHandler } from "./createAccount/index";
 import { deleteAccountHandler } from "./deleteAccount/index";
 import { getAccountDetailsHandler } from "./getAccountDetails/index";
+import { linkDeviceTokenHandler } from "./linkDeviceToken/index";
 import { AccountHandlerEnvSchema } from "./models";
+import { updateAccountHandler } from "./updateAccount/index";
 import { updateMeditationsHandler } from "./updateMeditations/index";
-import { upsertDisplayNameHandler } from "./upsertDisplayName/index";
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -30,8 +31,10 @@ export const handler = async (
         return updateMeditationsHandler(client, env, event);
       case "DELETE /accounts/{uuid}":
         return deleteAccountHandler(client, env, event);
-      case "PUT /accounts/{uuid}/display-name":
-        return upsertDisplayNameHandler(client, env, event);
+      case "PUT /accounts/{uuid}":
+        return updateAccountHandler(client, env, event);
+      case "PUT /accounts/{uuid}/device-tokens":
+        return linkDeviceTokenHandler(client, env, event);
       default:
         console.warn(`[account-handler] Unsupported route: ${route}`);
         return {

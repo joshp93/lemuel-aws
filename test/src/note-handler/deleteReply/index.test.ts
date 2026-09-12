@@ -14,7 +14,7 @@ const createDocClient = () =>
 
 describe("deleteReplyHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
-  const env = { TABLE_NAME: "TestTable" };
+  const env = { TABLE_NAME: "TestTable", FCM_SECRET_NAME: "test-fcm-secret" };
 
   beforeEach(() => {
     ddbMock.reset();

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   AdminDeleteUserCommand,
   CognitoIdentityProviderClient,
@@ -9,14 +10,11 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { queryDeviceTokensByUser } from "../../shared/deviceTokens";
 import type { AccountHandlerEnv } from "../models";
 
 const cognitoClient = new CognitoIdentityProviderClient({});
 
-/**
- * Parses a reaction tracker sk to extract the note composite key parts.
- * Format: "reaction-tracker#{noteAuthorUuid}#{ref}#{date}"
- */
 const parseReactionTracker = (
   sk: string,
 ): { noteAuthorUuid: string; ref: string; date: string } | null => {
@@ -28,10 +26,6 @@ const parseReactionTracker = (
   return { noteAuthorUuid, ref, date };
 };
 
-/**
- * Parses a reply tracker sk to extract the note composite key parts and the reply sk.
- * Format: "reply-tracker#{noteAuthorUuid}#{ref}#{date}#{replySk}"
- */
 const parseReplyTracker = (
   sk: string,
 ): {
@@ -49,16 +43,6 @@ const parseReplyTracker = (
   return { noteAuthorUuid, ref, date, replySk };
 };
 
-/**
- * Recomputes the reactionCounts for a note by querying all remaining reactions.
- *
- * @param client - DynamoDBDocumentClient
- * @param tableName - The DynamoDB table name
- * @param notePk - The composite pk of the parent note
- * @param noteAuthorUuid - The note author's UUID (the note's own pk)
- * @param ref - The proverb reference
- * @param date - The proverb date
- */
 const recomputeReactionCounts = async (
   client: DynamoDBDocumentClient,
   tableName: string,
@@ -91,16 +75,6 @@ const recomputeReactionCounts = async (
   );
 };
 
-/**
- * Recomputes the replyCount for a note by querying all remaining replies.
- *
- * @param client - DynamoDBDocumentClient
- * @param tableName - The DynamoDB table name
- * @param notePk - The composite pk of the parent note
- * @param noteAuthorUuid - The note author's UUID (the note's own pk)
- * @param ref - The proverb reference
- * @param date - The proverb date
- */
 const recomputeReplyCount = async (
   client: DynamoDBDocumentClient,
   tableName: string,
@@ -277,6 +251,19 @@ export const deleteAccountHandler = async (
           hasReply: true,
         });
       }
+    }
+
+    // Unlink device tokens: query by userId and remove the userId field
+    const deviceTokens = await queryDeviceTokensByUser(tableName, uuid);
+    for (const { token } of deviceTokens) {
+      const sk = createHash("sha256").update(token).digest("hex");
+      await client.send(
+        new UpdateCommand({
+          TableName: tableName,
+          Key: { pk: "device-token", sk },
+          UpdateExpression: "REMOVE userId",
+        }),
+      );
     }
 
     for (let i = 0; i < deleteRequests.length; i += 25) {

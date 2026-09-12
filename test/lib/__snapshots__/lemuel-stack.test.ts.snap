@@ -64,7 +64,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "f0b55358559e9b7d957a6226331fe03adc388032ad6395ea71df151c1e013c5d.zip",
+          "S3Key": "62965a7e54a798ccbf61c3f05b291f9e1fb1940bcc22f69d46c7c3b29ce678f8.zip",
         },
         "Environment": {
           "Variables": {
@@ -335,7 +335,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "7ad37271c77488671cfbf7bdf3133c006daae086abe377d3ce49defd32315c2c.zip",
+          "S3Key": "1e2e9ca000c2ee3ad567e46e98d50c947056f1c6db01ad3288fdc34f901c0ff2.zip",
         },
         "Environment": {
           "Variables": {
@@ -583,7 +583,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "d8569b26e492e31441cde37efe5f6ce7219971f2d8b4e9b53687f5b4fa4ae0e1.zip",
+          "S3Key": "64f7a6973aa1f67cf9e464d28ba0b9f39af5c35ec621dd1b8655c67a887ecc4b.zip",
         },
         "Environment": {
           "Variables": {
@@ -723,7 +723,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "a338d0fca921a17ddc9c92e7c20ea980cd56b84e34eea7757fd792f712342a0f.zip",
+          "S3Key": "7eec6e278a1fdddf331dbecb88cd515c5664f5de33738406fa89bac8e5827cb9.zip",
         },
         "Environment": {
           "Variables": {
@@ -863,7 +863,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "75a4a116b05d659130f302455bbcbd16444ed338b20fc05c085d3d7743265045.zip",
+          "S3Key": "4a5a60fc0dc5a6d8cda0da5afa9485ac9d4f5d3dbc43beb5bdad2e2de0729e4c.zip",
         },
         "Environment": {
           "Variables": {
@@ -1123,6 +1123,9 @@ exports[`LemuelStack should match snapshot 1`] = `
         "Schema": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "properties": {
+            "deviceToken": {
+              "type": "string",
+            },
             "displayName": {
               "maxLength": 50,
               "minLength": 1,
@@ -1138,7 +1141,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Model",
     },
-    "lemuelapiDeployment2137DA7A54ce5ea8c828a6f8ca4b1f34b93a7b47": {
+    "lemuelapiDeployment2137DA7A192ea165509f5bd2cb9e9436baf1d1a2": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
         "lemuelapiCreateAccountModel5688414D",
@@ -1149,9 +1152,9 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapiaccountsuuidcreatePOSTF4D626B0",
         "lemuelapiaccountsuuidcreateBE050D05",
         "lemuelapiaccountsuuidDELETED1828FDD",
-        "lemuelapiaccountsuuiddisplaynameOPTIONS132C5C73",
-        "lemuelapiaccountsuuiddisplaynamePUT50EFD4AC",
-        "lemuelapiaccountsuuiddisplaynameC6BF40C9",
+        "lemuelapiaccountsuuiddevicetokensOPTIONS5827F74B",
+        "lemuelapiaccountsuuiddevicetokensPUTB7F4FC75",
+        "lemuelapiaccountsuuiddevicetokensBEA6749C",
         "lemuelapiaccountsuuidGETD3AC2EFC",
         "lemuelapiaccountsuuidmeditationsdateOPTIONS91076273",
         "lemuelapiaccountsuuidmeditationsdatePOST1AAD0314",
@@ -1159,6 +1162,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapiaccountsuuidmeditationsOPTIONS88E970AF",
         "lemuelapiaccountsuuidmeditations52BFD88C",
         "lemuelapiaccountsuuidOPTIONS79DF5222",
+        "lemuelapiaccountsuuidPUT0AC42DF4",
         "lemuelapiaccountsuuid8C51CA52",
         "lemuelapiaccountsOPTIONS3552E76A",
         "lemuelapiaccounts792DD014",
@@ -1214,13 +1218,14 @@ exports[`LemuelStack should match snapshot 1`] = `
         "lemuelapiwidgetsrenderOPTIONSB051D8E3",
         "lemuelapiwidgetsrenderF6764F4E",
         "lemuelapiwidgetsC8ECF891",
-        "lemuelapiDisplayNameModel68041565",
+        "lemuelapiDeviceTokenModel5DA7BE58",
         "lemuelapiLogModelA896F382",
         "lemuelapiNoteModelE7B26908",
         "lemuelapiReactionModelC1C3964F",
         "lemuelapiRegisterDeviceTokenModel4B5CD430",
         "lemuelapiReplyModel69977750",
         "lemuelapiRequestValidator9BC748F4",
+        "lemuelapiUpdateAccountModelC4DA7783",
       ],
       "Metadata": {
         "aws:cdk:do-not-refactor": true,
@@ -1239,7 +1244,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7A54ce5ea8c828a6f8ca4b1f34b93a7b47",
+          "Ref": "lemuelapiDeployment2137DA7A192ea165509f5bd2cb9e9436baf1d1a2",
         },
         "MethodSettings": [
           {
@@ -1257,26 +1262,25 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Stage",
     },
-    "lemuelapiDisplayNameModel68041565": {
+    "lemuelapiDeviceTokenModel5DA7BE58": {
       "Properties": {
         "ContentType": "application/json",
-        "Name": "DisplayNameModel",
+        "Name": "DeviceTokenModel",
         "RestApiId": {
           "Ref": "lemuelapi762B60E0",
         },
         "Schema": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "properties": {
-            "displayName": {
-              "maxLength": 50,
+            "deviceToken": {
               "minLength": 1,
               "type": "string",
             },
           },
           "required": [
-            "displayName",
+            "deviceToken",
           ],
-          "title": "DisplayName",
+          "title": "DeviceToken",
           "type": "object",
         },
       },
@@ -1434,6 +1438,9 @@ exports[`LemuelStack should match snapshot 1`] = `
             "token": {
               "type": "string",
             },
+            "uuid": {
+              "type": "string",
+            },
           },
           "required": [
             "token",
@@ -1481,6 +1488,32 @@ exports[`LemuelStack should match snapshot 1`] = `
         "ValidateRequestParameters": true,
       },
       "Type": "AWS::ApiGateway::RequestValidator",
+    },
+    "lemuelapiUpdateAccountModelC4DA7783": {
+      "Properties": {
+        "ContentType": "application/json",
+        "Name": "UpdateAccountModel",
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+        "Schema": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "additionalProperties": false,
+          "properties": {
+            "displayName": {
+              "maxLength": 50,
+              "minLength": 1,
+              "type": "string",
+            },
+            "replyNotificationsEnabled": {
+              "type": "boolean",
+            },
+          },
+          "title": "UpdateAccount",
+          "type": "object",
+        },
+      },
+      "Type": "AWS::ApiGateway::Model",
     },
     "lemuelapiaccounts792DD014": {
       "Properties": {
@@ -1843,6 +1876,138 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Method",
     },
+    "lemuelapiaccountsuuidPUT0AC42DF4": {
+      "Properties": {
+        "AuthorizationType": "COGNITO_USER_POOLS",
+        "AuthorizerId": {
+          "Ref": "CognitoAuthorizerF3215DBC",
+        },
+        "HttpMethod": "PUT",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "accounthandler3A0FA172",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "RequestModels": {
+          "application/json": {
+            "Ref": "lemuelapiUpdateAccountModelC4DA7783",
+          },
+        },
+        "RequestParameters": {
+          "method.request.path.uuid": true,
+        },
+        "RequestValidatorId": {
+          "Ref": "lemuelapiBodyValidator6CBA4433",
+        },
+        "ResourceId": {
+          "Ref": "lemuelapiaccountsuuid8C51CA52",
+        },
+        "RestApiId": {
+          "Ref": "lemuelapi762B60E0",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "lemuelapiaccountsuuidPUTApiPermissionTestStacklemuelapiBB28E280PUTaccountsuuid68944490": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "accounthandler3A0FA172",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/PUT/accounts/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiaccountsuuidPUTApiPermissionTestTestStacklemuelapiBB28E280PUTaccountsuuid4BF9980C": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "accounthandler3A0FA172",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/PUT/accounts/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
     "lemuelapiaccountsuuidcreateBE050D05": {
       "Properties": {
         "ParentId": {
@@ -2027,19 +2192,19 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Method",
     },
-    "lemuelapiaccountsuuiddisplaynameC6BF40C9": {
+    "lemuelapiaccountsuuiddevicetokensBEA6749C": {
       "Properties": {
         "ParentId": {
           "Ref": "lemuelapiaccountsuuid8C51CA52",
         },
-        "PathPart": "display-name",
+        "PathPart": "device-tokens",
         "RestApiId": {
           "Ref": "lemuelapi762B60E0",
         },
       },
       "Type": "AWS::ApiGateway::Resource",
     },
-    "lemuelapiaccountsuuiddisplaynameOPTIONS132C5C73": {
+    "lemuelapiaccountsuuiddevicetokensOPTIONS5827F74B": {
       "Properties": {
         "ApiKeyRequired": false,
         "AuthorizationType": "NONE",
@@ -2071,7 +2236,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           },
         ],
         "ResourceId": {
-          "Ref": "lemuelapiaccountsuuiddisplaynameC6BF40C9",
+          "Ref": "lemuelapiaccountsuuiddevicetokensBEA6749C",
         },
         "RestApiId": {
           "Ref": "lemuelapi762B60E0",
@@ -2079,7 +2244,85 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Method",
     },
-    "lemuelapiaccountsuuiddisplaynamePUT50EFD4AC": {
+    "lemuelapiaccountsuuiddevicetokensPUTApiPermissionTestStacklemuelapiBB28E280PUTaccountsuuiddevicetokensB3A2000B": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "accounthandler3A0FA172",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/",
+              {
+                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
+              },
+              "/PUT/accounts/*/device-tokens",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiaccountsuuiddevicetokensPUTApiPermissionTestTestStacklemuelapiBB28E280PUTaccountsuuiddevicetokens6E4C52DC": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "accounthandler3A0FA172",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "lemuelapi762B60E0",
+              },
+              "/test-invoke-stage/PUT/accounts/*/device-tokens",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "lemuelapiaccountsuuiddevicetokensPUTB7F4FC75": {
       "Properties": {
         "AuthorizationType": "COGNITO_USER_POOLS",
         "AuthorizerId": {
@@ -2115,7 +2358,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "RequestModels": {
           "application/json": {
-            "Ref": "lemuelapiDisplayNameModel68041565",
+            "Ref": "lemuelapiDeviceTokenModel5DA7BE58",
           },
         },
         "RequestParameters": {
@@ -2125,91 +2368,13 @@ exports[`LemuelStack should match snapshot 1`] = `
           "Ref": "lemuelapiBodyValidator6CBA4433",
         },
         "ResourceId": {
-          "Ref": "lemuelapiaccountsuuiddisplaynameC6BF40C9",
+          "Ref": "lemuelapiaccountsuuiddevicetokensBEA6749C",
         },
         "RestApiId": {
           "Ref": "lemuelapi762B60E0",
         },
       },
       "Type": "AWS::ApiGateway::Method",
-    },
-    "lemuelapiaccountsuuiddisplaynamePUTApiPermissionTestStacklemuelapiBB28E280PUTaccountsuuiddisplayname65A8E275": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "accounthandler3A0FA172",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "lemuelapi762B60E0",
-              },
-              "/",
-              {
-                "Ref": "lemuelapiDeploymentStageprodB8C98E53",
-              },
-              "/PUT/accounts/*/display-name",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "lemuelapiaccountsuuiddisplaynamePUTApiPermissionTestTestStacklemuelapiBB28E280PUTaccountsuuiddisplayname75DF03AE": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "accounthandler3A0FA172",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "lemuelapi762B60E0",
-              },
-              "/test-invoke-stage/PUT/accounts/*/display-name",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
     },
     "lemuelapiaccountsuuidmeditations52BFD88C": {
       "Properties": {
@@ -5767,7 +5932,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "a426c54751e5486c1289c2c0d5c3fbb7e997e1a4638f30727f72d9211b4d5320.zip",
+          "S3Key": "a4c4150898e6635f75807d2e696ec3617ddc4eb994fb06b153bfb0528dc1a4e1.zip",
         },
         "Environment": {
           "Variables": {
@@ -6122,10 +6287,11 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "c06799f3bc55f599c51bbd536230b382202dab74efa49b18fb3c5baf0ad664b7.zip",
+          "S3Key": "13d0e74bfca6c21730a254b577cfd83922fbc8cf7871932d3a246af270ea67c8.zip",
         },
         "Environment": {
           "Variables": {
+            "FCM_SECRET_NAME": "fcm-server-creds",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -6140,6 +6306,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           ],
         },
         "Runtime": "nodejs22.x",
+        "Timeout": 10,
       },
       "Type": "AWS::Lambda::Function",
     },
@@ -6244,6 +6411,33 @@ exports[`LemuelStack should match snapshot 1`] = `
                 },
               ],
             },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:fcm-server-creds-??????",
+                  ],
+                ],
+              },
+            },
           ],
           "Version": "2012-10-17",
         },
@@ -6282,6 +6476,10 @@ exports[`LemuelStack should match snapshot 1`] = `
           },
           {
             "AttributeName": "uuid",
+            "AttributeType": "S",
+          },
+          {
+            "AttributeName": "userId",
             "AttributeType": "S",
           },
         ],
@@ -6335,6 +6533,18 @@ exports[`LemuelStack should match snapshot 1`] = `
               "ProjectionType": "ALL",
             },
           },
+          {
+            "IndexName": "user-device-tokens-index",
+            "KeySchema": [
+              {
+                "AttributeName": "userId",
+                "KeyType": "HASH",
+              },
+            ],
+            "Projection": {
+              "ProjectionType": "ALL",
+            },
+          },
         ],
         "KeySchema": [
           {
@@ -6354,6 +6564,223 @@ exports[`LemuelStack should match snapshot 1`] = `
       "Type": "AWS::DynamoDB::Table",
       "UpdateReplacePolicy": "Delete",
     },
+    "pushaccountnotifications1BCC149D": {
+      "DependsOn": [
+        "pushaccountnotificationsServiceRoleDefaultPolicy714DF52C",
+        "pushaccountnotificationsServiceRoleD5933378",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "b2407077a36feb70c66c4466b13fe31719fdb6c1fcf488043b488976bf95ab5b.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "FCM_SECRET_NAME": "fcm-server-creds",
+            "TABLE_NAME": {
+              "Ref": "proverbsstore7682A597",
+            },
+          },
+        },
+        "FunctionName": "push-account-notifications",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "pushaccountnotificationsServiceRoleD5933378",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+        "Timeout": 30,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "pushaccountnotificationsDynamoDBEventSourceTestStackproverbsstore0213FC8B6EF6BE45": {
+      "Properties": {
+        "BatchSize": 100,
+        "BisectBatchOnFunctionError": true,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "proverbsstore7682A597",
+            "StreamArn",
+          ],
+        },
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{"eventName":["INSERT"]}",
+            },
+          ],
+        },
+        "FunctionName": {
+          "Ref": "pushaccountnotifications1BCC149D",
+        },
+        "MaximumRetryAttempts": 2,
+        "StartingPosition": "TRIM_HORIZON",
+      },
+      "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "pushaccountnotificationsServiceRoleD5933378": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "pushaccountnotificationsServiceRoleDefaultPolicy714DF52C": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "proverbsstore7682A597",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "proverbsstore7682A597",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:fcm-server-creds-??????",
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": "dynamodb:ListStreams",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "proverbsstore7682A597",
+                  "StreamArn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "pushaccountnotificationsServiceRoleDefaultPolicy714DF52C",
+        "Roles": [
+          {
+            "Ref": "pushaccountnotificationsServiceRoleD5933378",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
     "pushdailyproverb35302875": {
       "DependsOn": [
         "pushdailyproverbServiceRoleDefaultPolicyFDA4289C",
@@ -6364,7 +6791,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "68b36447ee622232ff946e4591ac90879e67552c960f0c2e146698fe49bb7047.zip",
+          "S3Key": "6a1299f235f903917d5d0a334db41bada479f38fdfe88f14f0fb3780a8ca912c.zip",
         },
         "Environment": {
           "Variables": {
@@ -6421,6 +6848,10 @@ exports[`LemuelStack should match snapshot 1`] = `
                 "dynamodb:GetItem",
                 "dynamodb:Scan",
                 "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
@@ -6575,7 +7006,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "39dbfd87c706d9c2ff67f93ab59b0f6d3470fbd51d41e8ee3f84ae3377a07de5.zip",
+          "S3Key": "316ba978996ad7464658ad1e2209e19890ecfa4569c1252a4cdb52d416dac0e5.zip",
         },
         "Environment": {
           "Variables": {
@@ -6685,7 +7116,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "4ff89febde5eb39d14df3342e465bac9f70880a7d99a59792078d430b675bb8e.zip",
+          "S3Key": "d2ed49f89c5794c89d8117852e33a8e36ec447a9fbcb77168d19e234a37fed53.zip",
         },
         "Environment": {
           "Variables": {

@@ -24,6 +24,7 @@ describe("getAccountDetailsHandler", () => {
       totalMeditations: 0,
       totalNotes: 0,
       displayName: "Alice",
+      replyNotificationsEnabled: true,
     };
 
     ddbMock

@@ -1,3 +1,3 @@
 import type * as Generated from "../../../../temp";
 
-export type DisplayName = Generated.DisplayName;
+export type UpdateAccount = Generated.UpdateAccount;

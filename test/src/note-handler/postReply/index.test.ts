@@ -14,7 +14,7 @@ const createDocClient = () =>
 
 describe("postReplyHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
-  const env = { TABLE_NAME: "TestTable" };
+  const env = { TABLE_NAME: "TestTable", FCM_SECRET_NAME: "test-fcm-secret" };
 
   beforeEach(() => {
     ddbMock.reset();
@@ -58,8 +58,9 @@ describe("postReplyHandler", () => {
     expect(body.createdAt).toBe("2024-01-01T12:00:00.000Z");
 
     const putCalls = ddbMock.commandCalls(PutCommand);
-    expect(putCalls).toHaveLength(2);
+    expect(putCalls).toHaveLength(3);
     expect(putCalls[0].args[0].input.Item?.content).toBe("Great reflection!");
+    expect(putCalls[2].args[0].input.Item?.pk).toBe("reply-notification");
 
     const updateCalls = ddbMock.commandCalls(UpdateCommand);
     expect(updateCalls).toHaveLength(1);

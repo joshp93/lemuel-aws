@@ -5,4 +5,5 @@ export const buildAccountRecord = (uuid: string, displayName = "") => ({
   totalMeditations: 0,
   totalNotes: 0,
   displayName,
+  replyNotificationsEnabled: true,
 });

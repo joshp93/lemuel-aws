@@ -85,6 +85,7 @@ import { putReactionHandler } from "../../../src/note-handler/putReaction/index"
 describe("note-handler router", () => {
   beforeEach(() => {
     process.env.TABLE_NAME = "TestTable";
+    process.env.FCM_SECRET_NAME = "test-fcm-secret";
     jest.clearAllMocks();
   });
 

@@ -4,7 +4,8 @@
   "type": "object",
   "properties": {
     "token": { "type": "string" },
-    "platform": { "type": "string" }
+    "platform": { "type": "string" },
+    "uuid": { "type": "string" }
   },
   "required": ["token", "platform"]
 }

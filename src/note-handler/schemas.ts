@@ -3,6 +3,7 @@ import type { NoteEntity } from "../models/proverbStoreSchemas";
 
 export const NoteHandlerEnvSchema = z.object({
   TABLE_NAME: z.string().min(1, "TABLE_NAME is required"),
+  FCM_SECRET_NAME: z.string().min(1, "FCM_SECRET_NAME is required"),
 });
 
 export type NoteHandlerEnv = z.infer<typeof NoteHandlerEnvSchema>;

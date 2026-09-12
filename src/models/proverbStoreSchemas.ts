@@ -56,6 +56,7 @@ export const AccountEntitySchema = z.object({
   totalMeditations: z.number(),
   totalNotes: z.number(),
   displayName: z.string(),
+  replyNotificationsEnabled: z.boolean().default(true),
 });
 
 export type AccountEntity = z.infer<typeof AccountEntitySchema>;
@@ -135,6 +136,7 @@ export const DeviceTokenEntitySchema = z.object({
   token: z.string(),
   platform: z.string(),
   createdAt: z.string(),
+  userId: z.string().optional().describe("Cognito UUID of the device owner"),
 });
 
 export type DeviceTokenEntity = z.infer<typeof DeviceTokenEntitySchema>;

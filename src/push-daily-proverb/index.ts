@@ -1,84 +1,70 @@
 import { queryAllDeviceTokens } from "../shared/deviceTokens";
-import { sendToAllTokens } from "../shared/fcm";
-import { DynamoDBStreamEventSchema, EnvSchema } from "./schemas";
+import { getAccessToken, getFcmCreds } from "../shared/fcm";
+import { parseDdbRecord } from "../shared/parseDdbRecord";
+import { buildSilentPushMessage } from "./buildSilentPushMessage";
+import { EnvSchema } from "./schemas";
+import { sendToAllDevices } from "./sendToAllDevices";
+import type { DailyProverbImage } from "./types";
 
-/** Handler triggered by DynamoDB Stream on daily-proverb INSERT. Sends a silent FCM data message
- *  (type: "daily-proverb") with the proverb ref to all registered devices. */
+/** Responds to DynamoDB Stream INSERT events for tomorrow's daily-proverb
+ *  record. Sends a silent data-only FCM push to every registered device so
+ *  the client app can pre-fetch the next day's proverb via background task.
+ *
+ *  Records that do not match the daily-proverb shape for tomorrow's date are
+ *  silently skipped so other stream consumers are not interfered with. */
 export const handler = async (event: unknown): Promise<void> => {
   const env = EnvSchema.parse(process.env);
-  const parsed = DynamoDBStreamEventSchema.parse(event);
-
-  const record = parsed.Records[0];
-  if (!record) return;
-
-  if (record.eventName !== "INSERT") {
-    console.log(
-      "[push-daily-proverb] Skipping: eventName is",
-      record.eventName,
-    );
-    return;
-  }
-
-  const keys = record.dynamodb.Keys;
-  if (keys.pk.S !== "daily-proverb") {
-    console.log("[push-daily-proverb] Skipping: pk is", keys.pk.S);
-    return;
-  }
-
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
-  if (keys.sk.S !== tomorrow) {
-    console.log(
-      "[push-daily-proverb] Skipping: sk is",
-      keys.sk.S,
-      "expected",
-      tomorrow,
+
+  const rawRecords: unknown[] =
+    (event as { Records?: unknown[] }).Records ?? [];
+
+  for (const rawRecord of rawRecords) {
+    const parsed = parseDdbRecord<DailyProverbImage>(
+      rawRecord,
+      ["ref"],
+      "daily-proverb",
     );
-    return;
+
+    if (!parsed?.newImage) {
+      continue;
+    }
+
+    if (parsed.sk !== tomorrow) {
+      continue;
+    }
+
+    const ref = parsed.newImage.ref;
+    console.log("[push-daily-proverb] Pushing silent update for:", ref);
+
+    const tokens = await queryAllDeviceTokens(env.TABLE_NAME);
+    if (tokens.length === 0) {
+      console.log("[push-daily-proverb] No registered devices, skipping");
+      return;
+    }
+
+    console.log("[push-daily-proverb] Sending to", tokens.length, "devices");
+
+    const credentials = await getFcmCreds(env.FCM_SECRET_NAME);
+    const accessToken = await getAccessToken(credentials);
+    if (!accessToken) {
+      console.error("[push-daily-proverb] Failed to obtain FCM access token");
+      return;
+    }
+
+    const message = buildSilentPushMessage();
+    const cleanedCount = await sendToAllDevices(
+      tokens.map((t) => t.token),
+      message,
+      credentials.project_id,
+      accessToken,
+      env.TABLE_NAME,
+    );
+
+    console.log(
+      "[push-daily-proverb] Silent push complete, cleaned",
+      cleanedCount,
+      "stale tokens",
+    );
   }
-
-  const ref = record.dynamodb.NewImage?.ref?.S;
-  if (!ref) {
-    console.log("[push-daily-proverb] Skipping: no ref in NewImage");
-    return;
-  }
-
-  console.log("[push-daily-proverb] Pushing silent update for:", ref);
-
-  const tokens = await queryAllDeviceTokens(env.TABLE_NAME);
-  if (tokens.length === 0) {
-    console.log("[push-daily-proverb] No registered devices, skipping");
-    return;
-  }
-
-  console.log("[push-daily-proverb] Sending to", tokens.length, "devices");
-
-  const message = {
-    data: {
-      type: "daily-proverb",
-    },
-    android: {
-      priority: "high" as const,
-      ttl: "86400s",
-      collapseKey: "lemuel-daily-proverb",
-      direct_boot_ok: true,
-    },
-    apns: {
-      headers: {
-        "apns-priority": "10",
-      },
-      payload: {
-        aps: {
-          "content-available": 1,
-        },
-      },
-    },
-  };
-
-  await sendToAllTokens(
-    tokens.map((t) => t.token),
-    message,
-    process.env.FCM_SECRET_NAME!,
-  );
-
-  console.log("[push-daily-proverb] Silent push complete");
 };

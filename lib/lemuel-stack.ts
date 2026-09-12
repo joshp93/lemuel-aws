@@ -10,12 +10,13 @@ import * as eventSources from "aws-cdk-lib/aws-lambda-event-sources";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import type { Construct } from "constructs";
 import CreateAccountSchema from "./models/CreateAccountModel.json";
-import DisplayNameSchema from "./models/DisplayNameModel.json";
+import DeviceTokenSchema from "./models/DeviceTokenModel.json";
 import LogSchema from "./models/LogModel.json";
 import NoteSchema from "./models/NoteModel.json";
 import ReactionSchema from "./models/ReactionModel.json";
 import RegisterDeviceTokenSchema from "./models/RegisterDeviceTokenModel.json";
 import ReplySchema from "./models/ReplyModel.json";
+import UpdateAccountSchema from "./models/UpdateAccountModel.json";
 
 interface LemuelStackProps extends cdk.StackProps {
   userPoolId?: string;
@@ -56,6 +57,11 @@ export class LemuelStack extends cdk.Stack {
       indexName: "user-notes-index",
       partitionKey: { name: "uuid", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "dateCreated", type: dynamodb.AttributeType.STRING },
+    });
+
+    table.addGlobalSecondaryIndex({
+      indexName: "user-device-tokens-index",
+      partitionKey: { name: "userId", type: dynamodb.AttributeType.STRING },
     });
 
     // -----------------------------------------------------------
@@ -190,8 +196,10 @@ export class LemuelStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("dist/note-handler"),
+      timeout: cdk.Duration.seconds(10),
       environment: {
         TABLE_NAME: table.tableName,
+        FCM_SECRET_NAME: props.fcmSecretName,
       },
     });
 
@@ -242,6 +250,22 @@ export class LemuelStack extends cdk.Stack {
       },
       timeout: cdk.Duration.minutes(5),
     });
+
+    const pushAccountNotifications = new lambda.Function(
+      this,
+      "push-account-notifications",
+      {
+        functionName: "push-account-notifications",
+        runtime: lambda.Runtime.NODEJS_22_X,
+        handler: "index.handler",
+        code: lambda.Code.fromAsset("dist/push-account-notifications"),
+        timeout: cdk.Duration.seconds(30),
+        environment: {
+          TABLE_NAME: table.tableName,
+          FCM_SECRET_NAME: props.fcmSecretName,
+        },
+      },
+    );
 
     const serverWidgetHandler = new lambda.Function(
       this,
@@ -323,10 +347,16 @@ export class LemuelStack extends cdk.Stack {
       schema: CreateAccountSchema as apigateway.JsonSchema,
     });
 
-    const displayNameModel = api.addModel("DisplayNameModel", {
+    const updateAccountModel = api.addModel("UpdateAccountModel", {
       contentType: "application/json",
-      modelName: "DisplayNameModel",
-      schema: DisplayNameSchema as apigateway.JsonSchema,
+      modelName: "UpdateAccountModel",
+      schema: UpdateAccountSchema as apigateway.JsonSchema,
+    });
+
+    const deviceTokenModel = api.addModel("DeviceTokenModel", {
+      contentType: "application/json",
+      modelName: "DeviceTokenModel",
+      schema: DeviceTokenSchema as apigateway.JsonSchema,
     });
 
     const reactionModel = api.addModel("ReactionModel", {
@@ -439,15 +469,30 @@ export class LemuelStack extends cdk.Stack {
         requestValidator,
       });
 
+    accountUuid.addMethod(
+      "PUT",
+      new apigateway.LambdaIntegration(accountHandler),
+      {
+        ...auth(true),
+        requestParameters: {
+          "method.request.path.uuid": true,
+        },
+        requestModels: {
+          "application/json": updateAccountModel,
+        },
+        requestValidator: bodyValidator,
+      },
+    );
+
     accountUuid
-      .addResource("display-name")
+      .addResource("device-tokens")
       .addMethod("PUT", new apigateway.LambdaIntegration(accountHandler), {
         ...auth(true),
         requestParameters: {
           "method.request.path.uuid": true,
         },
         requestModels: {
-          "application/json": displayNameModel,
+          "application/json": deviceTokenModel,
         },
         requestValidator: bodyValidator,
       });
@@ -727,7 +772,8 @@ export class LemuelStack extends cdk.Stack {
     table.grantReadData(getProverb);
     table.grantReadData(getProverbs);
     table.grantWriteData(registerDeviceToken);
-    table.grantReadData(pushDailyProverb);
+    table.grantReadWriteData(pushDailyProverb);
+    table.grantReadWriteData(pushAccountNotifications);
     table.grantReadData(serverWidgetHandler);
 
     const fcmSecret = secretsmanager.Secret.fromSecretNameV2(
@@ -736,6 +782,8 @@ export class LemuelStack extends cdk.Stack {
       props.fcmSecretName,
     );
     fcmSecret.grantRead(pushDailyProverb);
+    fcmSecret.grantRead(pushAccountNotifications);
+    fcmSecret.grantRead(noteHandler);
 
     // -----------------------------------------------------------
     // EventBridge Rules & Event Source Mappings
@@ -749,6 +797,19 @@ export class LemuelStack extends cdk.Stack {
     pushDailyProverb.addEventSource(
       new eventSources.DynamoEventSource(table, {
         startingPosition: lambda.StartingPosition.TRIM_HORIZON,
+        filters: [
+          lambda.FilterCriteria.filter({
+            eventName: lambda.FilterRule.isEqual("INSERT"),
+          }),
+        ],
+      }),
+    );
+
+    pushAccountNotifications.addEventSource(
+      new eventSources.DynamoEventSource(table, {
+        startingPosition: lambda.StartingPosition.TRIM_HORIZON,
+        retryAttempts: 2,
+        bisectBatchOnError: true,
         filters: [
           lambda.FilterCriteria.filter({
             eventName: lambda.FilterRule.isEqual("INSERT"),

@@ -23,6 +23,9 @@ describe("deleteAccountHandler", () => {
   beforeEach(() => {
     ddbMock.reset();
     cognitoMock.reset();
+    ddbMock
+      .on(QueryCommand, { IndexName: "user-device-tokens-index" })
+      .resolves({ Items: [] });
     ddbMock.on(QueryCommand).resolves({ Items: [] });
     ddbMock.on(BatchWriteCommand).resolves({});
     ddbMock.on(UpdateCommand).resolves({});
@@ -58,6 +61,9 @@ describe("deleteAccountHandler", () => {
     ddbMock
       .on(QueryCommand)
       .resolves({ Items: [{ pk: "user-1", sk: "account" }] });
+    ddbMock
+      .on(QueryCommand, { IndexName: "user-device-tokens-index" })
+      .resolves({ Items: [] });
 
     const result = await deleteAccountHandler(
       ddbMock as unknown as DynamoDBDocumentClient,
@@ -123,13 +129,16 @@ describe("deleteAccountHandler", () => {
           ],
         });
       }
-      if (callCount === 5) {
+      if (callCount === 6) {
         return Promise.resolve({
           Items: [{ reactionType: "👍" }],
         });
       }
       return Promise.resolve({ Items: [] });
     });
+    ddbMock
+      .on(QueryCommand, { IndexName: "user-device-tokens-index" })
+      .resolves({ Items: [] });
 
     ddbMock.on(GetCommand).resolves({
       Item: { reactionType: "🙏" },
