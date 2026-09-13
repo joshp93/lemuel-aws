@@ -17,7 +17,7 @@ export const sendToAllDevices = async (
 
   for (const token of tokens) {
     try {
-      logger.info("[push-daily-proverb] Sending FCM to device", {
+      logger.debug("[push-daily-proverb] Sending FCM to device", {
         token: token.slice(0, 8),
       });
       const response = await sendFcmMessage(
@@ -26,7 +26,7 @@ export const sendToAllDevices = async (
         projectId,
         accessToken,
       );
-      logger.info("[push-daily-proverb] FCM response for device", {
+      logger.debug("[push-daily-proverb] FCM response for device", {
         token: token.slice(0, 8),
         status: response.status,
       });

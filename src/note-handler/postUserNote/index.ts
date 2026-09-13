@@ -21,7 +21,7 @@ export const postUserNoteHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  logger.info(`[postUserNote] Entering handler`);
+  logger.debug(`[postUserNote] Entering handler`);
 
   try {
     const uuid = event.pathParameters?.uuid ?? "";
@@ -29,7 +29,7 @@ export const postUserNoteHandler = async (
     const body = parsePostUserNoteRequest(event);
 
     const dateCreated = new Date().toISOString();
-    logger.info(`[postUserNote] Creating note`, { uuid, ref, dateCreated });
+    logger.debug(`[postUserNote] Creating note`, { uuid, ref, dateCreated });
 
     const entity = NoteEntitySchema.parse({
       pk: uuid,

@@ -17,7 +17,7 @@ export const parseGetProverbNotesRequest = (
   scanForward: boolean;
   userId: string | undefined;
 } => {
-  logger.info(`[getProverbNotes] Parsing request`, {
+  logger.debug(`[getProverbNotes] Parsing request`, {
     pathParams: event.pathParameters,
     queryParams: event.queryStringParameters,
   });

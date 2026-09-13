@@ -20,14 +20,14 @@ export const deleteUserNoteHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  logger.info(`[deleteUserNote] Entering handler`);
+  logger.debug(`[deleteUserNote] Entering handler`);
 
   try {
     const uuid = event.pathParameters?.uuid ?? "";
     const ref = event.pathParameters?.ref ?? "";
     const date = event.queryStringParameters?.date ?? "";
     const sk = `${ref}#${date}`;
-    logger.info(`[deleteUserNote] Deleting note`, { uuid, ref, date, sk });
+    logger.debug(`[deleteUserNote] Deleting note`, { uuid, ref, date, sk });
 
     await client.send(
       new DeleteCommand({
@@ -36,7 +36,7 @@ export const deleteUserNoteHandler = async (
       }),
     );
 
-    logger.info(`[deleteUserNote] Note deleted, re-counting`, { uuid });
+    logger.debug(`[deleteUserNote] Note deleted, re-counting`, { uuid });
 
     const queryResult = await client.send(
       new QueryCommand({

@@ -27,7 +27,7 @@ export const handler = async (
   const secret = await getSecret(secretName);
   const { apiKey, baseUrl } = secret;
 
-  logger.info(`Using base URL: ${baseUrl}`);
+  logger.debug(`Using base URL: ${baseUrl}`);
 
   const results: VersionOutput[] = [];
   for (const versionInput of parsed) {

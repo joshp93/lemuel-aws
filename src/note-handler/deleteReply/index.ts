@@ -34,7 +34,7 @@ export const deleteReplyHandler = async (
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
 
-    logger.info("[deleteReply] Looking up reply", {
+    logger.debug("[deleteReply] Looking up reply", {
       notePk,
       replySk,
       noteAuthorUuid,

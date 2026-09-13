@@ -15,14 +15,14 @@ export const getUserNoteHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  logger.info(`[getUserNote] Entering handler`);
+  logger.debug(`[getUserNote] Entering handler`);
 
   try {
     const uuid = event.pathParameters?.uuid ?? "";
     const ref = event.pathParameters?.ref ?? "";
     const date = event.queryStringParameters?.date ?? "";
     const sk = date ? `${ref}#${date}` : ref;
-    logger.info(`[getUserNote] Fetching note`, { uuid, ref, date, sk });
+    logger.debug(`[getUserNote] Fetching note`, { uuid, ref, date, sk });
 
     const result = await client.send(
       new GetCommand({
@@ -57,7 +57,7 @@ export const getUserNoteHandler = async (
       }),
     };
   } catch (error) {
-    logger.error(`[getUserNote] Error:`, error);
+    logger.error(`[getUserNote] Error:`, { error });
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

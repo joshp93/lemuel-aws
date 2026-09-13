@@ -20,11 +20,11 @@ export const getProverbNotesHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  logger.info(`[getProverbNotes] Entering handler`);
+  logger.debug(`[getProverbNotes] Entering handler`);
 
   try {
     const params = parseGetProverbNotesRequest(event);
-    logger.info(`[getProverbNotes] Parsed request`, {
+    logger.debug(`[getProverbNotes] Parsed request`, {
       ref: params.ref,
       limit: params.limit,
       hasLastKey: !!params.exclusiveStartKey,

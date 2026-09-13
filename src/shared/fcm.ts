@@ -61,7 +61,7 @@ export const sendFcmMessage = async (
   accessToken: string,
 ): Promise<Response> => {
   const url = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
-  logger.info("[FCM] Sending request", {
+  logger.debug("[FCM] Sending request", {
     token: token.slice(0, 8),
     status: "pending",
   });
@@ -79,7 +79,7 @@ export const sendFcmMessage = async (
     }),
     signal: AbortSignal.timeout(5000),
   });
-  logger.info("[FCM] Response received", {
+  logger.debug("[FCM] Response received", {
     token: token.slice(0, 8),
     status: response.status,
     statusText: response.statusText,

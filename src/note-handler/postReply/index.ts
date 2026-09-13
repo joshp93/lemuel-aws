@@ -55,7 +55,7 @@ export const postReplyHandler = async (
       createdAt,
     });
 
-    logger.info("[postReply] Writing reply", {
+    logger.debug("[postReply] Writing reply", {
       pk: notePk,
       sk: entityReplySk,
       noteAuthorUuid,

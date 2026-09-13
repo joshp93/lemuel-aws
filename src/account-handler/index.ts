@@ -13,7 +13,7 @@ import { logger } from "../shared/logger";
 export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  logger.info(
+  logger.debug(
     `[account-handler] Routing request: ${event.httpMethod} ${event.resource}`,
     { pathParams: event.pathParameters },
   );

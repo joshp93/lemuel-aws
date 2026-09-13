@@ -45,7 +45,7 @@ export const sendToDevice = async (
       projectId,
       accessToken,
     );
-    logger.info("[push-account-notifications] FCM response classified", {
+    logger.debug("[push-account-notifications] FCM response classified", {
       status: response.status,
     });
     const status = await classifyResponse(response, token);

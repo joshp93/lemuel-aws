@@ -59,6 +59,6 @@ export const fetchBible = async (
     throw new BibleNotFoundError(version, availableVersions);
   }
 
-  logger.info(`Found bible: ${matchingBible.name} (${matchingBible.id})`);
+  logger.debug(`Found bible: ${matchingBible.name} (${matchingBible.id})`);
   return matchingBible;
 };

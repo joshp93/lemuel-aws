@@ -30,16 +30,16 @@ export const fetchSingleVersion = async (
   const bible = await fetchBible(baseUrl, apiKey, version);
   const bibleId = bible.id;
   const versionName = bible.abbreviationLocal.toLowerCase();
-  logger.info(`Found matching bible: ${bible.name} (ID: ${bibleId})`);
+  logger.debug(`Found matching bible: ${bible.name} (ID: ${bibleId})`);
 
   const chapters = getChaptersFromRefs(REFS);
-  logger.info(`Building chapter list from ${REFS.length} proverb references`);
-  logger.info(`Prepared to fetch ${chapters.length} chapters`);
+  logger.debug(`Building chapter list from ${REFS.length} proverb references`);
+  logger.debug(`Prepared to fetch ${chapters.length} chapters`);
 
   const proverbs: Proverb[] = [];
 
   for (const chapter of chapters) {
-    logger.info(`Fetching chapter ${chapter}...`);
+    logger.debug(`Fetching chapter ${chapter}...`);
 
     const chapterData = await fetchChapter(baseUrl, apiKey, bibleId, chapter);
     const content = chapterData.data.content || [];
@@ -47,7 +47,7 @@ export const fetchSingleVersion = async (
     const chapterProverbs = buildProverbsFromChapter(content, chapter);
     proverbs.push(...chapterProverbs);
 
-logger.info(
+logger.debug(
       `Chapter ${chapter} complete - collected ${chapterProverbs.length} proverbs`,
     );
 

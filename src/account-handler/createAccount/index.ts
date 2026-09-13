@@ -20,8 +20,8 @@ export const createAccountHandler = async (
     const body = parseBody<CreateAccount>(event, "displayName");
     const { displayName } = body;
 
-    logger.info("[createAccount] Request body:", JSON.stringify(body));
-    logger.info(
+    logger.debug("[createAccount] Request body:", JSON.stringify(body));
+    logger.debug(
       "[createAccount] Extracted displayName:",
       JSON.stringify(displayName),
     );
@@ -43,7 +43,7 @@ export const createAccountHandler = async (
     }
 
     const item = buildAccountRecord(uuid, displayName);
-    logger.info("[createAccount] Storing item:", JSON.stringify(item));
+    logger.debug("[createAccount] Storing item:", JSON.stringify(item));
 
     await client.send(
       new PutCommand({

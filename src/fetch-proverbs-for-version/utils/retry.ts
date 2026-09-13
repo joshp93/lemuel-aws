@@ -54,7 +54,7 @@ export async function fetchWithRetry(
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const delay = calculateDelay(attempt, baseDelayMs);
-      logger.info(
+      logger.debug(
         `Network error on attempt ${attempt + 1}/${maxRetries + 1}: ${errorMessage}, retrying in ${delay}ms...`,
       );
       await sleep(delay);
@@ -74,7 +74,7 @@ export async function fetchWithRetry(
     }
 
     const delay = calculateDelay(attempt, baseDelayMs);
-    logger.info(
+    logger.debug(
       `Received ${response.status} on attempt ${attempt + 1}/${maxRetries + 1}, retrying in ${delay}ms...`,
     );
     await sleep(delay);

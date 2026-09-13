@@ -16,7 +16,7 @@ export const parseGetUserNotesRequest = (
   exclusiveStartKey?: Record<string, unknown>;
   scanForward: boolean;
 } => {
-  logger.info(`[getUserNotes] Parsing request`, {
+  logger.debug(`[getUserNotes] Parsing request`, {
     pathParams: event.pathParameters,
     queryParams: event.queryStringParameters,
   });

@@ -20,11 +20,11 @@ export const getUserNotesHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  logger.info(`[getUserNotes] Entering handler`);
+  logger.debug(`[getUserNotes] Entering handler`);
 
   try {
     const params = parseGetUserNotesRequest(event);
-    logger.info(`[getUserNotes] Parsed request`, {
+    logger.debug(`[getUserNotes] Parsed request`, {
       uuid: params.uuid,
       limit: params.limit,
       hasLastKey: !!params.exclusiveStartKey,

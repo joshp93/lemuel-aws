@@ -48,6 +48,6 @@ export const fetchChapter = async (
   }
 
   const data = (await response.json()) as ChaptersResponse;
-  logger.info(`Fetched chapter ${chapter}: ${data.data.verseCount} verses`);
+  logger.debug(`Fetched chapter ${chapter}: ${data.data.verseCount} verses`);
   return data;
 };

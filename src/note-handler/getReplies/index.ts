@@ -27,7 +27,7 @@ export const getRepliesHandler = async (
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
 
-    logger.info("[getReplies] Querying", { notePk, noteAuthorUuid, ref, date });
+    logger.debug("[getReplies] Querying", { notePk, noteAuthorUuid, ref, date });
 
     const result = await client.send(
       new QueryCommand({
