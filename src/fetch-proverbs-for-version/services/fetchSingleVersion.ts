@@ -1,3 +1,4 @@
+import { logger } from "../../shared/logger";
 import { REFS } from "../constants/refs";
 import {
   buildProverbsFromChapter,
@@ -24,21 +25,21 @@ export const fetchSingleVersion = async (
 ): Promise<VersionOutput> => {
   const { version, citation } = input;
 
-  console.log(`Starting fetch for version: ${version}`);
+  logger.info(`Starting fetch for version: ${version}`);
 
   const bible = await fetchBible(baseUrl, apiKey, version);
   const bibleId = bible.id;
   const versionName = bible.abbreviationLocal.toLowerCase();
-  console.log(`Found matching bible: ${bible.name} (ID: ${bibleId})`);
+  logger.info(`Found matching bible: ${bible.name} (ID: ${bibleId})`);
 
   const chapters = getChaptersFromRefs(REFS);
-  console.log(`Building chapter list from ${REFS.length} proverb references`);
-  console.log(`Prepared to fetch ${chapters.length} chapters`);
+  logger.info(`Building chapter list from ${REFS.length} proverb references`);
+  logger.info(`Prepared to fetch ${chapters.length} chapters`);
 
   const proverbs: Proverb[] = [];
 
   for (const chapter of chapters) {
-    console.log(`Fetching chapter ${chapter}...`);
+    logger.info(`Fetching chapter ${chapter}...`);
 
     const chapterData = await fetchChapter(baseUrl, apiKey, bibleId, chapter);
     const content = chapterData.data.content || [];
@@ -46,14 +47,14 @@ export const fetchSingleVersion = async (
     const chapterProverbs = buildProverbsFromChapter(content, chapter);
     proverbs.push(...chapterProverbs);
 
-    console.log(
+logger.info(
       `Chapter ${chapter} complete - collected ${chapterProverbs.length} proverbs`,
     );
 
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  console.log(
+  logger.info(
     `Fetch complete for ${version} - total proverbs: ${proverbs.length}`,
   );
 

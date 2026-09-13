@@ -1,4 +1,5 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
+import { logger } from "../../shared/logger";
 
 /**
  * Extracts and validates path parameters and pagination query parameters
@@ -16,7 +17,7 @@ export const parseGetProverbNotesRequest = (
   scanForward: boolean;
   userId: string | undefined;
 } => {
-  console.log(`[getProverbNotes] Parsing request`, {
+  logger.info(`[getProverbNotes] Parsing request`, {
     pathParams: event.pathParameters,
     queryParams: event.queryStringParameters,
   });

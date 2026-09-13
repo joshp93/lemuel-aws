@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
@@ -61,7 +62,7 @@ export const handler = async (
     ...(citation && { citation }),
   });
 
-  console.debug("Proverb for the day:", response);
+  logger.debug("Proverb for the day:", response);
   return {
     statusCode: 200,
     body: response,

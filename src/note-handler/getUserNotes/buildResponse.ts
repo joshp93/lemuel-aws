@@ -5,6 +5,7 @@ import type {
 import type { APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import { collectDisplayNames } from "../../shared/displayNames";
+import { logger } from "../../shared/logger";
 
 /**
  * Builds the API Gateway response from the DynamoDB GSI query result.
@@ -37,7 +38,7 @@ export const buildGetUserNotesResponse = async (
     );
   }
 
-  console.log(
+  logger.info(
     `[getUserNotes] Building response with ${enriched.length} items`,
     {
       hasMore: !!lastKey,

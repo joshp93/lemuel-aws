@@ -8,11 +8,12 @@ import { linkDeviceTokenHandler } from "./linkDeviceToken/index";
 import { AccountHandlerEnvSchema } from "./models";
 import { updateAccountHandler } from "./updateAccount/index";
 import { updateMeditationsHandler } from "./updateMeditations/index";
+import { logger } from "../shared/logger";
 
 export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(
+  logger.info(
     `[account-handler] Routing request: ${event.httpMethod} ${event.resource}`,
     { pathParams: event.pathParameters },
   );
@@ -36,14 +37,14 @@ export const handler = async (
       case "PUT /accounts/{uuid}/device-tokens":
         return linkDeviceTokenHandler(client, env, event);
       default:
-        console.warn(`[account-handler] Unsupported route: ${route}`);
+        logger.warn(`[account-handler] Unsupported route: ${route}`);
         return {
           statusCode: 405,
           body: JSON.stringify({ error: "Method not allowed" }),
         };
     }
   } catch (error) {
-    console.error(`[account-handler] Unhandled error:`, error);
+    logger.error(`[account-handler] Unhandled error:`, error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

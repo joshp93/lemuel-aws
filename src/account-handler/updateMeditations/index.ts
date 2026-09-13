@@ -7,6 +7,7 @@ import {
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { MeditationEntitySchema } from "../../models/proverbStoreSchemas";
 import type { AccountHandlerEnv, UpdateMeditationsResponse } from "../models";
+import { logger } from "../../shared/logger";
 
 export const updateMeditationsHandler = async (
   client: DynamoDBDocumentClient,
@@ -56,7 +57,7 @@ export const updateMeditationsHandler = async (
       body: JSON.stringify(response),
     };
   } catch (error) {
-    console.error("[updateMeditations] Error:", error);
+    logger.error("[updateMeditations] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

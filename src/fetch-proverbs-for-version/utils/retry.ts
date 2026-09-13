@@ -1,3 +1,5 @@
+import { logger } from "../../shared/logger";
+
 /**
  * Sleeps for the given number of milliseconds.
  * @param ms - Number of milliseconds to sleep
@@ -52,7 +54,7 @@ export async function fetchWithRetry(
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const delay = calculateDelay(attempt, baseDelayMs);
-      console.log(
+      logger.info(
         `Network error on attempt ${attempt + 1}/${maxRetries + 1}: ${errorMessage}, retrying in ${delay}ms...`,
       );
       await sleep(delay);
@@ -72,7 +74,7 @@ export async function fetchWithRetry(
     }
 
     const delay = calculateDelay(attempt, baseDelayMs);
-    console.log(
+    logger.info(
       `Received ${response.status} on attempt ${attempt + 1}/${maxRetries + 1}, retrying in ${delay}ms...`,
     );
     await sleep(delay);

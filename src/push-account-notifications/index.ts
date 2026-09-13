@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { parseDdbRecord } from "../shared/parseDdbRecord";
@@ -72,7 +73,7 @@ export const handler = async (event: unknown): Promise<void> => {
         await deleteNotificationRecord(env.TABLE_NAME, notificationRecord.sk);
       }
     } catch (error) {
-      console.error(
+      logger.error(
         "[push-account-notifications] Unhandled error, record will be retried",
         error,
       );

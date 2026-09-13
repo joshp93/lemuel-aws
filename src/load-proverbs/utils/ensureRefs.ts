@@ -1,3 +1,4 @@
+import { logger } from "../../shared/logger";
 import {
   type DynamoDBDocumentClient,
   GetCommand,
@@ -39,7 +40,7 @@ export const ensureRefs = async (
       usedRefs: [],
     };
 
-    console.debug("Creating refs item", JSON.stringify(refs));
+    logger.debug("Creating refs item", JSON.stringify(refs));
     await client.send(
       new PutCommand({
         TableName: tableName,
@@ -47,6 +48,6 @@ export const ensureRefs = async (
       }),
     );
   } else {
-    console.debug("Refs item already exists, skipping creation.");
+    logger.debug("Refs item already exists, skipping creation.");
   }
 };

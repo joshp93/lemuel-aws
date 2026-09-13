@@ -8,6 +8,7 @@ import { parseBody } from "../../shared/parseBody";
 import type { AccountHandlerEnv, CreateAccountResponse } from "../models";
 import { buildAccountRecord } from "./buildAccountRecord";
 import type { CreateAccount } from "./models/types";
+import { logger } from "../../shared/logger";
 
 export const createAccountHandler = async (
   client: DynamoDBDocumentClient,
@@ -19,8 +20,8 @@ export const createAccountHandler = async (
     const body = parseBody<CreateAccount>(event, "displayName");
     const { displayName } = body;
 
-    console.log("[createAccount] Request body:", JSON.stringify(body));
-    console.log(
+    logger.info("[createAccount] Request body:", JSON.stringify(body));
+    logger.info(
       "[createAccount] Extracted displayName:",
       JSON.stringify(displayName),
     );
@@ -33,7 +34,7 @@ export const createAccountHandler = async (
     );
 
     if (existing.Item) {
-      console.log("[createAccount] Account already exists, skipping creation");
+      logger.info("[createAccount] Account already exists, skipping creation");
       const response: CreateAccountResponse = { success: true };
       return {
         statusCode: 200,
@@ -42,7 +43,7 @@ export const createAccountHandler = async (
     }
 
     const item = buildAccountRecord(uuid, displayName);
-    console.log("[createAccount] Storing item:", JSON.stringify(item));
+    logger.info("[createAccount] Storing item:", JSON.stringify(item));
 
     await client.send(
       new PutCommand({
@@ -51,7 +52,7 @@ export const createAccountHandler = async (
       }),
     );
 
-    console.log("[createAccount] Account created successfully");
+    logger.info("[createAccount] Account created successfully");
     const response: CreateAccountResponse = { success: true };
 
     return {
@@ -59,7 +60,7 @@ export const createAccountHandler = async (
       body: JSON.stringify(response),
     };
   } catch (error) {
-    console.error("[createAccount] Error:", error);
+    logger.error("[createAccount] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

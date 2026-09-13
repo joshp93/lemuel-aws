@@ -5,6 +5,7 @@ import {
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { AccountHandlerEnv } from "../models";
 import type { UpdateAccount } from "./models/types";
+import { logger } from "../../shared/logger";
 
 export const updateAccountHandler = async (
   client: DynamoDBDocumentClient,
@@ -60,7 +61,7 @@ export const updateAccountHandler = async (
       body: JSON.stringify({ success: true }),
     };
   } catch (error) {
-    console.error("[updateAccount] Error:", error);
+    logger.error("[updateAccount] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

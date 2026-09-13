@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import {
   AdminGetUserCommand,
   CognitoIdentityProviderClient,
@@ -59,7 +60,7 @@ export const handler = async (
       throw error;
     }
   } catch (error) {
-    console.error("Error checking user existence:", error);
+    logger.error("Error checking user existence:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

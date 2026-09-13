@@ -2,6 +2,7 @@ import { type DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { AccountEntitySchema } from "../../models/proverbStoreSchemas";
 import type { AccountHandlerEnv } from "../models";
+import { logger } from "../../shared/logger";
 
 export const getAccountDetailsHandler = async (
   client: DynamoDBDocumentClient,
@@ -21,18 +22,14 @@ export const getAccountDetailsHandler = async (
       }),
     );
 
-    if (!result.Item) {
-      console.log("[getAccountDetails] No account found for uuid:", uuid);
+if (!result.Item) {
+      logger.info("[getAccountDetails] No account found for uuid:", uuid);
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Account not found" }),
       };
     }
 
-    console.log(
-      "[getAccountDetails] Raw DynamoDB item:",
-      JSON.stringify(result.Item),
-    );
     const entity = AccountEntitySchema.parse(result.Item);
 
     return {
@@ -40,7 +37,7 @@ export const getAccountDetailsHandler = async (
       body: JSON.stringify(entity),
     };
   } catch (error) {
-    console.error("[getAccountDetails] Error:", error);
+    logger.error("[getAccountDetails] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

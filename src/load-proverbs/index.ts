@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { VersionCitationSchema } from "../models/proverbStoreSchemas";
@@ -21,7 +22,7 @@ import { ensureVersions } from "./utils/ensureVersions";
  * @param event - An array of version outputs, each containing proverbs and optional citation.
  */
 export const handler = async (event: LoadProverbsEvent): Promise<void> => {
-  console.debug("Event:", JSON.stringify(event));
+  logger.debug("Event:", JSON.stringify(event));
   LoadProverbsEventSchema.parse(event);
 
   const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -44,7 +45,7 @@ export const handler = async (event: LoadProverbsEvent): Promise<void> => {
         sk: result.version,
         citation: result.citation,
       });
-      console.debug(
+      logger.debug(
         "Creating/updating citation item",
         JSON.stringify(citationEntity),
       );

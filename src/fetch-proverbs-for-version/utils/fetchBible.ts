@@ -1,3 +1,4 @@
+import { logger } from "../../shared/logger";
 import type { Bible, BiblesResponse } from "../models/apiBible";
 import { fetchWithRetry } from "./retry";
 
@@ -58,6 +59,6 @@ export const fetchBible = async (
     throw new BibleNotFoundError(version, availableVersions);
   }
 
-  console.log(`Found bible: ${matchingBible.name} (${matchingBible.id})`);
+  logger.info(`Found bible: ${matchingBible.name} (${matchingBible.id})`);
   return matchingBible;
 };

@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { createHash } from "node:crypto";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
@@ -36,7 +37,7 @@ export const handler = async (
 
   const item = DeviceTokenEntitySchema.parse(itemData);
 
-  console.log("[register-device-token] Token registered:", {
+  logger.info("[register-device-token] Token registered:", {
     platform: body.platform,
   });
 
@@ -47,7 +48,7 @@ export const handler = async (
     }),
   );
 
-  console.log("[register-device-token] Token stored successfully");
+  logger.info("[register-device-token] Token stored successfully");
 
   return {
     statusCode: 200,

@@ -6,6 +6,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
 import { buildGetReactionsResponse } from "./buildResponse";
 import { parseGetReactionsRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles GET /notes/users/{uuid}/{ref}/reactions
@@ -40,7 +41,7 @@ export const getReactionsHandler = async (
       requestingUserId,
     );
   } catch (error) {
-    console.error("[getReactions] Error:", error);
+    logger.error("[getReactions] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

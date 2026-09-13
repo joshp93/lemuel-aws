@@ -7,6 +7,7 @@ import {
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
 import { parseDeleteReactionRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles DELETE /notes/users/{uuid}/{ref}/reactions
@@ -104,7 +105,7 @@ export const deleteReactionHandler = async (
 
     return { statusCode: 200, body: JSON.stringify({}) };
   } catch (error) {
-    console.error("[deleteReaction] Error:", error);
+    logger.error("[deleteReaction] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

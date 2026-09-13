@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { deleteDeviceToken } from "../shared/deviceTokens";
 import { sendFcmMessage } from "../shared/fcm";
 import type { FcmReplyPayload } from "./types";
@@ -16,7 +17,7 @@ const classifyResponse = async (
       return "stale";
     }
     if (body.includes("INVALID_ARGUMENT")) {
-      console.error("[push-account-notifications] FCM INVALID_ARGUMENT", {
+      logger.error("[push-account-notifications] FCM INVALID_ARGUMENT", {
         token: token.slice(0, 8),
         status: response.status,
         body,
@@ -44,15 +45,15 @@ export const sendToDevice = async (
       projectId,
       accessToken,
     );
-    console.log("[push-account-notifications] FCM response classified", {
+    logger.info("[push-account-notifications] FCM response classified", {
       status: response.status,
     });
     const status = await classifyResponse(response, token);
     if (status === "stale") {
-      console.log("[push-account-notifications] Deleting stale token");
+      logger.info("[push-account-notifications] Deleting stale token");
       await deleteDeviceToken(tableName, token);
     }
   } catch (error) {
-    console.error("[push-account-notifications] FCM send failed", { error });
+    logger.error("[push-account-notifications] FCM send failed", { error });
   }
 };

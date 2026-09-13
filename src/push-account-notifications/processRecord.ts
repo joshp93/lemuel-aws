@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { queryDeviceTokensByUser } from "../shared/deviceTokens";
 import {
   type FcmCredentials,
@@ -32,7 +33,7 @@ export const processRecord = async (
   const { sk, noteAuthorUuid, replyAuthorUuid, ref, date, content } = record;
 
   if (isSelfReply(replyAuthorUuid, noteAuthorUuid)) {
-    console.log(
+    logger.info(
       "[push-account-notifications] Self-reply detected, deleting notification record",
     );
     return { action: "delete", sk };
@@ -45,7 +46,7 @@ export const processRecord = async (
   );
 
   if (!enabled) {
-    console.log(
+    logger.info(
       "[push-account-notifications] Reply notifications disabled for note author, deleting record",
     );
     return { action: "delete", sk };
@@ -60,13 +61,13 @@ export const processRecord = async (
   const tokens = await queryDeviceTokensByUser(ctx.tableName, noteAuthorUuid);
 
   if (tokens.length === 0) {
-    console.log(
+    logger.info(
       "[push-account-notifications] No device tokens for note author, deleting record",
     );
     return { action: "delete", sk };
   }
 
-  console.log(
+  logger.info(
     "[push-account-notifications] Sending to",
     tokens.length,
     "devices",
@@ -76,7 +77,7 @@ export const processRecord = async (
   const accessToken = await getAccessToken(credentials);
 
   if (!accessToken) {
-    console.error(
+    logger.error(
       "[push-account-notifications] Failed to obtain FCM access token",
     );
     return { action: "retry", sk };
@@ -101,7 +102,7 @@ export const processRecord = async (
     );
   }
 
-  console.log(
+  logger.info(
     "[push-account-notifications] Notifications sent successfully, deleting record",
   );
   return { action: "delete", sk };

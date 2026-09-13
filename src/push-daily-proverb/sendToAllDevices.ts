@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { deleteDeviceToken } from "../shared/deviceTokens";
 import { sendFcmMessage } from "../shared/fcm";
 import { isStaleToken } from "./isStaleToken";
@@ -16,7 +17,7 @@ export const sendToAllDevices = async (
 
   for (const token of tokens) {
     try {
-      console.log("[push-daily-proverb] Sending FCM to device", {
+      logger.info("[push-daily-proverb] Sending FCM to device", {
         token: token.slice(0, 8),
       });
       const response = await sendFcmMessage(
@@ -25,19 +26,19 @@ export const sendToAllDevices = async (
         projectId,
         accessToken,
       );
-      console.log("[push-daily-proverb] FCM response for device", {
+      logger.info("[push-daily-proverb] FCM response for device", {
         token: token.slice(0, 8),
         status: response.status,
       });
       if (await isStaleToken(response, token)) {
-        console.log("[push-daily-proverb] Deleting stale token", {
+        logger.info("[push-daily-proverb] Deleting stale token", {
           token: token.slice(0, 8),
         });
         await deleteDeviceToken(tableName, token);
         cleanedCount++;
       }
     } catch (error) {
-      console.error("[push-daily-proverb] FCM send error for token", {
+      logger.error("[push-daily-proverb] FCM send error for token", {
         token: token.slice(0, 8),
         error,
       });

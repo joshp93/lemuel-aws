@@ -1,3 +1,4 @@
+import { logger } from "../../shared/logger";
 import {
   BatchWriteCommand,
   type DynamoDBDocumentClient,
@@ -29,8 +30,8 @@ export const writeBatch = async (
         [tableName]: batch,
       },
     });
-    console.debug("Batch Write Command:", JSON.stringify(command));
+    logger.debug("Batch Write Command:", JSON.stringify(command));
     const response = await client.send(command);
-    console.debug("Batch Write Response:", JSON.stringify(response));
+    logger.debug("Batch Write Response:", JSON.stringify(response));
   }
 };

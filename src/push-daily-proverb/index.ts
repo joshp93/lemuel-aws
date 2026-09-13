@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { queryAllDeviceTokens } from "../shared/deviceTokens";
 import { getAccessToken, getFcmCreds } from "../shared/fcm";
 import { parseDdbRecord } from "../shared/parseDdbRecord";
@@ -35,20 +36,20 @@ export const handler = async (event: unknown): Promise<void> => {
     }
 
     const ref = parsed.newImage.ref;
-    console.log("[push-daily-proverb] Pushing silent update for:", ref);
+    logger.info("[push-daily-proverb] Pushing silent update for:", ref);
 
     const tokens = await queryAllDeviceTokens(env.TABLE_NAME);
     if (tokens.length === 0) {
-      console.log("[push-daily-proverb] No registered devices, skipping");
+      logger.info("[push-daily-proverb] No registered devices, skipping");
       return;
     }
 
-    console.log("[push-daily-proverb] Sending to", tokens.length, "devices");
+    logger.info("[push-daily-proverb] Sending to", tokens.length, "devices");
 
     const credentials = await getFcmCreds(env.FCM_SECRET_NAME);
     const accessToken = await getAccessToken(credentials);
     if (!accessToken) {
-      console.error("[push-daily-proverb] Failed to obtain FCM access token");
+      logger.error("[push-daily-proverb] Failed to obtain FCM access token");
       return;
     }
 
@@ -61,7 +62,7 @@ export const handler = async (event: unknown): Promise<void> => {
       env.TABLE_NAME,
     );
 
-    console.log(
+    logger.info(
       "[push-daily-proverb] Silent push complete, cleaned",
       cleanedCount,
       "stale tokens",

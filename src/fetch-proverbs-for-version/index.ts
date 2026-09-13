@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { fetchSingleVersion } from "./services/fetchSingleVersion";
 import {
   type FetchProverbsForVersionEvent,
@@ -18,7 +19,7 @@ import { getSecret } from "./utils/getSecret";
 export const handler = async (
   event: FetchProverbsForVersionEvent,
 ): Promise<Output> => {
-  console.debug("Event:", JSON.stringify(event));
+  logger.debug("Event:", JSON.stringify(event));
 
   const parsed = FetchProverbsForVersionEventSchema.parse(event);
 
@@ -26,7 +27,7 @@ export const handler = async (
   const secret = await getSecret(secretName);
   const { apiKey, baseUrl } = secret;
 
-  console.log(`Using base URL: ${baseUrl}`);
+  logger.info(`Using base URL: ${baseUrl}`);
 
   const results: VersionOutput[] = [];
   for (const versionInput of parsed) {

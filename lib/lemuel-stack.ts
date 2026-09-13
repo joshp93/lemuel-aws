@@ -77,6 +77,7 @@ export class LemuelStack extends cdk.Stack {
         code: lambda.Code.fromAsset("dist/fetch-proverbs-for-version"),
         environment: {
           API_BIBLE_SECRET_NAME: props.apiBibleSecretName,
+          POWERTOOLS_LOG_LEVEL: "INFO",
         },
         timeout: cdk.Duration.minutes(1),
       },
@@ -95,6 +96,7 @@ export class LemuelStack extends cdk.Stack {
       code: lambda.Code.fromAsset("dist/choose-proverb"),
       environment: {
         TABLE_NAME: table.tableName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
       },
     });
 
@@ -105,6 +107,7 @@ export class LemuelStack extends cdk.Stack {
       code: lambda.Code.fromAsset("dist/get-proverb"),
       environment: {
         TABLE_NAME: table.tableName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
       },
     });
 
@@ -115,6 +118,7 @@ export class LemuelStack extends cdk.Stack {
       code: lambda.Code.fromAsset("dist/get-proverbs"),
       environment: {
         TABLE_NAME: table.tableName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
       },
     });
 
@@ -124,6 +128,7 @@ export class LemuelStack extends cdk.Stack {
       handler: "index.handler",
       code: lambda.Code.fromAsset("dist/check-user-exists"),
       environment: {
+        POWERTOOLS_LOG_LEVEL: "INFO",
         ...(props.userPoolId ? { USER_POOL_ID: props.userPoolId } : {}),
       },
     });
@@ -164,6 +169,7 @@ export class LemuelStack extends cdk.Stack {
         code: lambda.Code.fromAsset("dist/get-available-versions"),
         environment: {
           TABLE_NAME: table.tableName,
+          POWERTOOLS_LOG_LEVEL: "INFO",
         },
       },
     );
@@ -175,6 +181,7 @@ export class LemuelStack extends cdk.Stack {
       code: lambda.Code.fromAsset("dist/account-handler"),
       environment: {
         TABLE_NAME: table.tableName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
         ...(props.userPoolId ? { USER_POOL_ID: props.userPoolId } : {}),
       },
     });
@@ -200,6 +207,7 @@ export class LemuelStack extends cdk.Stack {
       environment: {
         TABLE_NAME: table.tableName,
         FCM_SECRET_NAME: props.fcmSecretName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
       },
     });
 
@@ -211,6 +219,7 @@ export class LemuelStack extends cdk.Stack {
       timeout: cdk.Duration.minutes(5),
       environment: {
         TABLE_NAME: table.tableName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
       },
     });
 
@@ -222,6 +231,7 @@ export class LemuelStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       environment: {
         TABLE_NAME: table.tableName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
       },
     });
 
@@ -235,6 +245,7 @@ export class LemuelStack extends cdk.Stack {
         code: lambda.Code.fromAsset("dist/register-device-token"),
         environment: {
           TABLE_NAME: table.tableName,
+          POWERTOOLS_LOG_LEVEL: "INFO",
         },
       },
     );
@@ -247,6 +258,7 @@ export class LemuelStack extends cdk.Stack {
       environment: {
         TABLE_NAME: table.tableName,
         FCM_SECRET_NAME: props.fcmSecretName,
+        POWERTOOLS_LOG_LEVEL: "INFO",
       },
       timeout: cdk.Duration.minutes(5),
     });
@@ -263,6 +275,7 @@ export class LemuelStack extends cdk.Stack {
         environment: {
           TABLE_NAME: table.tableName,
           FCM_SECRET_NAME: props.fcmSecretName,
+          POWERTOOLS_LOG_LEVEL: "INFO",
         },
       },
     );
@@ -277,6 +290,7 @@ export class LemuelStack extends cdk.Stack {
         code: lambda.Code.fromAsset("dist/server-widget-handler"),
         environment: {
           TABLE_NAME: table.tableName,
+          POWERTOOLS_LOG_LEVEL: "INFO",
         },
       },
     );

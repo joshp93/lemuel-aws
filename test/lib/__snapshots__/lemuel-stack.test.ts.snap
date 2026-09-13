@@ -68,6 +68,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -238,6 +239,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "USER_POOL_ID": {
               "Fn::ImportValue": "UserMgmt:ExportsOutputReflemueluserpool9CAE2591D8756CD7",
             },
@@ -339,6 +341,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -484,6 +487,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         "Environment": {
           "Variables": {
             "API_BIBLE_SECRET_NAME": "test-api-bible-creds",
+            "POWERTOOLS_LOG_LEVEL": "INFO",
           },
         },
         "FunctionName": "fetch-proverbs-for-version",
@@ -587,6 +591,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -727,6 +732,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -867,6 +873,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -5939,6 +5946,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -6149,6 +6157,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -6290,11 +6299,12 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "bd28ce660c5442d82fdd6e91a8c7a846dc327e23b353a16d65227410f5fc242f.zip",
+          "S3Key": "c73cfdf11ad3015d5ed7af09d2be91f094fad12f35afaf70b9fd1e3cc49410f3.zip",
         },
         "Environment": {
           "Variables": {
             "FCM_SECRET_NAME": "fcm-server-creds",
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -6582,6 +6592,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         "Environment": {
           "Variables": {
             "FCM_SECRET_NAME": "fcm-server-creds",
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -6799,6 +6810,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         "Environment": {
           "Variables": {
             "FCM_SECRET_NAME": "fcm-server-creds",
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -7013,6 +7025,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },
@@ -7123,6 +7136,7 @@ exports[`LemuelStack should match snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
+            "POWERTOOLS_LOG_LEVEL": "INFO",
             "TABLE_NAME": {
               "Ref": "proverbsstore7682A597",
             },

@@ -8,6 +8,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostUserNoteRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles POST /notes/users/{uuid}/{ref}
@@ -20,7 +21,7 @@ export const postUserNoteHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`[postUserNote] Entering handler`);
+  logger.info(`[postUserNote] Entering handler`);
 
   try {
     const uuid = event.pathParameters?.uuid ?? "";
@@ -28,7 +29,7 @@ export const postUserNoteHandler = async (
     const body = parsePostUserNoteRequest(event);
 
     const dateCreated = new Date().toISOString();
-    console.log(`[postUserNote] Creating note`, { uuid, ref, dateCreated });
+    logger.info(`[postUserNote] Creating note`, { uuid, ref, dateCreated });
 
     const entity = NoteEntitySchema.parse({
       pk: uuid,
@@ -68,13 +69,13 @@ export const postUserNoteHandler = async (
       }),
     );
 
-    console.log(`[postUserNote] Note saved successfully`, { uuid, ref });
+    logger.info(`[postUserNote] Note saved successfully`, { uuid, ref });
     return {
       statusCode: 200,
       body: JSON.stringify(entity),
     };
   } catch (error) {
-    console.error(`[postUserNote] Error:`, error);
+    logger.error(`[postUserNote] Error:`, error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

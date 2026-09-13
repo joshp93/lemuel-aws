@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getWidgetHandler } from "./getWidgetHandler";
 
@@ -12,7 +13,7 @@ import { getWidgetHandler } from "./getWidgetHandler";
 export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.debug("[server-widget-handler] Request received");
+  logger.debug("[server-widget-handler] Request received");
 
   const handler = getWidgetHandler();
 
@@ -29,7 +30,7 @@ export const handler = async (
     headers: new Headers((event.headers ?? {}) as Record<string, string>),
   });
 
-  console.debug("[server-widget-handler] Delegating to Voltra handler", {
+  logger.debug("[server-widget-handler] Delegating to Voltra handler", {
     widgetId: qs.widgetId,
     version: request.headers.get("x-bible-version"),
   });
@@ -37,7 +38,7 @@ export const handler = async (
   const response = await handler(request);
   const body = await response.text();
 
-  console.debug("[server-widget-handler] Response", {
+  logger.debug("[server-widget-handler] Response", {
     statusCode: response.status,
     bodyLength: body.length,
   });

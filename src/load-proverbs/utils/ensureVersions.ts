@@ -1,3 +1,4 @@
+import { logger } from "../../shared/logger";
 import {
   type DynamoDBDocumentClient,
   GetCommand,
@@ -36,7 +37,7 @@ export const ensureVersions = async (
     const versionEntity = VersionEntitySchema.parse({
       versions: newVersions,
     });
-    console.debug("Creating versions item", JSON.stringify(versionEntity));
+    logger.debug("Creating versions item", JSON.stringify(versionEntity));
     await client.send(
       new PutCommand({
         TableName: tableName,
@@ -53,7 +54,7 @@ export const ensureVersions = async (
         sk: "versions",
         versions: merged,
       });
-      console.debug("Updating versions item", JSON.stringify(updatedEntity));
+      logger.debug("Updating versions item", JSON.stringify(updatedEntity));
       await client.send(
         new PutCommand({
           TableName: tableName,
@@ -61,7 +62,7 @@ export const ensureVersions = async (
         }),
       );
     } else {
-      console.debug("Versions already up to date, skipping update.");
+      logger.debug("Versions already up to date, skipping update.");
     }
   }
 };

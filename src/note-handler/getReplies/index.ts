@@ -7,6 +7,7 @@ import type { ReplyEntity } from "../../models/proverbStoreSchemas";
 import { ReplyEntitySchema } from "../../models/proverbStoreSchemas";
 import type { NoteHandlerEnv } from "../schemas";
 import { parseGetRepliesRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles GET /notes/users/{uuid}/{ref}/replies
@@ -26,7 +27,7 @@ export const getRepliesHandler = async (
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
 
-    console.log("[getReplies] Querying", { notePk, noteAuthorUuid, ref, date });
+    logger.info("[getReplies] Querying", { notePk, noteAuthorUuid, ref, date });
 
     const result = await client.send(
       new QueryCommand({
@@ -55,7 +56,7 @@ export const getRepliesHandler = async (
       body: JSON.stringify({ items, lastKey }),
     };
   } catch (error) {
-    console.error("[getReplies] Error:", error);
+    logger.error("[getReplies] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

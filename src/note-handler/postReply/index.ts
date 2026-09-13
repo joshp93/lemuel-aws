@@ -9,6 +9,7 @@ import { fetchDisplayName } from "../../shared/fetchAccountDisplayName";
 import { findReplySk } from "../../shared/findReplySk";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostReplyRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 export const postReplyHandler = async (
   client: DynamoDBDocumentClient,
@@ -54,7 +55,7 @@ export const postReplyHandler = async (
       createdAt,
     });
 
-    console.log("[postReply] Writing reply", {
+    logger.info("[postReply] Writing reply", {
       pk: notePk,
       sk: entityReplySk,
       noteAuthorUuid,
@@ -108,7 +109,7 @@ export const postReplyHandler = async (
 
     return { statusCode: 200, body: JSON.stringify(entity) };
   } catch (error) {
-    console.error("[postReply] Error:", error);
+    logger.error("[postReply] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

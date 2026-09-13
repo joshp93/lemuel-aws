@@ -2,6 +2,7 @@ import { type DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import type { NoteHandlerEnv } from "../schemas";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles GET /notes/users/{uuid}/{ref}
@@ -14,14 +15,14 @@ export const getUserNoteHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`[getUserNote] Entering handler`);
+  logger.info(`[getUserNote] Entering handler`);
 
   try {
     const uuid = event.pathParameters?.uuid ?? "";
     const ref = event.pathParameters?.ref ?? "";
     const date = event.queryStringParameters?.date ?? "";
     const sk = date ? `${ref}#${date}` : ref;
-    console.log(`[getUserNote] Fetching note`, { uuid, ref, date, sk });
+    logger.info(`[getUserNote] Fetching note`, { uuid, ref, date, sk });
 
     const result = await client.send(
       new GetCommand({
@@ -31,7 +32,7 @@ export const getUserNoteHandler = async (
     );
 
     if (!result.Item) {
-      console.log(`[getUserNote] Note not found`, { uuid, ref });
+      logger.info(`[getUserNote] Note not found`, { uuid, ref });
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Note not found" }),
@@ -47,7 +48,7 @@ export const getUserNoteHandler = async (
       }),
     );
 
-    console.log(`[getUserNote] Note found`, { uuid, ref });
+    logger.info(`[getUserNote] Note found`, { uuid, ref });
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -56,7 +57,7 @@ export const getUserNoteHandler = async (
       }),
     };
   } catch (error) {
-    console.error(`[getUserNote] Error:`, error);
+    logger.error(`[getUserNote] Error:`, error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

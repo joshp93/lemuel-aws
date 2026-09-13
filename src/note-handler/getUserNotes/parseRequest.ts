@@ -1,4 +1,5 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
+import { logger } from "../../shared/logger";
 
 /**
  * Extracts and validates path parameters and pagination query parameters
@@ -15,7 +16,7 @@ export const parseGetUserNotesRequest = (
   exclusiveStartKey?: Record<string, unknown>;
   scanForward: boolean;
 } => {
-  console.log(`[getUserNotes] Parsing request`, {
+  logger.info(`[getUserNotes] Parsing request`, {
     pathParams: event.pathParameters,
     queryParams: event.queryStringParameters,
   });

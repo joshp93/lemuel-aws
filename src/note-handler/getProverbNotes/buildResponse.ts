@@ -6,6 +6,7 @@ import type { APIGatewayProxyResult } from "aws-lambda";
 import type { NoteEntity } from "../../models/proverbStoreSchemas";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import { collectDisplayNames } from "../../shared/displayNames";
+import { logger } from "../../shared/logger";
 
 /**
  * Filters a list of note entities to exclude private notes that don't belong
@@ -59,7 +60,7 @@ export const buildGetProverbNotesResponse = async (
     );
   }
 
-  console.log(
+  logger.info(
     `[getProverbNotes] Building response with ${enriched.length} items`,
     { hasMore: !!lastKey, userId: userId ?? "anonymous" },
   );

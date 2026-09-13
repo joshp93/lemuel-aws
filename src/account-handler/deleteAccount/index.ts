@@ -12,6 +12,7 @@ import {
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { queryDeviceTokensByUser } from "../../shared/deviceTokens";
 import type { AccountHandlerEnv } from "../models";
+import { logger } from "../../shared/logger";
 
 const cognitoClient = new CognitoIdentityProviderClient({});
 
@@ -319,7 +320,7 @@ export const deleteAccountHandler = async (
       body: JSON.stringify({ success: true }),
     };
   } catch (error) {
-    console.error("[deleteAccount] Error:", error);
+    logger.error("[deleteAccount] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

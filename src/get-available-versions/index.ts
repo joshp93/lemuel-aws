@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
@@ -24,7 +25,7 @@ export const handler = async (
     entity.versions.sort((a, b) => a.localeCompare(b)),
   );
 
-  console.debug("Available versions:", response);
+  logger.debug("Available versions:", response);
   return {
     statusCode: 200,
     body: response,

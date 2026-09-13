@@ -1,3 +1,4 @@
+import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DeleteCommand,
@@ -21,7 +22,7 @@ type Migration = z.infer<typeof MigrationSchema>;
 export const handler = async (
   event: unknown,
 ): Promise<{ migrated: number }> => {
-  console.debug("Event:", JSON.stringify(event));
+  logger.debug("Event:", JSON.stringify(event));
   const parsed = MigrateUserUuidsEventSchema.parse(event);
   const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
   const tableName = process.env.TABLE_NAME!;
@@ -31,7 +32,7 @@ export const handler = async (
     total += await migrateUser(client, tableName, m);
   }
 
-  console.info(
+  logger.info(
     `Migration complete: ${total} items updated across ${parsed.migrations.length} users`,
   );
   return { migrated: total };

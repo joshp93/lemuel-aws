@@ -13,6 +13,7 @@ import { postReplyHandler } from "./postReply/index";
 import { postUserNoteHandler } from "./postUserNote/index";
 import { putReactionHandler } from "./putReaction/index";
 import { NoteHandlerEnvSchema } from "./schemas";
+import { logger } from "../shared/logger";
 
 /**
  * Routes incoming API Gateway requests to the appropriate note handler
@@ -34,7 +35,7 @@ import { NoteHandlerEnvSchema } from "./schemas";
 export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(
+  logger.info(
     `[note-handler] Routing request: ${event.httpMethod} ${event.resource}`,
     {
       pathParams: event.pathParameters,
@@ -71,14 +72,14 @@ export const handler = async (
       case "DELETE /notes/users/{uuid}/{ref}/replies":
         return deleteReplyHandler(client, env, event);
       default:
-        console.warn(`[note-handler] Unsupported route: ${route}`);
+        logger.warn(`[note-handler] Unsupported route: ${route}`);
         return {
           statusCode: 405,
           body: JSON.stringify({ error: "Method not allowed" }),
         };
     }
   } catch (error) {
-    console.error(`[note-handler] Unhandled error:`, error);
+    logger.error(`[note-handler] Unhandled error:`, error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

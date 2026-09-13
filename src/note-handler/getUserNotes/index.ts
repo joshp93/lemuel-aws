@@ -6,6 +6,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
 import { buildGetUserNotesResponse } from "./buildResponse";
 import { parseGetUserNotesRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles GET /notes/users/{uuid}
@@ -19,11 +20,11 @@ export const getUserNotesHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`[getUserNotes] Entering handler`);
+  logger.info(`[getUserNotes] Entering handler`);
 
   try {
     const params = parseGetUserNotesRequest(event);
-    console.log(`[getUserNotes] Parsed request`, {
+    logger.info(`[getUserNotes] Parsed request`, {
       uuid: params.uuid,
       limit: params.limit,
       hasLastKey: !!params.exclusiveStartKey,
@@ -43,12 +44,12 @@ export const getUserNotesHandler = async (
       }),
     );
 
-    console.log(
+    logger.info(
       `[getUserNotes] Query returned ${result.Items?.length ?? 0} items`,
     );
     return buildGetUserNotesResponse(client, env.TABLE_NAME, result);
   } catch (error) {
-    console.error(`[getUserNotes] Error:`, error);
+    logger.error(`[getUserNotes] Error:`, error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

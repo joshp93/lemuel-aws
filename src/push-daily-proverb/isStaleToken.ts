@@ -1,3 +1,5 @@
+import { logger } from "../shared/logger";
+
 /** Checks an FCM v1 HTTP API response and returns true when the token is
  *  stale — UNREGISTERED means the token is no longer valid and should be
  *  removed. INVALID_ARGUMENT responses are logged in full for review but do
@@ -12,7 +14,7 @@ export const isStaleToken = async (
       return true;
     }
     if (body.includes("INVALID_ARGUMENT")) {
-      console.error("[push-daily-proverb] FCM INVALID_ARGUMENT", {
+      logger.error("[push-daily-proverb] FCM INVALID_ARGUMENT", {
         token: token?.slice(0, 8),
         status: response.status,
         body,

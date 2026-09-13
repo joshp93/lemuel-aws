@@ -1,3 +1,4 @@
+import { logger } from "./logger";
 import {
   GetSecretValueCommand,
   SecretsManagerClient,
@@ -60,7 +61,7 @@ export const sendFcmMessage = async (
   accessToken: string,
 ): Promise<Response> => {
   const url = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
-  console.log("[FCM] Sending request", {
+  logger.info("[FCM] Sending request", {
     token: token.slice(0, 8),
     status: "pending",
   });
@@ -78,7 +79,7 @@ export const sendFcmMessage = async (
     }),
     signal: AbortSignal.timeout(5000),
   });
-  console.log("[FCM] Response received", {
+  logger.info("[FCM] Response received", {
     token: token.slice(0, 8),
     status: response.status,
     statusText: response.statusText,

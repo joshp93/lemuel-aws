@@ -4,6 +4,7 @@ import { linkDeviceToken } from "../../shared/deviceTokens";
 import { parseBody } from "../../shared/parseBody";
 import type { AccountHandlerEnv } from "../models";
 import type { DeviceToken } from "./models/types";
+import { logger } from "../../shared/logger";
 
 export const linkDeviceTokenHandler = async (
   client: DynamoDBDocumentClient,
@@ -22,7 +23,7 @@ export const linkDeviceTokenHandler = async (
       body: JSON.stringify({ success: true }),
     };
   } catch (error) {
-    console.error("[linkDeviceToken] Error:", error);
+    logger.error("[linkDeviceToken] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

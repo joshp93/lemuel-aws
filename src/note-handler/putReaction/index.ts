@@ -8,6 +8,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ReactionEntitySchema } from "../../models/proverbStoreSchemas";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePutReactionRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles PUT /notes/users/{uuid}/{ref}/reactions
@@ -129,7 +130,7 @@ export const putReactionHandler = async (
 
     return { statusCode: 200, body: JSON.stringify({}) };
   } catch (error) {
-    console.error("[putReaction] Error:", error);
+    logger.error("[putReaction] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

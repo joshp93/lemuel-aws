@@ -1,3 +1,4 @@
+import { logger } from "../../shared/logger";
 import type { ChaptersResponse } from "../models/apiBible";
 import { fetchWithRetry } from "./retry";
 
@@ -47,6 +48,6 @@ export const fetchChapter = async (
   }
 
   const data = (await response.json()) as ChaptersResponse;
-  console.log(`Fetched chapter ${chapter}: ${data.data.verseCount} verses`);
+  logger.info(`Fetched chapter ${chapter}: ${data.data.verseCount} verses`);
   return data;
 };

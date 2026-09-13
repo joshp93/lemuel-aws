@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles DELETE /notes/users/{uuid}/{ref}
@@ -19,14 +20,14 @@ export const deleteUserNoteHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`[deleteUserNote] Entering handler`);
+  logger.info(`[deleteUserNote] Entering handler`);
 
   try {
     const uuid = event.pathParameters?.uuid ?? "";
     const ref = event.pathParameters?.ref ?? "";
     const date = event.queryStringParameters?.date ?? "";
     const sk = `${ref}#${date}`;
-    console.log(`[deleteUserNote] Deleting note`, { uuid, ref, date, sk });
+    logger.info(`[deleteUserNote] Deleting note`, { uuid, ref, date, sk });
 
     await client.send(
       new DeleteCommand({
@@ -35,7 +36,7 @@ export const deleteUserNoteHandler = async (
       }),
     );
 
-    console.log(`[deleteUserNote] Note deleted, re-counting`, { uuid });
+    logger.info(`[deleteUserNote] Note deleted, re-counting`, { uuid });
 
     const queryResult = await client.send(
       new QueryCommand({
@@ -57,13 +58,13 @@ export const deleteUserNoteHandler = async (
       }),
     );
 
-    console.log(`[deleteUserNote] Note deleted successfully`, { uuid, ref });
+    logger.info(`[deleteUserNote] Note deleted successfully`, { uuid, ref });
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true }),
     };
   } catch (error) {
-    console.error(`[deleteUserNote] Error:`, error);
+    logger.error(`[deleteUserNote] Error:`, error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

@@ -6,6 +6,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
 import { buildGetProverbNotesResponse } from "./buildResponse";
 import { parseGetProverbNotesRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles GET /notes/proverbs/{ref}
@@ -19,11 +20,11 @@ export const getProverbNotesHandler = async (
   env: NoteHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`[getProverbNotes] Entering handler`);
+  logger.info(`[getProverbNotes] Entering handler`);
 
   try {
     const params = parseGetProverbNotesRequest(event);
-    console.log(`[getProverbNotes] Parsed request`, {
+    logger.info(`[getProverbNotes] Parsed request`, {
       ref: params.ref,
       limit: params.limit,
       hasLastKey: !!params.exclusiveStartKey,
@@ -43,7 +44,7 @@ export const getProverbNotesHandler = async (
       }),
     );
 
-    console.log(
+    logger.info(
       `[getProverbNotes] Query returned ${result.Items?.length ?? 0} items`,
     );
     return buildGetProverbNotesResponse(
@@ -53,7 +54,7 @@ export const getProverbNotesHandler = async (
       params.userId,
     );
   } catch (error) {
-    console.error(`[getProverbNotes] Error:`, error);
+    logger.error(`[getProverbNotes] Error:`, error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),

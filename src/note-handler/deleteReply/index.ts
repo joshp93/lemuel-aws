@@ -7,6 +7,7 @@ import {
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { NoteHandlerEnv } from "../schemas";
 import { parseDeleteReplyRequest } from "./parseRequest";
+import { logger } from "../../shared/logger";
 
 /**
  * Handles DELETE /notes/users/{uuid}/{ref}/replies/{replySk}
@@ -33,15 +34,12 @@ export const deleteReplyHandler = async (
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
 
-    console.log("[deleteReply] Looking up reply", {
+    logger.info("[deleteReply] Looking up reply", {
       notePk,
       replySk,
       noteAuthorUuid,
       ref,
       date,
-      rawPathParams: event.pathParameters,
-      rawQueryParams: event.queryStringParameters,
-      rawResource: event.resource,
     });
 
     const existingReply = await client.send(
@@ -52,7 +50,7 @@ export const deleteReplyHandler = async (
     );
 
     if (!existingReply.Item) {
-      console.warn("[deleteReply] Reply not found at key", {
+      logger.warn("[deleteReply] Reply not found at key", {
         pk: notePk,
         sk: replySk,
       });
@@ -94,7 +92,7 @@ export const deleteReplyHandler = async (
 
     return { statusCode: 200, body: JSON.stringify({}) };
   } catch (error) {
-    console.error("[deleteReply] Error:", error);
+    logger.error("[deleteReply] Error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),
