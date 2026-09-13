@@ -6,15 +6,6 @@ jest.mock("@aws-sdk/client-secrets-manager", () => ({
   GetSecretValueCommand: jest.fn(),
 }));
 
-jest.mock("../../../src/shared/logger", () => ({
-  logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  },
-}));
-
 global.fetch = jest.fn();
 const fetchMock = global.fetch as jest.MockedFunction<typeof fetch>;
 
