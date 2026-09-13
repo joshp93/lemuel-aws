@@ -1141,7 +1141,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       },
       "Type": "AWS::ApiGateway::Model",
     },
-    "lemuelapiDeployment2137DA7A192ea165509f5bd2cb9e9436baf1d1a2": {
+    "lemuelapiDeployment2137DA7Af738df697737148bbe51ee6c44cb2ce6": {
       "DependsOn": [
         "lemuelapiBodyValidator6CBA4433",
         "lemuelapiCreateAccountModel5688414D",
@@ -1244,7 +1244,7 @@ exports[`LemuelStack should match snapshot 1`] = `
       ],
       "Properties": {
         "DeploymentId": {
-          "Ref": "lemuelapiDeployment2137DA7A192ea165509f5bd2cb9e9436baf1d1a2",
+          "Ref": "lemuelapiDeployment2137DA7Af738df697737148bbe51ee6c44cb2ce6",
         },
         "MethodSettings": [
           {
@@ -1467,6 +1467,9 @@ exports[`LemuelStack should match snapshot 1`] = `
             },
             "date": {
               "type": "string",
+            },
+            "isUpdate": {
+              "type": "boolean",
             },
           },
           "required": [
@@ -6287,7 +6290,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "13d0e74bfca6c21730a254b577cfd83922fbc8cf7871932d3a246af270ea67c8.zip",
+          "S3Key": "bd28ce660c5442d82fdd6e91a8c7a846dc327e23b353a16d65227410f5fc242f.zip",
         },
         "Environment": {
           "Variables": {
@@ -6574,7 +6577,7 @@ exports[`LemuelStack should match snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "b2407077a36feb70c66c4466b13fe31719fdb6c1fcf488043b488976bf95ab5b.zip",
+          "S3Key": "dc4e402f6bfd440bb46ff5f4e8710bede03bb8a901c096bd348485f5cec35429.zip",
         },
         "Environment": {
           "Variables": {

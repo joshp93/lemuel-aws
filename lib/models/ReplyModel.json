@@ -4,7 +4,8 @@
   "type": "object",
   "properties": {
     "content": { "type": "string" },
-    "date": { "type": "string" }
+    "date": { "type": "string" },
+    "isUpdate": { "type": "boolean" }
   },
   "required": ["content", "date"]
 }

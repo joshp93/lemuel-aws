@@ -3,6 +3,7 @@ import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
+  QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent } from "aws-lambda";
@@ -26,16 +27,18 @@ describe("postReplyHandler", () => {
     jest.useRealTimers();
   });
 
-  const makeEvent = (): APIGatewayProxyEvent =>
+  const makeEvent = (body?: Record<string, unknown>): APIGatewayProxyEvent =>
     ({
       pathParameters: {
         uuid: "author-id",
         ref: "Proverbs3:5",
       },
-      body: JSON.stringify({
-        content: "Great reflection!",
-        date: "2024-01-01",
-      }),
+      body: JSON.stringify(
+        body ?? {
+          content: "Great reflection!",
+          date: "2024-01-01",
+        },
+      ),
       requestContext: {
         authorizer: {
           claims: { sub: "user-1" },
@@ -67,6 +70,42 @@ describe("postReplyHandler", () => {
     expect(updateCalls[0].args[0].input.UpdateExpression).toBe(
       "ADD replyCount :incr",
     );
+  });
+
+  it("skips notification, tracker, and replyCount when isUpdate is true and overwrites the existing reply", async () => {
+    ddbMock.on(GetCommand).resolves({
+      Item: { pk: "user-1", sk: "account", displayName: "Alice" },
+    });
+    ddbMock.on(QueryCommand).resolves({
+      Items: [
+        {
+          pk: "user-1",
+          sk: "reply-tracker#author-id#Proverbs3:5#2024-01-01#reply#original-ts",
+        },
+      ],
+    });
+
+    const result = await postReplyHandler(
+      createDocClient(),
+      env,
+      makeEvent({
+        content: "Updated content",
+        date: "2024-01-01",
+        isUpdate: true,
+      }),
+    );
+
+    expect(result.statusCode).toBe(200);
+    const body = JSON.parse(result.body);
+    expect(body.sk).toBe("reply#original-ts");
+    expect(body.content).toBe("Updated content");
+
+    const putCalls = ddbMock.commandCalls(PutCommand);
+    expect(putCalls).toHaveLength(1);
+    expect(putCalls[0].args[0].input.Item?.sk).toBe("reply#original-ts");
+
+    const updateCalls = ddbMock.commandCalls(UpdateCommand);
+    expect(updateCalls).toHaveLength(0);
   });
 
   it("returns 401 when userId is missing", async () => {

@@ -19,6 +19,7 @@ export const parsePostReplyRequest = (
   userId: string;
   date: string;
   content: string;
+  isUpdate: boolean;
 } => {
   const noteAuthorUuid = event.pathParameters?.uuid ?? "";
   const ref = event.pathParameters?.ref ?? "";
@@ -33,5 +34,6 @@ export const parsePostReplyRequest = (
     userId,
     date: body.date,
     content: body.content,
+    isUpdate: body.isUpdate ?? false,
   };
 };
