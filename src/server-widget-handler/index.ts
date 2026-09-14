@@ -1,5 +1,5 @@
-import { logger } from "../shared/logger";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { logger } from "../shared/logger";
 import { getWidgetHandler } from "./getWidgetHandler";
 
 /**

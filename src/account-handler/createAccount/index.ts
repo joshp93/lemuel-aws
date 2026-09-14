@@ -4,11 +4,11 @@ import {
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { logger } from "../../shared/logger";
 import { parseBody } from "../../shared/parseBody";
 import type { AccountHandlerEnv, CreateAccountResponse } from "../models";
 import { buildAccountRecord } from "./buildAccountRecord";
 import type { CreateAccount } from "./models/types";
-import { logger } from "../../shared/logger";
 
 export const createAccountHandler = async (
   client: DynamoDBDocumentClient,

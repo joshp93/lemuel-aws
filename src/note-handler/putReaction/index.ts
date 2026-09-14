@@ -6,9 +6,9 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ReactionEntitySchema } from "../../models/proverbStoreSchemas";
+import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePutReactionRequest } from "./parseRequest";
-import { logger } from "../../shared/logger";
 
 /**
  * Handles PUT /notes/users/{uuid}/{ref}/reactions

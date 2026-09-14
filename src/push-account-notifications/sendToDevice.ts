@@ -1,6 +1,6 @@
-import { logger } from "../shared/logger";
 import { deleteDeviceToken } from "../shared/deviceTokens";
 import { sendFcmMessage } from "../shared/fcm";
+import { logger } from "../shared/logger";
 import type { FcmReplyPayload } from "./types";
 
 /** Checks an FCM v1 HTTP API response and returns "stale" when the token is

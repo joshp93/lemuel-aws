@@ -5,8 +5,8 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import type { NoteHandlerEnv } from "../schemas";
 import { logger } from "../../shared/logger";
+import type { NoteHandlerEnv } from "../schemas";
 
 /**
  * Handles DELETE /notes/users/{uuid}/{ref}

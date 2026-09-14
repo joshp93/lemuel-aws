@@ -1,10 +1,10 @@
-import { logger } from "../../shared/logger";
 import {
   type DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { RefsEntity } from "../../models/proverbStoreSchemas";
+import { logger } from "../../shared/logger";
 
 /**
  * Ensures the refs metadata item exists in DynamoDB.

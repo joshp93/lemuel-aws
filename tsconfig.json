@@ -23,7 +23,8 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "types": ["node", "jest"],
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "."
   },
   "exclude": ["node_modules", "dist", "cdk.out", "scripts"]
 }

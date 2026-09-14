@@ -1,6 +1,6 @@
-import { logger } from "../shared/logger";
 import { queryAllDeviceTokens } from "../shared/deviceTokens";
 import { getAccessToken, getFcmCreds } from "../shared/fcm";
+import { logger } from "../shared/logger";
 import { parseDdbRecord } from "../shared/parseDdbRecord";
 import { buildSilentPushMessage } from "./buildSilentPushMessage";
 import { EnvSchema } from "./schemas";
@@ -44,7 +44,9 @@ export const handler = async (event: unknown): Promise<void> => {
       return;
     }
 
-    logger.info("[push-daily-proverb] Sending to", tokens.length, "devices");
+    logger.info("[push-daily-proverb] Sending to devices", {
+      count: tokens.length,
+    });
 
     const credentials = await getFcmCreds(env.FCM_SECRET_NAME);
     const accessToken = await getAccessToken(credentials);
@@ -63,9 +65,8 @@ export const handler = async (event: unknown): Promise<void> => {
     );
 
     logger.info(
-      "[push-daily-proverb] Silent push complete, cleaned",
-      cleanedCount,
-      "stale tokens",
+      "[push-daily-proverb] Silent push complete, cleaned stale tokens",
+      { count: cleanedCount },
     );
   }
 };

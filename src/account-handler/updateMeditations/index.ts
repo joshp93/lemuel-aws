@@ -6,8 +6,8 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { MeditationEntitySchema } from "../../models/proverbStoreSchemas";
-import type { AccountHandlerEnv, UpdateMeditationsResponse } from "../models";
 import { logger } from "../../shared/logger";
+import type { AccountHandlerEnv, UpdateMeditationsResponse } from "../models";
 
 export const updateMeditationsHandler = async (
   client: DynamoDBDocumentClient,

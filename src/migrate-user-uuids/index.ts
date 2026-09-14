@@ -1,4 +1,3 @@
-import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DeleteCommand,
@@ -7,6 +6,7 @@ import {
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
+import { logger } from "../shared/logger";
 
 const MigrationSchema = z.object({
   oldUuid: z.string().min(1),

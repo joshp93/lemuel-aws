@@ -1,4 +1,3 @@
-import { logger } from "../shared/logger";
 import {
   AdminGetUserCommand,
   CognitoIdentityProviderClient,
@@ -6,6 +5,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
+import { logger } from "../shared/logger";
 
 const envSchema = z.object({
   USER_POOL_ID: z.string().min(1, "USER_POOL_ID is required"),

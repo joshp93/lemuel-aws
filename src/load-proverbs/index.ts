@@ -1,7 +1,7 @@
-import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { VersionCitationSchema } from "../models/proverbStoreSchemas";
+import { logger } from "../shared/logger";
 import {
   type LoadProverbsEvent,
   LoadProverbsEventSchema,

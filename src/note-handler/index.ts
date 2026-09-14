@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { logger } from "../shared/logger";
 import { deleteReactionHandler } from "./deleteReaction/index";
 import { deleteReplyHandler } from "./deleteReply/index";
 import { deleteUserNoteHandler } from "./deleteUserNote/index";
@@ -13,7 +14,6 @@ import { postReplyHandler } from "./postReply/index";
 import { postUserNoteHandler } from "./postUserNote/index";
 import { putReactionHandler } from "./putReaction/index";
 import { NoteHandlerEnvSchema } from "./schemas";
-import { logger } from "../shared/logger";
 
 /**
  * Routes incoming API Gateway requests to the appropriate note handler

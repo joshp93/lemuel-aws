@@ -11,8 +11,8 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { queryDeviceTokensByUser } from "../../shared/deviceTokens";
-import type { AccountHandlerEnv } from "../models";
 import { logger } from "../../shared/logger";
+import type { AccountHandlerEnv } from "../models";
 
 const cognitoClient = new CognitoIdentityProviderClient({});
 

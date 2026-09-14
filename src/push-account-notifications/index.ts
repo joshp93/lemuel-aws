@@ -1,6 +1,6 @@
-import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { logger } from "../shared/logger";
 import { parseDdbRecord } from "../shared/parseDdbRecord";
 import { processRecord } from "./processRecord";
 import { EnvSchema } from "./schemas";

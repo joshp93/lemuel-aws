@@ -35,6 +35,9 @@ export const renderProverbWidget = async (
       <VoltraAndroid.Column
         verticalAlignment="center-vertically"
         horizontalAlignment="start"
+        style={{
+          gap: 12,
+        }}
       >
         <VoltraAndroid.Text
           style={{
@@ -49,7 +52,6 @@ export const renderProverbWidget = async (
           style={{
             fontSize: 18,
             color: "#1a1a1a",
-            marginTop: 12,
           }}
         >
           {proverb.proverb}
@@ -59,7 +61,6 @@ export const renderProverbWidget = async (
             style={{
               fontSize: 10,
               color: "#666666",
-              marginTop: 15,
               textAlign: "left",
             }}
           >

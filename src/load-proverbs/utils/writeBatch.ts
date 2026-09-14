@@ -1,8 +1,8 @@
-import { logger } from "../../shared/logger";
 import {
   BatchWriteCommand,
   type DynamoDBDocumentClient,
 } from "@aws-sdk/lib-dynamodb";
+import { logger } from "../../shared/logger";
 import type { ProverbItem } from "../transforms/buildProverbItem";
 
 /**

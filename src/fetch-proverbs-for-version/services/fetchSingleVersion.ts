@@ -47,7 +47,7 @@ export const fetchSingleVersion = async (
     const chapterProverbs = buildProverbsFromChapter(content, chapter);
     proverbs.push(...chapterProverbs);
 
-logger.debug(
+    logger.debug(
       `Chapter ${chapter} complete - collected ${chapterProverbs.length} proverbs`,
     );
 

@@ -1,4 +1,3 @@
-import { logger } from "../shared/logger";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
@@ -7,6 +6,7 @@ import {
   ProverbEntitySchema,
   VersionCitationSchema,
 } from "../models/proverbStoreSchemas";
+import { logger } from "../shared/logger";
 
 export const handler = async (
   event: APIGatewayProxyEvent,

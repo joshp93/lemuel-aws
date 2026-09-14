@@ -1,4 +1,3 @@
-import { logger } from "../shared/logger";
 import { queryDeviceTokensByUser } from "../shared/deviceTokens";
 import {
   type FcmCredentials,
@@ -8,6 +7,7 @@ import {
 import { fetchDisplayName } from "../shared/fetchAccountDisplayName";
 import { fetchReplyNotificationsEnabled } from "../shared/fetchReplyNotificationsEnabled";
 import { isSelfReply } from "../shared/isSelfReply";
+import { logger } from "../shared/logger";
 import { truncateReply } from "../shared/truncateReply";
 import { buildMessage } from "./buildMessage";
 import { sendToDevice } from "./sendToDevice";
@@ -67,11 +67,9 @@ export const processRecord = async (
     return { action: "delete", sk };
   }
 
-  logger.info(
-    "[push-account-notifications] Sending to",
-    tokens.length,
-    "devices",
-  );
+  logger.info("[push-account-notifications] Sending to devices", {
+    count: tokens.length,
+  });
 
   const credentials: FcmCredentials = await getFcmCreds(ctx.fcmSecretName);
   const accessToken = await getAccessToken(credentials);

@@ -1,10 +1,10 @@
 import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { linkDeviceToken } from "../../shared/deviceTokens";
+import { logger } from "../../shared/logger";
 import { parseBody } from "../../shared/parseBody";
 import type { AccountHandlerEnv } from "../models";
 import type { DeviceToken } from "./models/types";
-import { logger } from "../../shared/logger";
 
 export const linkDeviceTokenHandler = async (
   client: DynamoDBDocumentClient,

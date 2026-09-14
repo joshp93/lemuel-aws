@@ -1,8 +1,8 @@
 import { type DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { AccountEntitySchema } from "../../models/proverbStoreSchemas";
-import type { AccountHandlerEnv } from "../models";
 import { logger } from "../../shared/logger";
+import type { AccountHandlerEnv } from "../models";
 
 export const getAccountDetailsHandler = async (
   client: DynamoDBDocumentClient,
@@ -22,7 +22,7 @@ export const getAccountDetailsHandler = async (
       }),
     );
 
-if (!result.Item) {
+    if (!result.Item) {
       logger.info("[getAccountDetails] No account found for uuid:", uuid);
       return {
         statusCode: 404,

@@ -7,9 +7,9 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ReplyEntitySchema } from "../../models/proverbStoreSchemas";
 import { fetchDisplayName } from "../../shared/fetchAccountDisplayName";
 import { findReplySk } from "../../shared/findReplySk";
+import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostReplyRequest } from "./parseRequest";
-import { logger } from "../../shared/logger";
 
 export const postReplyHandler = async (
   client: DynamoDBDocumentClient,

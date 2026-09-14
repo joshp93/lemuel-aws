@@ -1,9 +1,9 @@
-import { logger } from "../shared/logger";
 import { createHash } from "node:crypto";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { DeviceTokenEntitySchema } from "../models/proverbStoreSchemas";
+import { logger } from "../shared/logger";
 import { parseBody } from "../shared/parseBody";
 import type { RegisterDeviceToken } from "./models/types";
 import { EnvSchema } from "./schemas";

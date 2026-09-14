@@ -3,10 +3,10 @@ import {
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { buildGetProverbNotesResponse } from "./buildResponse";
 import { parseGetProverbNotesRequest } from "./parseRequest";
-import { logger } from "../../shared/logger";
 
 /**
  * Handles GET /notes/proverbs/{ref}

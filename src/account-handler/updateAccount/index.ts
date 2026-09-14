@@ -3,9 +3,9 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { logger } from "../../shared/logger";
 import type { AccountHandlerEnv } from "../models";
 import type { UpdateAccount } from "./models/types";
-import { logger } from "../../shared/logger";
 
 export const updateAccountHandler = async (
   client: DynamoDBDocumentClient,

@@ -1,6 +1,6 @@
-import { logger } from "../shared/logger";
 import { deleteDeviceToken } from "../shared/deviceTokens";
 import { sendFcmMessage } from "../shared/fcm";
+import { logger } from "../shared/logger";
 import { isStaleToken } from "./isStaleToken";
 
 /** Sends the silent push message to every registered device. Stale or

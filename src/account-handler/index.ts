@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { logger } from "../shared/logger";
 import { createAccountHandler } from "./createAccount/index";
 import { deleteAccountHandler } from "./deleteAccount/index";
 import { getAccountDetailsHandler } from "./getAccountDetails/index";
@@ -8,7 +9,6 @@ import { linkDeviceTokenHandler } from "./linkDeviceToken/index";
 import { AccountHandlerEnvSchema } from "./models";
 import { updateAccountHandler } from "./updateAccount/index";
 import { updateMeditationsHandler } from "./updateMeditations/index";
-import { logger } from "../shared/logger";
 
 export const handler = async (
   event: APIGatewayProxyEvent,

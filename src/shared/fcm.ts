@@ -1,10 +1,10 @@
-import { logger } from "./logger";
 import {
   GetSecretValueCommand,
   SecretsManagerClient,
 } from "@aws-sdk/client-secrets-manager";
 import { JWT } from "google-auth-library";
 import { z } from "zod";
+import { logger } from "./logger";
 
 /** Schema for the FCM service account JSON stored in Secrets Manager. */
 export const FirebasePrivateKeySchema = z.object({

@@ -1,10 +1,10 @@
-import { logger } from "../../shared/logger";
 import {
   type DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { VersionEntitySchema } from "../../models/proverbStoreSchemas";
+import { logger } from "../../shared/logger";
 
 /**
  * Ensures the versions metadata item exists and is up to date.

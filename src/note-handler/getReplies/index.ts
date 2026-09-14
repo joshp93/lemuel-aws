@@ -5,9 +5,9 @@ import {
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { ReplyEntity } from "../../models/proverbStoreSchemas";
 import { ReplyEntitySchema } from "../../models/proverbStoreSchemas";
+import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parseGetRepliesRequest } from "./parseRequest";
-import { logger } from "../../shared/logger";
 
 /**
  * Handles GET /notes/users/{uuid}/{ref}/replies
@@ -27,7 +27,12 @@ export const getRepliesHandler = async (
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
 
-    logger.debug("[getReplies] Querying", { notePk, noteAuthorUuid, ref, date });
+    logger.debug("[getReplies] Querying", {
+      notePk,
+      noteAuthorUuid,
+      ref,
+      date,
+    });
 
     const result = await client.send(
       new QueryCommand({

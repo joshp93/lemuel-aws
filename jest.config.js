@@ -6,8 +6,4 @@ module.exports = {
     "^.+\\.tsx?$": "ts-jest",
   },
   setupFiles: ["<rootDir>/test/setup.ts"],
-  moduleNameMapper: {
-    "^@aws-lambda-powertools/logger$":
-      "<rootDir>/test/__mocks__/powertools-logger.ts",
-  },
 };

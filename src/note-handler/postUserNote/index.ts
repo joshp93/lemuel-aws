@@ -6,9 +6,9 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
+import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostUserNoteRequest } from "./parseRequest";
-import { logger } from "../../shared/logger";
 
 /**
  * Handles POST /notes/users/{uuid}/{ref}
