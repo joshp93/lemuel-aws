@@ -21,52 +21,54 @@ export const renderProverbWidget = async (
   const proverb = await fetchTodayProverb(version);
 
   const content = (
-    <VoltraAndroid.Box
-      deepLinkUrl="lemuel://"
-      style={{
-        padding: 16,
-        backgroundColor: "#FDFBF7",
-        borderRadius: 16,
-        width: "100%",
-        height: "100%",
-        justifyContent: "center",
-      }}
-    >
+    <VoltraAndroid.Box deepLinkUrl="lemuel://">
       <VoltraAndroid.Column
-        verticalAlignment="center-vertically"
-        horizontalAlignment="start"
         style={{
-          gap: 12,
+          padding: 16,
+          backgroundColor: "#FDFBF7",
+          borderRadius: 16,
+          width: "100%",
+          height: "100%",
         }}
       >
-        <VoltraAndroid.Text
+        <VoltraAndroid.LazyColumn
+          horizontalAlignment="start"
           style={{
-            fontSize: 18,
-            fontWeight: "bold",
-            color: "#333333",
+            width: "100%",
+            height: "100%",
           }}
         >
-          {proverb.ref}
-        </VoltraAndroid.Text>
-        <VoltraAndroid.Text
-          style={{
-            fontSize: 18,
-            color: "#1a1a1a",
-          }}
-        >
-          {proverb.proverb}
-        </VoltraAndroid.Text>
-        {proverb.citation ? (
           <VoltraAndroid.Text
             style={{
-              fontSize: 10,
-              color: "#666666",
-              textAlign: "left",
+              fontSize: 18,
+              fontWeight: "bold",
+              color: "#333333",
+              paddingBottom: 12,
             }}
           >
-            {proverb.citation}
+            {proverb.ref}
           </VoltraAndroid.Text>
-        ) : null}
+          <VoltraAndroid.Text
+            style={{
+              fontSize: 18,
+              color: "#1a1a1a",
+              paddingBottom: 12,
+            }}
+          >
+            {proverb.proverb}
+          </VoltraAndroid.Text>
+          {proverb.citation ? (
+            <VoltraAndroid.Text
+              style={{
+                fontSize: 10,
+                color: "#666666",
+                textAlign: "left",
+              }}
+            >
+              {proverb.citation}
+            </VoltraAndroid.Text>
+          ) : null}
+        </VoltraAndroid.LazyColumn>
       </VoltraAndroid.Column>
     </VoltraAndroid.Box>
   );
