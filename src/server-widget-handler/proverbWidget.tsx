@@ -23,6 +23,7 @@ export const renderProverbWidget = async (
   const content = (
     <VoltraAndroid.Box deepLinkUrl="lemuel://">
       <VoltraAndroid.Column
+        deepLinkUrl="lemuel://"
         style={{
           padding: 16,
           backgroundColor: "#FDFBF7",
@@ -32,6 +33,7 @@ export const renderProverbWidget = async (
         }}
       >
         <VoltraAndroid.LazyColumn
+          deepLinkUrl="lemuel://"
           horizontalAlignment="start"
           style={{
             width: "100%",
@@ -39,6 +41,7 @@ export const renderProverbWidget = async (
           }}
         >
           <VoltraAndroid.Text
+            deepLinkUrl="lemuel://"
             style={{
               fontSize: 18,
               fontWeight: "bold",
@@ -49,6 +52,7 @@ export const renderProverbWidget = async (
             {proverb.ref}
           </VoltraAndroid.Text>
           <VoltraAndroid.Text
+            deepLinkUrl="lemuel://"
             style={{
               fontSize: 18,
               color: "#1a1a1a",
@@ -59,6 +63,7 @@ export const renderProverbWidget = async (
           </VoltraAndroid.Text>
           {proverb.citation ? (
             <VoltraAndroid.Text
+              deepLinkUrl="lemuel://"
               style={{
                 fontSize: 10,
                 color: "#666666",
