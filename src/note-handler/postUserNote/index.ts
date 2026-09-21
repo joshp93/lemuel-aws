@@ -6,6 +6,10 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostUserNoteRequest } from "./parseRequest";
@@ -70,15 +74,9 @@ export const postUserNoteHandler = async (
     );
 
     logger.info(`[postUserNote] Note saved successfully`, { uuid, ref });
-    return {
-      statusCode: 200,
-      body: JSON.stringify(entity),
-    };
+    return formatResponse(entity);
   } catch (error) {
     logger.error(`[postUserNote] Error:`, error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

@@ -3,6 +3,7 @@ import {
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { formatErrorResponse } from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { buildGetReactionsResponse } from "./buildResponse";
@@ -42,9 +43,6 @@ export const getReactionsHandler = async (
     );
   } catch (error) {
     logger.error("[getReactions] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

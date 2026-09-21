@@ -5,6 +5,10 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 
@@ -59,15 +63,9 @@ export const deleteUserNoteHandler = async (
     );
 
     logger.info(`[deleteUserNote] Note deleted successfully`, { uuid, ref });
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true }),
-    };
+    return formatResponse({ success: true });
   } catch (error) {
     logger.error(`[deleteUserNote] Error:`, error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

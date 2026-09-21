@@ -5,6 +5,10 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parseDeleteReactionRequest } from "./parseRequest";
@@ -26,10 +30,7 @@ export const deleteReactionHandler = async (
       parseDeleteReactionRequest(event);
 
     if (!userId || !date) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Missing userId or date" }),
-      };
+      return formatErrorResponse("Missing userId or date", 400);
     }
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
@@ -43,7 +44,7 @@ export const deleteReactionHandler = async (
 
     const emoji = existingReaction.Item?.reactionType as string | undefined;
     if (!emoji) {
-      return { statusCode: 200, body: JSON.stringify({}) };
+      return formatResponse({});
     }
 
     await client.send(
@@ -103,12 +104,9 @@ export const deleteReactionHandler = async (
       );
     }
 
-    return { statusCode: 200, body: JSON.stringify({}) };
+    return formatResponse({});
   } catch (error) {
     logger.error("[deleteReaction] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

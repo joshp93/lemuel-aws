@@ -5,6 +5,10 @@ import {
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { ReplyEntity } from "../../models/proverbStoreSchemas";
 import { ReplyEntitySchema } from "../../models/proverbStoreSchemas";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parseGetRepliesRequest } from "./parseRequest";
@@ -56,15 +60,9 @@ export const getRepliesHandler = async (
       );
     }
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ items, lastKey }),
-    };
+    return formatResponse({ items, lastKey });
   } catch (error) {
     logger.error("[getReplies] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

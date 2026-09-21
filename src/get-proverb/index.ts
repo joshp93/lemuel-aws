@@ -6,6 +6,7 @@ import {
   ProverbEntitySchema,
   VersionCitationSchema,
 } from "../models/proverbStoreSchemas";
+import { formatResponse } from "../shared/formatResponse";
 import { logger } from "../shared/logger";
 
 export const handler = async (
@@ -57,14 +58,11 @@ export const handler = async (
     citation = citationEntity.citation;
   }
 
-  const response = JSON.stringify({
+  const response = {
     ...proverbEntity.proverb,
     ...(citation && { citation }),
-  });
-
-  logger.debug("Proverb for the day:", response);
-  return {
-    statusCode: 200,
-    body: response,
   };
+
+  logger.debug("Proverb for the day:", JSON.stringify(response));
+  return formatResponse(response);
 };

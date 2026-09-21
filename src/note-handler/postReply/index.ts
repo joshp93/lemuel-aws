@@ -7,6 +7,10 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ReplyEntitySchema } from "../../models/proverbStoreSchemas";
 import { fetchDisplayName } from "../../shared/fetchAccountDisplayName";
 import { findReplySk } from "../../shared/findReplySk";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePostReplyRequest } from "./parseRequest";
@@ -21,10 +25,7 @@ export const postReplyHandler = async (
       parsePostReplyRequest(event);
 
     if (!userId) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ error: "Unauthorized" }),
-      };
+      return formatErrorResponse("Unauthorized", 401);
     }
 
     const createdAt = new Date().toISOString();
@@ -107,12 +108,9 @@ export const postReplyHandler = async (
       );
     }
 
-    return { statusCode: 200, body: JSON.stringify(entity) };
+    return formatResponse(entity);
   } catch (error) {
     logger.error("[postReply] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

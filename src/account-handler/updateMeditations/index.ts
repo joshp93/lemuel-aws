@@ -6,6 +6,10 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { MeditationEntitySchema } from "../../models/proverbStoreSchemas";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { AccountHandlerEnv, UpdateMeditationsResponse } from "../models";
 
@@ -52,15 +56,9 @@ export const updateMeditationsHandler = async (
 
     const response: UpdateMeditationsResponse = { success: true };
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(response),
-    };
+    return formatResponse(response);
   } catch (error) {
     logger.error("[updateMeditations] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

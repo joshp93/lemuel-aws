@@ -3,6 +3,10 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { AccountHandlerEnv } from "../models";
 import type { UpdateAccount } from "./models/types";
@@ -37,13 +41,10 @@ export const updateAccountHandler = async (
     }
 
     if (updateExpressionParts.length === 0) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          error:
-            "At least one field (displayName, replyNotificationsEnabled) must be provided",
-        }),
-      };
+      return formatErrorResponse(
+        "At least one field (displayName, replyNotificationsEnabled) must be provided",
+        400,
+      );
     }
 
     await client.send(
@@ -56,15 +57,9 @@ export const updateAccountHandler = async (
       }),
     );
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true }),
-    };
+    return formatResponse({ success: true });
   } catch (error) {
     logger.error("[updateAccount] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

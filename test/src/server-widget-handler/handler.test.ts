@@ -34,7 +34,10 @@ describe("server-widget-handler", () => {
 
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body!)).toEqual({ ok: true });
-    expect(result.headers).toEqual({ "Content-Type": "application/json" });
+    expect(result.headers).toMatchObject({
+      "Content-Type": "application/json",
+    });
+    expect(result.headers!["Access-Control-Allow-Origin"]).toBe("*");
   });
 
   it("handles events with no query string parameters", async () => {

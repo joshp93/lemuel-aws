@@ -6,6 +6,10 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ReactionEntitySchema } from "../../models/proverbStoreSchemas";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parsePutReactionRequest } from "./parseRequest";
@@ -27,10 +31,7 @@ export const putReactionHandler = async (
       parsePutReactionRequest(event);
 
     if (!userId) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ error: "Unauthorized" }),
-      };
+      return formatErrorResponse("Unauthorized", 401);
     }
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
@@ -48,7 +49,7 @@ export const putReactionHandler = async (
       | undefined;
 
     if (existingType === reactionType) {
-      return { statusCode: 200, body: JSON.stringify({}) };
+      return formatResponse({});
     }
 
     const entity = ReactionEntitySchema.parse({
@@ -128,12 +129,9 @@ export const putReactionHandler = async (
       );
     }
 
-    return { statusCode: 200, body: JSON.stringify({}) };
+    return formatResponse({});
   } catch (error) {
     logger.error("[putReaction] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

@@ -5,6 +5,10 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { parseDeleteReplyRequest } from "./parseRequest";
@@ -26,10 +30,7 @@ export const deleteReplyHandler = async (
       parseDeleteReplyRequest(event);
 
     if (!userId || !date || !replySk) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Missing required params" }),
-      };
+      return formatErrorResponse("Missing required params", 400);
     }
 
     const notePk = `note#${noteAuthorUuid}#${ref}#${date}`;
@@ -54,14 +55,11 @@ export const deleteReplyHandler = async (
         pk: notePk,
         sk: replySk,
       });
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Reply not found" }),
-      };
+      return formatErrorResponse("Reply not found", 404);
     }
 
     if (existingReply.Item.authorUuid !== userId) {
-      return { statusCode: 403, body: JSON.stringify({ error: "Forbidden" }) };
+      return formatErrorResponse("Forbidden", 403);
     }
 
     await client.send(
@@ -90,12 +88,9 @@ export const deleteReplyHandler = async (
       }),
     );
 
-    return { statusCode: 200, body: JSON.stringify({}) };
+    return formatResponse({});
   } catch (error) {
     logger.error("[deleteReply] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

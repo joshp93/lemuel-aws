@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { formatErrorResponse } from "../shared/formatResponse";
 import { logger } from "../shared/logger";
 import { deleteReactionHandler } from "./deleteReaction/index";
 import { deleteReplyHandler } from "./deleteReply/index";
@@ -73,16 +74,10 @@ export const handler = async (
         return deleteReplyHandler(client, env, event);
       default:
         logger.warn(`[note-handler] Unsupported route: ${route}`);
-        return {
-          statusCode: 405,
-          body: JSON.stringify({ error: "Method not allowed" }),
-        };
+        return formatErrorResponse("Method not allowed", 405);
     }
   } catch (error) {
     logger.error(`[note-handler] Unhandled error:`, error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

@@ -3,6 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { DeviceTokenEntitySchema } from "../models/proverbStoreSchemas";
+import { formatResponse } from "../shared/formatResponse";
 import { logger } from "../shared/logger";
 import { parseBody } from "../shared/parseBody";
 import type { RegisterDeviceToken } from "./models/types";
@@ -50,8 +51,5 @@ export const handler = async (
 
   logger.info("[register-device-token] Token stored successfully");
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ success: true }),
-  };
+  return formatResponse({ success: true });
 };

@@ -5,6 +5,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
+import { formatErrorResponse, formatResponse } from "../shared/formatResponse";
 import { logger } from "../shared/logger";
 
 const envSchema = z.object({
@@ -27,10 +28,7 @@ export const handler = async (
     const email = body.email;
 
     if (!email) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Email is required" }),
-      };
+      return formatErrorResponse("Email is required", 400);
     }
 
     const client = new CognitoIdentityProviderClient({});
@@ -45,25 +43,16 @@ export const handler = async (
 
       // User exists
       const response: CheckUserExistsResponse = { exists: true };
-      return {
-        statusCode: 200,
-        body: JSON.stringify(response),
-      };
+      return formatResponse(response);
     } catch (error) {
       if (error instanceof UserNotFoundException) {
         const response: CheckUserExistsResponse = { exists: false };
-        return {
-          statusCode: 200,
-          body: JSON.stringify(response),
-        };
+        return formatResponse(response);
       }
       throw error;
     }
   } catch (error) {
     logger.error("Error checking user existence:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

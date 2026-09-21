@@ -11,6 +11,10 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { queryDeviceTokensByUser } from "../../shared/deviceTokens";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { AccountHandlerEnv } from "../models";
 
@@ -116,10 +120,7 @@ export const deleteAccountHandler = async (
     const sub = claims?.sub;
 
     if (sub !== uuid) {
-      return {
-        statusCode: 403,
-        body: JSON.stringify({ error: "Forbidden" }),
-      };
+      return formatErrorResponse("Forbidden", 403);
     }
 
     const tableName = env.TABLE_NAME;
@@ -315,15 +316,9 @@ export const deleteAccountHandler = async (
       }),
     );
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true }),
-    };
+    return formatResponse({ success: true });
   } catch (error) {
     logger.error("[deleteAccount] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

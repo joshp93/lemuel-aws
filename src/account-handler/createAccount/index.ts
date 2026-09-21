@@ -4,6 +4,10 @@ import {
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import { parseBody } from "../../shared/parseBody";
 import type { AccountHandlerEnv, CreateAccountResponse } from "../models";
@@ -36,10 +40,7 @@ export const createAccountHandler = async (
     if (existing.Item) {
       logger.info("[createAccount] Account already exists, skipping creation");
       const response: CreateAccountResponse = { success: true };
-      return {
-        statusCode: 200,
-        body: JSON.stringify(response),
-      };
+      return formatResponse(response);
     }
 
     const item = buildAccountRecord(uuid, displayName);
@@ -55,15 +56,9 @@ export const createAccountHandler = async (
     logger.info("[createAccount] Account created successfully");
     const response: CreateAccountResponse = { success: true };
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(response),
-    };
+    return formatResponse(response);
   } catch (error) {
     logger.error("[createAccount] Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

@@ -1,6 +1,10 @@
 import { type DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
+import {
+  formatErrorResponse,
+  formatResponse,
+} from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 
@@ -33,10 +37,7 @@ export const getUserNoteHandler = async (
 
     if (!result.Item) {
       logger.info(`[getUserNote] Note not found`, { uuid, ref });
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Note not found" }),
-      };
+      return formatErrorResponse("Note not found", 404);
     }
 
     const entity = NoteEntitySchema.parse(result.Item);
@@ -49,18 +50,12 @@ export const getUserNoteHandler = async (
     );
 
     logger.info(`[getUserNote] Note found`, { uuid, ref });
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        ...entity,
-        displayName: accountResult.Item?.displayName ?? "",
-      }),
-    };
+    return formatResponse({
+      ...entity,
+      displayName: accountResult.Item?.displayName ?? "",
+    });
   } catch (error) {
     logger.error(`[getUserNote] Error:`, { error });
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return formatErrorResponse("Internal server error");
   }
 };

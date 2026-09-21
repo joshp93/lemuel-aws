@@ -1,6 +1,7 @@
 import { Logger } from "@aws-lambda-powertools/logger";
 import type { LogLevel } from "@aws-lambda-powertools/logger/types";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { formatResponse } from "../shared/formatResponse";
 import { parseBody } from "../shared/parseBody";
 import type { Log } from "./models/types";
 
@@ -34,15 +35,9 @@ export const handler = async (
       logger.info(logMessage, { originalLevel: level });
     }
 
-    return {
-      statusCode: 202,
-      body: JSON.stringify({ accepted: true }),
-    };
+    return formatResponse({ accepted: true }, 202);
   } catch (error) {
     logger.error("Failed to process log entry", { error });
-    return {
-      statusCode: 202,
-      body: JSON.stringify({ accepted: true }),
-    };
+    return formatResponse({ accepted: true }, 202);
   }
 };

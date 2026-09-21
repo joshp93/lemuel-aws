@@ -2,6 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { VersionEntitySchema } from "../models/proverbStoreSchemas";
+import { formatResponse } from "../shared/formatResponse";
 import { logger } from "../shared/logger";
 
 export const handler = async (
@@ -21,13 +22,8 @@ export const handler = async (
   );
 
   const entity = VersionEntitySchema.parse(result.Item!);
-  const response = JSON.stringify(
-    entity.versions.sort((a, b) => a.localeCompare(b)),
-  );
+  const versions = entity.versions.sort((a, b) => a.localeCompare(b));
 
-  logger.debug("Available versions:", response);
-  return {
-    statusCode: 200,
-    body: response,
-  };
+  logger.debug("Available versions:", JSON.stringify(versions));
+  return formatResponse(versions);
 };
