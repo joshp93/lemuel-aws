@@ -6,6 +6,7 @@ import type { APIGatewayProxyResult } from "aws-lambda";
 import type { ReactionEntity } from "../../models/proverbStoreSchemas";
 import { ReactionEntitySchema } from "../../models/proverbStoreSchemas";
 import { collectDisplayNames } from "../../shared/displayNames";
+import { formatResponse } from "../../shared/formatResponse";
 
 /**
  * Builds the API Gateway response from the reaction query result.
@@ -48,8 +49,9 @@ export const buildGetReactionsResponse = async (
     createdAt: r.createdAt,
   }));
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ reactionCounts, userReaction, reactions: enriched }),
-  };
+  return formatResponse({
+    reactionCounts,
+    userReaction,
+    reactions: enriched,
+  });
 };

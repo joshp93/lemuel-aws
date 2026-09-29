@@ -6,6 +6,7 @@ import type { APIGatewayProxyResult } from "aws-lambda";
 import type { NoteEntity } from "../../models/proverbStoreSchemas";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import { collectDisplayNames } from "../../shared/displayNames";
+import { formatResponse } from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 
 /**
@@ -65,8 +66,5 @@ export const buildGetProverbNotesResponse = async (
     { hasMore: !!lastKey, userId: userId ?? "anonymous" },
   );
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ items: enriched, lastKey }),
-  };
+  return formatResponse({ items: enriched, lastKey });
 };

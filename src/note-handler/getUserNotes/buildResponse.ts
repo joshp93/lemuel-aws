@@ -5,6 +5,7 @@ import type {
 import type { APIGatewayProxyResult } from "aws-lambda";
 import { NoteEntitySchema } from "../../models/proverbStoreSchemas";
 import { collectDisplayNames } from "../../shared/displayNames";
+import { formatResponse } from "../../shared/formatResponse";
 import { logger } from "../../shared/logger";
 
 /**
@@ -45,8 +46,5 @@ export const buildGetUserNotesResponse = async (
     },
   );
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ items: enriched, lastKey }),
-  };
+  return formatResponse({ items: enriched, lastKey });
 };
