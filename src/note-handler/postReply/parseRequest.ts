@@ -8,6 +8,9 @@ import type { Reply } from "./models/types";
  * Validation is handled by API Gateway's ReplyModel JSON schema,
  * so the body is trusted at this layer.
  *
+ * `sk` identifies the reply being edited and is only meaningful when
+ * `isUpdate` is true; it is empty for a new reply, which has no key yet.
+ *
  * @param event - The API Gateway proxy event with Cognito authorizer claims
  * @returns Parsed request fields used by the handler
  */
@@ -20,6 +23,7 @@ export const parsePostReplyRequest = (
   date: string;
   content: string;
   isUpdate: boolean;
+  sk: string;
 } => {
   const noteAuthorUuid = event.pathParameters?.uuid ?? "";
   const ref = event.pathParameters?.ref ?? "";
@@ -35,5 +39,6 @@ export const parsePostReplyRequest = (
     date: body.date,
     content: body.content,
     isUpdate: body.isUpdate ?? false,
+    sk: body.sk ?? "",
   };
 };
