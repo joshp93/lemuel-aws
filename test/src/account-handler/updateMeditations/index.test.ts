@@ -5,10 +5,10 @@ import {
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import type { AccountHandlerEnv } from "../../../../src/account-handler/models";
 import { updateMeditationsHandler } from "../../../../src/account-handler/updateMeditations/index";
+import { authenticatedEvent } from "../../../helpers/authenticatedEvent";
 
 describe("updateMeditationsHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
@@ -26,9 +26,9 @@ describe("updateMeditationsHandler", () => {
     ddbMock.on(QueryCommand).resolves({ Count: 3 });
     ddbMock.on(UpdateCommand).resolves({});
 
-    const event = {
+    const event = authenticatedEvent("user-123", {
       pathParameters: { uuid: "user-123", date: "2026-02-01" },
-    } as unknown as APIGatewayProxyEvent;
+    });
 
     const result = await updateMeditationsHandler(
       DynamoDBDocumentClient.from(new DynamoDBClient({})),
@@ -70,14 +70,43 @@ describe("updateMeditationsHandler", () => {
     });
   });
 
+  it("returns 401 when the request is unauthenticated", async () => {
+    const event = {
+      pathParameters: { uuid: "user-123", date: "2026-02-01" },
+    } as unknown as Parameters<typeof updateMeditationsHandler>[2];
+
+    const result = await updateMeditationsHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
+
+    expect(result.statusCode).toBe(401);
+  });
+
+  it("returns 403 when the path uuid belongs to another user", async () => {
+    const event = authenticatedEvent("user-123", {
+      pathParameters: { uuid: "user-456", date: "2026-02-01" },
+    });
+
+    const result = await updateMeditationsHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
+
+    expect(result.statusCode).toBe(403);
+    expect(ddbMock.commandCalls(PutCommand)).toHaveLength(0);
+  });
+
   it("sets count to 0 when Query returns undefined Count", async () => {
     ddbMock.on(PutCommand).resolves({});
     ddbMock.on(QueryCommand).resolves({ Count: undefined });
     ddbMock.on(UpdateCommand).resolves({});
 
-    const event = {
+    const event = authenticatedEvent("user-123", {
       pathParameters: { uuid: "user-123", date: "2026-02-02" },
-    } as unknown as APIGatewayProxyEvent;
+    });
 
     const result = await updateMeditationsHandler(
       DynamoDBDocumentClient.from(new DynamoDBClient({})),
@@ -96,9 +125,9 @@ describe("updateMeditationsHandler", () => {
   it("returns 500 when DynamoDB throws an error", async () => {
     ddbMock.on(PutCommand).rejects(new Error("DynamoDB failure"));
 
-    const event = {
+    const event = authenticatedEvent("user-123", {
       pathParameters: { uuid: "user-123", date: "2026-02-01" },
-    } as unknown as APIGatewayProxyEvent;
+    });
 
     const result = await updateMeditationsHandler(
       DynamoDBDocumentClient.from(new DynamoDBClient({})),

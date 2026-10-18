@@ -5,14 +5,16 @@ import {
   formatErrorResponse,
   formatResponse,
 } from "../../shared/formatResponse";
+import { getAuthenticatedSub } from "../../shared/getAuthenticatedSub";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 
 /**
  * Handles GET /notes/users/{uuid}/{ref}
  *
- * Fetches a single note by its primary key (pk=uuid, sk=ref).
- * Returns 404 if the note does not exist.
+ * Fetches the signed-in user's own note. The caller's identity comes from the
+ * Cognito `sub` claim, and the path uuid must match it. Returns 404 if the
+ * note does not exist.
  */
 export const getUserNoteHandler = async (
   client: DynamoDBDocumentClient,
@@ -22,7 +24,17 @@ export const getUserNoteHandler = async (
   logger.debug(`[getUserNote] Entering handler`);
 
   try {
-    const uuid = event.pathParameters?.uuid ?? "";
+    const sub = getAuthenticatedSub(event);
+    if (!sub) {
+      return formatErrorResponse("Unauthorized", 401);
+    }
+
+    const pathUuid = event.pathParameters?.uuid ?? "";
+    if (pathUuid && pathUuid !== sub) {
+      return formatErrorResponse("Forbidden", 403);
+    }
+
+    const uuid = sub;
     const ref = event.pathParameters?.ref ?? "";
     const date = event.queryStringParameters?.date ?? "";
     const sk = date ? `${ref}#${date}` : ref;

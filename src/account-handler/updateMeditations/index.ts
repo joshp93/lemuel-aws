@@ -10,16 +10,33 @@ import {
   formatErrorResponse,
   formatResponse,
 } from "../../shared/formatResponse";
+import { getAuthenticatedSub } from "../../shared/getAuthenticatedSub";
 import { logger } from "../../shared/logger";
 import type { AccountHandlerEnv, UpdateMeditationsResponse } from "../models";
 
+/**
+ * Handles POST /accounts/{uuid}/meditations/{date}
+ *
+ * Records a completed meditation for the signed-in user. The caller's
+ * identity comes from the Cognito `sub` claim, and the path uuid must match it.
+ */
 export const updateMeditationsHandler = async (
   client: DynamoDBDocumentClient,
   env: AccountHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const uuid = event.pathParameters?.uuid ?? "";
+    const sub = getAuthenticatedSub(event);
+    if (!sub) {
+      return formatErrorResponse("Unauthorized", 401);
+    }
+
+    const pathUuid = event.pathParameters?.uuid ?? "";
+    if (pathUuid && pathUuid !== sub) {
+      return formatErrorResponse("Forbidden", 403);
+    }
+
+    const uuid = sub;
     const date = event.pathParameters?.date ?? "";
 
     const meditation = MeditationEntitySchema.parse({

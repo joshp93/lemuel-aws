@@ -7,17 +7,34 @@ import {
   formatErrorResponse,
   formatResponse,
 } from "../../shared/formatResponse";
+import { getAuthenticatedSub } from "../../shared/getAuthenticatedSub";
 import { logger } from "../../shared/logger";
 import type { AccountHandlerEnv } from "../models";
 import type { UpdateAccount } from "./models/types";
 
+/**
+ * Handles PUT /accounts/{uuid}
+ *
+ * Updates the signed-in user's account record. The caller's identity comes
+ * from the Cognito `sub` claim, and the path uuid must match it.
+ */
 export const updateAccountHandler = async (
   client: DynamoDBDocumentClient,
   env: AccountHandlerEnv,
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const uuid = event.pathParameters!.uuid;
+    const sub = getAuthenticatedSub(event);
+    if (!sub) {
+      return formatErrorResponse("Unauthorized", 401);
+    }
+
+    const pathUuid = event.pathParameters?.uuid;
+    if (pathUuid && pathUuid !== sub) {
+      return formatErrorResponse("Forbidden", 403);
+    }
+
+    const uuid = sub;
     const body = JSON.parse(event.body ?? "{}") as UpdateAccount;
 
     const updateExpressionParts: string[] = [];

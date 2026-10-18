@@ -4,9 +4,9 @@ import {
   DynamoDBDocumentClient,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { getReactionsHandler } from "../../../../src/note-handler/getReactions/index";
+import { authenticatedEvent } from "../../../helpers/authenticatedEvent";
 
 const createDocClient = () =>
   DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -36,17 +36,19 @@ describe("getReactionsHandler", () => {
     },
   ];
 
-  const makeEvent = (userId?: string): APIGatewayProxyEvent =>
-    ({
-      pathParameters: {
-        uuid: "author-id",
-        ref: "Proverbs3:5",
-      },
-      queryStringParameters: {
-        date: "2024-01-01",
-        ...(userId ? { userId } : {}),
-      },
-    }) as unknown as APIGatewayProxyEvent;
+  const makeEvent = (
+    sub?: string,
+    queryStringParameters: Record<string, string> = { date: "2024-01-01" },
+  ) =>
+    sub
+      ? authenticatedEvent(sub, {
+          pathParameters: { uuid: "author-id", ref: "Proverbs3:5" },
+          queryStringParameters,
+        })
+      : ({
+          pathParameters: { uuid: "author-id", ref: "Proverbs3:5" },
+          queryStringParameters,
+        } as unknown as Parameters<typeof getReactionsHandler>[2]);
 
   it("returns reactions with counts and display names", async () => {
     ddbMock.on(QueryCommand).resolves({ Items: reactionItems });
@@ -72,6 +74,26 @@ describe("getReactionsHandler", () => {
     expect(body.reactions).toHaveLength(2);
     expect(body.reactions[0].displayName).toBe("Alice");
     expect(body.reactions[1].displayName).toBe("Bob");
+  });
+
+  it("takes the requesting user from the token, not the query string", async () => {
+    ddbMock.on(QueryCommand).resolves({ Items: reactionItems });
+    ddbMock.on(BatchGetCommand).resolves({
+      Responses: {
+        TestTable: [
+          { pk: "user-1", sk: "account", displayName: "Alice" },
+          { pk: "user-2", sk: "account", displayName: "Bob" },
+        ],
+      },
+    });
+
+    const result = await getReactionsHandler(
+      createDocClient(),
+      env,
+      makeEvent("user-1", { date: "2024-01-01", userId: "user-2" }),
+    );
+
+    expect(JSON.parse(result.body).userReaction).toBe("🙏");
   });
 
   it("returns empty reactions and no userReaction when none exist", async () => {

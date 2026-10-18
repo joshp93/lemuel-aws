@@ -4,6 +4,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { formatErrorResponse } from "../../shared/formatResponse";
+import { getAuthenticatedSub } from "../../shared/getAuthenticatedSub";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 import { buildGetUserNotesResponse } from "./buildResponse";
@@ -12,9 +13,9 @@ import { parseGetUserNotesRequest } from "./parseRequest";
 /**
  * Handles GET /notes/users/{uuid}
  *
- * Queries the user-notes-index GSI by user uuid, sorted by dateCreated
- * descending (most recent first). Supports cursor-based pagination via
- * limit, lastKey, and scanForward query parameters.
+ * Lists the signed-in user's own notes. The caller's identity comes from the
+ * Cognito `sub` claim, and the path uuid must match it. Queries the
+ * user-notes-index GSI by that uuid, sorted by dateCreated descending.
  */
 export const getUserNotesHandler = async (
   client: DynamoDBDocumentClient,
@@ -24,9 +25,19 @@ export const getUserNotesHandler = async (
   logger.debug(`[getUserNotes] Entering handler`);
 
   try {
+    const sub = getAuthenticatedSub(event);
+    if (!sub) {
+      return formatErrorResponse("Unauthorized", 401);
+    }
+
+    const pathUuid = event.pathParameters?.uuid ?? "";
+    if (pathUuid && pathUuid !== sub) {
+      return formatErrorResponse("Forbidden", 403);
+    }
+
     const params = parseGetUserNotesRequest(event);
     logger.debug(`[getUserNotes] Parsed request`, {
-      uuid: params.uuid,
+      uuid: sub,
       limit: params.limit,
       hasLastKey: !!params.exclusiveStartKey,
       scanForward: params.scanForward,
@@ -38,7 +49,7 @@ export const getUserNotesHandler = async (
         IndexName: "user-notes-index",
         KeyConditionExpression: "#uid = :uid",
         ExpressionAttributeNames: { "#uid": "uuid" },
-        ExpressionAttributeValues: { ":uid": params.uuid },
+        ExpressionAttributeValues: { ":uid": sub },
         Limit: params.limit,
         ExclusiveStartKey: params.exclusiveStartKey,
         ScanIndexForward: params.scanForward,

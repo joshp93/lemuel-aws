@@ -7,6 +7,7 @@ import {
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { getProverbNotesHandler } from "../../../../src/note-handler/getProverbNotes/index";
+import { authenticatedEvent } from "../../../helpers/authenticatedEvent";
 
 const createDocClient = () =>
   DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -143,7 +144,7 @@ describe("getProverbNotesHandler", () => {
     expect(body.items[0].uuid).toBe("user1");
   });
 
-  it("includes the author's own private notes when userId matches", async () => {
+  it("includes the author's own private notes when the token's sub matches", async () => {
     ddbMock.on(QueryCommand).resolves({
       Items: [
         {
@@ -179,10 +180,9 @@ describe("getProverbNotesHandler", () => {
       ],
     });
 
-    const event = {
+    const event = authenticatedEvent("user2", {
       pathParameters: { ref: "Proverbs3:5" },
-      queryStringParameters: { userId: "user2" },
-    } as unknown as APIGatewayProxyEvent;
+    });
 
     const result = await getProverbNotesHandler(createDocClient(), env, event);
     const body = JSON.parse(result.body);
@@ -190,6 +190,44 @@ describe("getProverbNotesHandler", () => {
     expect(body.items).toHaveLength(2);
     expect(body.items[0].note).toBe("Public note");
     expect(body.items[1].note).toBe("Author's private note");
+  });
+
+  it("does not expose private notes for a userId supplied in the query string", async () => {
+    ddbMock.on(QueryCommand).resolves({
+      Items: [
+        {
+          pk: "user1",
+          sk: "Proverbs3:5",
+          note: "Public note",
+          dateCreated: "2024-01-01T12:00:00.000Z",
+          date: "2024-01-01",
+          uuid: "user1",
+          ref: "Proverbs3:5",
+          isPrivate: false,
+        },
+        {
+          pk: "user2",
+          sk: "Proverbs3:5",
+          note: "Private note",
+          dateCreated: "2024-01-01T12:00:00.000Z",
+          date: "2024-01-01",
+          uuid: "user2",
+          ref: "Proverbs3:5",
+          isPrivate: true,
+        },
+      ],
+    });
+
+    const event = {
+      pathParameters: { ref: "Proverbs3:5" },
+      queryStringParameters: { userId: "user2" },
+    } as unknown as Parameters<typeof getProverbNotesHandler>[2];
+
+    const result = await getProverbNotesHandler(createDocClient(), env, event);
+    const body = JSON.parse(result.body);
+
+    expect(body.items).toHaveLength(1);
+    expect(body.items[0].note).toBe("Public note");
   });
 
   it("includes public notes where isPrivate is missing (backward compatibility)", async () => {

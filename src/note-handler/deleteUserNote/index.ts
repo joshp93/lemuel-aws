@@ -9,15 +9,17 @@ import {
   formatErrorResponse,
   formatResponse,
 } from "../../shared/formatResponse";
+import { getAuthenticatedSub } from "../../shared/getAuthenticatedSub";
 import { logger } from "../../shared/logger";
 import type { NoteHandlerEnv } from "../schemas";
 
 /**
  * Handles DELETE /notes/users/{uuid}/{ref}
  *
- * Deletes a note by its primary key (pk=uuid, sk=ref#date).
- * Re-counts remaining notes and updates the account's totalNotes.
- * Idempotent — does not error if the note does not exist.
+ * Deletes the signed-in user's note. The caller's identity comes from the
+ * Cognito `sub` claim, and the path uuid must match it. Re-counts remaining
+ * notes and updates the account's totalNotes. Idempotent — a note that does
+ * not exist is treated as already deleted.
  */
 export const deleteUserNoteHandler = async (
   client: DynamoDBDocumentClient,
@@ -27,7 +29,17 @@ export const deleteUserNoteHandler = async (
   logger.debug(`[deleteUserNote] Entering handler`);
 
   try {
-    const uuid = event.pathParameters?.uuid ?? "";
+    const sub = getAuthenticatedSub(event);
+    if (!sub) {
+      return formatErrorResponse("Unauthorized", 401);
+    }
+
+    const pathUuid = event.pathParameters?.uuid ?? "";
+    if (pathUuid && pathUuid !== sub) {
+      return formatErrorResponse("Forbidden", 403);
+    }
+
+    const uuid = sub;
     const ref = event.pathParameters?.ref ?? "";
     const date = event.queryStringParameters?.date ?? "";
     const sk = `${ref}#${date}`;
@@ -37,6 +49,10 @@ export const deleteUserNoteHandler = async (
       new DeleteCommand({
         TableName: env.TABLE_NAME,
         Key: { pk: uuid, sk },
+        ConditionExpression:
+          "attribute_not_exists(#pk) OR attribute_not_exists(#uuid) OR #uuid = :uuid",
+        ExpressionAttributeNames: { "#pk": "pk", "#uuid": "uuid" },
+        ExpressionAttributeValues: { ":uuid": uuid },
       }),
     );
 
@@ -65,6 +81,13 @@ export const deleteUserNoteHandler = async (
     logger.info(`[deleteUserNote] Note deleted successfully`, { uuid, ref });
     return formatResponse({ success: true });
   } catch (error) {
+    if (
+      error instanceof Error &&
+      error.name === "ConditionalCheckFailedException"
+    ) {
+      return formatErrorResponse("Forbidden", 403);
+    }
+
     logger.error(`[deleteUserNote] Error:`, error);
     return formatErrorResponse("Internal server error");
   }

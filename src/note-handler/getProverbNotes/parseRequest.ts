@@ -1,9 +1,12 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
+import { getAuthenticatedSub } from "../../shared/getAuthenticatedSub";
 import { logger } from "../../shared/logger";
 
 /**
  * Extracts and validates path parameters and pagination query parameters
- * for the getProverbNotes endpoint.
+ * for the getProverbNotes endpoint. The requesting user's identity is taken
+ * from the Cognito authorizer, so private notes can only be included for the
+ * signed-in owner.
  *
  * @param event - The API Gateway proxy event
  * @returns Parsed ref, limit, exclusiveStartKey, scanForward, and optional userId
@@ -39,7 +42,7 @@ export const parseGetProverbNotesRequest = (
     );
   }
 
-  const userId = event.queryStringParameters?.userId ?? undefined;
+  const userId = getAuthenticatedSub(event);
 
   return { ref, limit, exclusiveStartKey, scanForward, userId };
 };

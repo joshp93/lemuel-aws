@@ -12,9 +12,9 @@ import { EnvSchema } from "./schemas";
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 /** Registers or updates a device FCM token by storing the token and platform.
- *  The sort key is a sha256 hash of the token. When a Cognito uuid is provided
- *  in the request body, the userId attribute is set on the record so the token
- *  persists across account operations (e.g. account deletion).
+ *  The sort key is a sha256 hash of the token. This endpoint only registers
+ *  the device; linking a token to an account is done by the authenticated
+ *  PUT /accounts/{uuid}/device-tokens route.
  *  Returns { success: true } on success. */
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -31,10 +31,6 @@ export const handler = async (
     platform: body.platform,
     createdAt: new Date().toISOString(),
   };
-
-  if (body.uuid) {
-    itemData.userId = body.uuid;
-  }
 
   const item = DeviceTokenEntitySchema.parse(itemData);
 

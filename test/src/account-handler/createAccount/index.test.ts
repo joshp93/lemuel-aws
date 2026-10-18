@@ -4,10 +4,10 @@ import {
   GetCommand,
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
-import type { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { createAccountHandler } from "../../../../src/account-handler/createAccount/index";
 import type { AccountHandlerEnv } from "../../../../src/account-handler/models";
+import { authenticatedEvent } from "../../../helpers/authenticatedEvent";
 
 describe("createAccountHandler", () => {
   const ddbMock = mockClient(DynamoDBDocumentClient);
@@ -24,10 +24,10 @@ describe("createAccountHandler", () => {
     ddbMock.on(GetCommand).resolves({});
     ddbMock.on(PutCommand).resolves({});
 
-    const event = {
+    const event = authenticatedEvent("user-123", {
       pathParameters: { uuid: "user-123" },
       body: JSON.stringify({ displayName: "Alice" }),
-    } as unknown as APIGatewayProxyEvent;
+    });
 
     const result = await createAccountHandler(
       DynamoDBDocumentClient.from(new DynamoDBClient({})),
@@ -51,15 +51,46 @@ describe("createAccountHandler", () => {
     expect(typeof item!.accountCreatedDate).toBe("string");
   });
 
+  it("returns 401 when the request is unauthenticated", async () => {
+    const event = {
+      pathParameters: { uuid: "user-123" },
+      body: JSON.stringify({ displayName: "Alice" }),
+    } as unknown as Parameters<typeof createAccountHandler>[2];
+
+    const result = await createAccountHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
+
+    expect(result.statusCode).toBe(401);
+  });
+
+  it("returns 403 when the path uuid belongs to another user", async () => {
+    const event = authenticatedEvent("user-123", {
+      pathParameters: { uuid: "user-456" },
+      body: JSON.stringify({ displayName: "Alice" }),
+    });
+
+    const result = await createAccountHandler(
+      DynamoDBDocumentClient.from(new DynamoDBClient({})),
+      env,
+      event,
+    );
+
+    expect(result.statusCode).toBe(403);
+    expect(ddbMock.commandCalls(PutCommand)).toHaveLength(0);
+  });
+
   it("does nothing when account record already exists", async () => {
     ddbMock
       .on(GetCommand)
       .resolves({ Item: { pk: "user-123", sk: "account" } });
 
-    const event = {
+    const event = authenticatedEvent("user-123", {
       pathParameters: { uuid: "user-123" },
       body: JSON.stringify({ displayName: "Alice" }),
-    } as unknown as APIGatewayProxyEvent;
+    });
 
     const result = await createAccountHandler(
       DynamoDBDocumentClient.from(new DynamoDBClient({})),
@@ -78,10 +109,10 @@ describe("createAccountHandler", () => {
     ddbMock.on(GetCommand).resolves({});
     ddbMock.on(PutCommand).rejects(new Error("DynamoDB failure"));
 
-    const event = {
+    const event = authenticatedEvent("user-123", {
       pathParameters: { uuid: "user-123" },
       body: JSON.stringify({ displayName: "Alice" }),
-    } as unknown as APIGatewayProxyEvent;
+    });
 
     const result = await createAccountHandler(
       DynamoDBDocumentClient.from(new DynamoDBClient({})),
